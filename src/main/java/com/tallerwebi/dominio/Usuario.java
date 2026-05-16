@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.modelo.Direccion;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,55 +20,24 @@ public class Usuario {
   private Boolean activo = false;
   private String nombre;
   private Long telefono;
-  private String direccion;
-  private String ciudad;
-  private String pais;
-  private String codigoPostal;
-  private String provincia;
   private String fechaCreacion;
+
+  // refactorizo por que eran muchos atributos
+  @Embedded
+  private Direccion ubicacion;
+
+  public Usuario() {}
+
+  public Direccion getUbicacion() {
+    return this.ubicacion;
+  }
+
+  public void setUbicacion(Direccion ubicacion) {
+    this.ubicacion = ubicacion;
+  }
 
   public Boolean isActivo() {
     return this.activo;
-  }
-
-  public String getDireccion() {
-    return this.direccion;
-  }
-
-  public void setDireccion(String direccion) {
-    this.direccion = direccion;
-  }
-
-  public String getCiudad() {
-    return this.ciudad;
-  }
-
-  public void setCiudad(String ciudad) {
-    this.ciudad = ciudad;
-  }
-
-  public String getPais() {
-    return this.pais;
-  }
-
-  public void setPais(String pais) {
-    this.pais = pais;
-  }
-
-  public String getCodigoPostal() {
-    return this.codigoPostal;
-  }
-
-  public void setCodigoPostal(String codigoPostal) {
-    this.codigoPostal = codigoPostal;
-  }
-
-  public String getProvincia() {
-    return this.provincia;
-  }
-
-  public void setProvincia(String provincia) {
-    this.provincia = provincia;
   }
 
   public String getFechaCreacion() {
@@ -84,6 +55,7 @@ public class Usuario {
   public void setAvatarUrl(String avatarUrl) {
     this.avatarUrl = avatarUrl;
   }
+
   private String avatarUrl;
 
   public String getNombre() {
@@ -137,6 +109,7 @@ public class Usuario {
   public void activar() {
     activo = true;
   }
+
   public Long getTelefono() {
     return telefono;
   }
