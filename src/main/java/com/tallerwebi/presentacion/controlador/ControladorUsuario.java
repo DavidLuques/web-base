@@ -16,9 +16,14 @@ public class ControladorUsuario {
     this.servicioUsuario = servicioUsuario;
   }
 
-  // Al entrar a /api/usuarios/1, se ejecuta esto
   @GetMapping("/{id}")
   public Usuario verPerfil(@PathVariable Long id) {
     return servicioUsuario.obtenerPerfil(id);
+  }
+
+  @DeleteMapping("/{id}")
+  public String eliminarCuenta(@PathVariable Long id) {
+    servicioUsuario.eliminar(id);
+    return "La cuenta ha sido desactivada exitosamente";
   }
 }

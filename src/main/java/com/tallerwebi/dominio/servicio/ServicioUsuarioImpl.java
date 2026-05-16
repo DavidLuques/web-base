@@ -21,4 +21,12 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
   public Usuario obtenerPerfil(Long id) {
     return repositorioUsuario.buscarPorId(id);
   }
+
+  @Override
+  public void eliminar(Long id) {
+    Usuario usuario = repositorioUsuario.buscarPorId(id);
+    if (usuario != null) {
+      usuario.setActivo(false); // queda el usuario como inactivo en lugar de eliminarlo fisicamente
+    }
+  }
 }
