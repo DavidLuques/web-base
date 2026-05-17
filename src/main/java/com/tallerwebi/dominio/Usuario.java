@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.modelo.Direccion;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +18,53 @@ public class Usuario {
   private String password;
   private String rol;
   private Boolean activo = false;
+  private String nombre;
+  private Long telefono;
+  private String fechaCreacion;
+
+  // refactorizo por que eran muchos atributos
+  @Embedded
+  private Direccion ubicacion;
+
+  public Usuario() {}
+
+  public Direccion getUbicacion() {
+    return this.ubicacion;
+  }
+
+  public void setUbicacion(Direccion ubicacion) {
+    this.ubicacion = ubicacion;
+  }
+
+  public Boolean isActivo() {
+    return this.activo;
+  }
+
+  public String getFechaCreacion() {
+    return this.fechaCreacion;
+  }
+
+  public void setFechaCreacion(String fechaCreacion) {
+    this.fechaCreacion = fechaCreacion;
+  }
+
+  public String getAvatarUrl() {
+    return this.avatarUrl;
+  }
+
+  public void setAvatarUrl(String avatarUrl) {
+    this.avatarUrl = avatarUrl;
+  }
+
+  private String avatarUrl;
+
+  public String getNombre() {
+    return nombre;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
+  }
 
   public Long getId() {
     return id;
@@ -59,5 +108,13 @@ public class Usuario {
 
   public void activar() {
     activo = true;
+  }
+
+  public Long getTelefono() {
+    return telefono;
+  }
+
+  public void setTelefono(Long telefono) {
+    this.telefono = telefono;
   }
 }
