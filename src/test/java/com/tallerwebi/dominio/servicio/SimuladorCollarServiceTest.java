@@ -109,30 +109,32 @@ public class SimuladorCollarServiceTest {
   }
 
   @Test
-  public void dadoUnRangoValidoCuandoGeneroMuchasLecturasEntoncesLosValoresDeAcelerometroNuncaSuperanElMaximoEsperado() {
+  public void dadoUnRangoValido_cuandoGeneroMuchasLecturas_entoncesLosValoresDeAcelerometroNuncaSuperanElMaximoEsperado() {
     for (int i = 0; i < 50; i++) {
       LecturaSensor lectura = simuladorCollarService.generarLectura(
         FRECUENCIA_MINIMA,
         FRECUENCIA_MAXIMA
       );
 
-      assertThat(lectura.getAccelX(), lessThan(8.0));
-      assertThat(lectura.getAccelY(), lessThan(8.0));
-      assertThat(lectura.getAccelZ(), lessThan(8.0));
+      // BASE_MOVIMIENTO_CORRIENDO(8) + RANGO_MOVIMIENTO_CORRIENDO(4) = 12 max por eje
+      assertThat(lectura.getAccelX(), lessThan(12.0));
+      assertThat(lectura.getAccelY(), lessThan(12.0));
+      assertThat(lectura.getAccelZ(), lessThan(12.0));
     }
   }
 
   @Test
-  public void dadoUnRangoValidoCuandoGeneroMuchasLecturasEntoncesLosValoresDeGiroscopioNuncaSuperanElMaximoEsperado() {
+  public void dadoUnRangoValido_cuandoGeneroMuchasLecturas_entoncesLosValoresDeGiroscopioNuncaSuperanElMaximoEsperado() {
     for (int i = 0; i < 50; i++) {
       LecturaSensor lectura = simuladorCollarService.generarLectura(
         FRECUENCIA_MINIMA,
         FRECUENCIA_MAXIMA
       );
 
-      assertThat(lectura.getGyroX(), lessThan(5.0));
-      assertThat(lectura.getGyroY(), lessThan(5.0));
-      assertThat(lectura.getGyroZ(), lessThan(5.0));
+      // BASE_GYRO_CORRIENDO(4) + RANGO_GYRO_CORRIENDO(2) = 6 max por eje
+      assertThat(lectura.getGyroX(), lessThan(6.0));
+      assertThat(lectura.getGyroY(), lessThan(6.0));
+      assertThat(lectura.getGyroZ(), lessThan(6.0));
     }
   }
 }

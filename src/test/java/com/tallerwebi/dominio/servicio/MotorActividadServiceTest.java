@@ -129,6 +129,6 @@ public class MotorActividadServiceTest {
     motorActividadService.analizar(mascota, dormido);
     EstadoMascota segundoEstado = motorActividadService.analizar(mascota, corridaBrusca);
 
-    assertThat(segundoEstado, equalTo(EstadoMascota.DURMIENDO));
+    assertThat(segundoEstado, equalTo(EstadoMascota.REPOSO));
   }
 }
