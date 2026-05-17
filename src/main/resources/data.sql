@@ -13,5 +13,5 @@ VALUES ('MEDIANO', 80, 120);
 INSERT INTO rango_vital_por_tamano (tamano, frecuenciaMinima, frecuenciaMaxima)
 VALUES ('GRANDE', 60, 100);
 
-INSERT INTO mascota(id, nombre, esteril, fecha_nacimiento, peso, raza, genero, tipo, imagen_mascota, usuario_id)
-VALUES (null, 'Firulais', true, '2020-01-01', 10.5, 'Labrador', 'Macho', 'Perro', null, 2);
+INSERT INTO mascota(id, nombre, esteril, fecha_nacimiento, peso, raza, genero, tipo, imagen_mascota, tamano, usuario_id)
+VALUES (null, 'Firulais', true, '2020-01-01', 10.5, 'Labrador', 'Macho', 'Perro', null, 'MEDIANO', 2);
