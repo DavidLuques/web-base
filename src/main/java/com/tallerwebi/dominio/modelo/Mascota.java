@@ -3,7 +3,6 @@ package com.tallerwebi.dominio.modelo;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
-import java.time.LocalDate;
 import javax.persistence.*;
 
 @Entity
@@ -15,7 +14,6 @@ public class Mascota {
   private Long id;
 
   private String nombre;
-  private Double peso;
 
   @Enumerated(EnumType.STRING)
   private EstadoMascota estadoActual;
@@ -23,26 +21,23 @@ public class Mascota {
   @Enumerated(EnumType.STRING)
   private TamanoMascota tamano;
 
-  private Boolean esteril;
-
-  @Column(name = "fecha_nacimiento")
-  private LocalDate fechaNacimiento;
-
-  private String raza;
-  private String genero;
-  private String tipo;
-
-  @Column(name = "imagen_mascota")
-  private String imagenMascota;
+  @Embedded
+  private DatosMascota datos;
 
   @ManyToOne
   @JoinColumn(name = "usuario_id", nullable = false)
   private Usuario usuario;
 
-  public Mascota() {}
+  public Mascota() {
+    this.datos = new DatosMascota();
+  }
 
   public Long getId() {
     return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public String getNombre() {
@@ -53,12 +48,12 @@ public class Mascota {
     this.nombre = nombre;
   }
 
-  public Double getPeso() {
-    return peso;
+  public EstadoMascota getEstadoActual() {
+    return estadoActual;
   }
 
-  public void setPeso(Double peso) {
-    this.peso = peso;
+  public void setEstadoActual(EstadoMascota estadoActual) {
+    this.estadoActual = estadoActual;
   }
 
   public TamanoMascota getTamano() {
@@ -69,75 +64,80 @@ public class Mascota {
     this.tamano = tamano;
   }
 
-  public EstadoMascota getEstadoActual() {
-    return estadoActual;
-  }
-
-  public void setEstadoActual(EstadoMascota estadoActual) {
-    this.estadoActual = estadoActual;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Boolean isEsteril() {
-    return this.esteril;
-  }
-
-  public Boolean getEsteril() {
-    return this.esteril;
-  }
-
-  public void setEsteril(Boolean esteril) {
-    this.esteril = esteril;
-  }
-
-  public LocalDate getFechaNacimiento() {
-    return this.fechaNacimiento;
-  }
-
-  public void setFechaNacimiento(LocalDate fechaNacimiento) {
-    this.fechaNacimiento = fechaNacimiento;
-  }
-
-  public String getRaza() {
-    return this.raza;
-  }
-
-  public void setRaza(String raza) {
-    this.raza = raza;
-  }
-
-  public String getGenero() {
-    return this.genero;
-  }
-
-  public void setGenero(String genero) {
-    this.genero = genero;
-  }
-
-  public String getTipo() {
-    return this.tipo;
-  }
-
-  public void setTipo(String tipo) {
-    this.tipo = tipo;
-  }
-
-  public String getImagenMascota() {
-    return this.imagenMascota;
-  }
-
-  public void setImagenMascota(String imagenMascota) {
-    this.imagenMascota = imagenMascota;
-  }
-
   public Usuario getUsuario() {
-    return this.usuario;
+    return usuario;
   }
 
   public void setUsuario(Usuario usuario) {
     this.usuario = usuario;
+  }
+
+  public DatosMascota getDatos() {
+    return datos;
+  }
+
+  public void setDatos(DatosMascota datos) {
+    this.datos = datos;
+  }
+
+  // Delegación para mantener compatibilidad con el código existente
+  public Double getPeso() {
+    return datos.getPeso();
+  }
+
+  public void setPeso(Double peso) {
+    datos.setPeso(peso);
+  }
+
+  public Boolean isEsteril() {
+    return datos.isEsteril();
+  }
+
+  public Boolean getEsteril() {
+    return datos.getEsteril();
+  }
+
+  public void setEsteril(Boolean esteril) {
+    datos.setEsteril(esteril);
+  }
+
+  public java.time.LocalDate getFechaNacimiento() {
+    return datos.getFechaNacimiento();
+  }
+
+  public void setFechaNacimiento(java.time.LocalDate fechaNacimiento) {
+    datos.setFechaNacimiento(fechaNacimiento);
+  }
+
+  public String getRaza() {
+    return datos.getRaza();
+  }
+
+  public void setRaza(String raza) {
+    datos.setRaza(raza);
+  }
+
+  public String getGenero() {
+    return datos.getGenero();
+  }
+
+  public void setGenero(String genero) {
+    datos.setGenero(genero);
+  }
+
+  public String getTipo() {
+    return datos.getTipo();
+  }
+
+  public void setTipo(String tipo) {
+    datos.setTipo(tipo);
+  }
+
+  public String getImagenMascota() {
+    return datos.getImagenMascota();
+  }
+
+  public void setImagenMascota(String imagenMascota) {
+    datos.setImagenMascota(imagenMascota);
   }
 }
