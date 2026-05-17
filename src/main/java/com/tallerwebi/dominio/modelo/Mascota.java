@@ -1,7 +1,9 @@
 package com.tallerwebi.dominio.modelo;
 
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import java.time.LocalDate;
 import javax.persistence.*;
 
 @Entity
@@ -13,7 +15,6 @@ public class Mascota {
   private Long id;
 
   private String nombre;
-
   private Double peso;
 
   @Enumerated(EnumType.STRING)
@@ -21,6 +22,22 @@ public class Mascota {
 
   @Enumerated(EnumType.STRING)
   private TamanoMascota tamano;
+
+  private Boolean esteril;
+
+  @Column(name = "fecha_nacimiento")
+  private LocalDate fechaNacimiento;
+
+  private String raza;
+  private String genero;
+  private String tipo;
+
+  @Column(name = "imagen_mascota")
+  private String imagenMascota;
+
+  @ManyToOne
+  @JoinColumn(name = "usuario_id", nullable = false)
+  private Usuario usuario;
 
   public Mascota() {}
 
@@ -62,5 +79,65 @@ public class Mascota {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public Boolean isEsteril() {
+    return this.esteril;
+  }
+
+  public Boolean getEsteril() {
+    return this.esteril;
+  }
+
+  public void setEsteril(Boolean esteril) {
+    this.esteril = esteril;
+  }
+
+  public LocalDate getFechaNacimiento() {
+    return this.fechaNacimiento;
+  }
+
+  public void setFechaNacimiento(LocalDate fechaNacimiento) {
+    this.fechaNacimiento = fechaNacimiento;
+  }
+
+  public String getRaza() {
+    return this.raza;
+  }
+
+  public void setRaza(String raza) {
+    this.raza = raza;
+  }
+
+  public String getGenero() {
+    return this.genero;
+  }
+
+  public void setGenero(String genero) {
+    this.genero = genero;
+  }
+
+  public String getTipo() {
+    return this.tipo;
+  }
+
+  public void setTipo(String tipo) {
+    this.tipo = tipo;
+  }
+
+  public String getImagenMascota() {
+    return this.imagenMascota;
+  }
+
+  public void setImagenMascota(String imagenMascota) {
+    this.imagenMascota = imagenMascota;
+  }
+
+  public Usuario getUsuario() {
+    return this.usuario;
+  }
+
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
   }
 }

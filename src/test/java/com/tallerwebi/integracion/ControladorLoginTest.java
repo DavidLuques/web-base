@@ -30,7 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 @ContextConfiguration(classes = { SpringWebTestConfig.class, HibernateTestConfig.class })
 public class ControladorLoginTest {
 
-  private Usuario usuarioMock;
+  private Usuario usuario;
 
   @Autowired
   private WebApplicationContext wac;
@@ -39,8 +39,8 @@ public class ControladorLoginTest {
 
   @BeforeEach
   public void init() {
-    usuarioMock = mock(Usuario.class);
-    when(usuarioMock.getEmail()).thenReturn("dami@unlam.com");
+    usuario = new Usuario();
+    usuario.setEmail("dami@unlam.com");
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
   }
 
