@@ -1,6 +1,8 @@
 package com.tallerwebi.dominio.modelo;
 
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.enums.EstadoMascota;
+import com.tallerwebi.dominio.enums.TamanoMascota;
 import java.time.LocalDate;
 import javax.persistence.*;
 
@@ -13,12 +15,19 @@ public class Mascota {
   private Long id;
 
   private String nombre;
+  private Double peso;
+
+  @Enumerated(EnumType.STRING)
+  private EstadoMascota estadoActual;
+
+  @Enumerated(EnumType.STRING)
+  private TamanoMascota tamano;
+
   private Boolean esteril;
 
   @Column(name = "fecha_nacimiento")
   private LocalDate fechaNacimiento;
 
-  private Double peso;
   private String raza;
   private String genero;
   private String tipo;
@@ -50,6 +59,22 @@ public class Mascota {
 
   public void setPeso(Double peso) {
     this.peso = peso;
+  }
+
+  public TamanoMascota getTamano() {
+    return tamano;
+  }
+
+  public void setTamano(TamanoMascota tamano) {
+    this.tamano = tamano;
+  }
+
+  public EstadoMascota getEstadoActual() {
+    return estadoActual;
+  }
+
+  public void setEstadoActual(EstadoMascota estadoActual) {
+    this.estadoActual = estadoActual;
   }
 
   public void setId(Long id) {
