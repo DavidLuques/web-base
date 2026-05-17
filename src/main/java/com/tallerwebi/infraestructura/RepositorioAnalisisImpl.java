@@ -20,4 +20,13 @@ public class RepositorioAnalisisImpl implements RepositorioAnalisis {
   public void guardar(Analisis nuevoAnalisis) {
     sessionFactory.getCurrentSession().save(nuevoAnalisis);
   }
+
+  @Override
+  public Analisis obtenerUltimoAnalisis(Long id){
+    return (Analisis) sessionFactory.getCurrentSession()
+        .createQuery("FROM Analisis a WHERE a.mascota.id = :id ORDER BY a.fechaYHora DESC")
+        .setParameter("id", id)
+        .setMaxResults(1)
+        .uniqueResult();
+  }
 }

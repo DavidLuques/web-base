@@ -52,4 +52,18 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
       repositorioAnalisis.guardar(nuevoAnalisis);
     }
   }
+
+  public Double calcularDistancia(Double lat1, Double lon1, Double lat2, Double lon2 ){
+    final int RADIO_TIERRA = 6371;
+    double disLat = Math.toRadians(lat1 - lat2);
+    double disLon = Math.toRadians(lon1 - lon2);
+
+    double a = Math.sin(disLat / 2) * Math.sin(disLat / 2) +
+               Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+               Math.sin(disLon / 2) * Math.sin(disLon / 2);
+
+    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+    return RADIO_TIERRA * c;
+  }
 }
