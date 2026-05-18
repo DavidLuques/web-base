@@ -17,7 +17,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EnableScheduling
 @EnableWebMvc
 @Configuration
-@EnableScheduling
 @ComponentScan(
   { "com.tallerwebi.presentacion", "com.tallerwebi.dominio", "com.tallerwebi.infraestructura" }
 )
