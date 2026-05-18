@@ -29,6 +29,9 @@ public class SimuladorCollarService {
   private static final double BASE_GYRO_CORRIENDO = 4.0;
   private static final double RANGO_GYRO_CORRIENDO = 2.0;
 
+  private Double latitudActual = -34.7222;
+  private Double longitudActual = -58.5250;
+
   private final Random random = new Random();
 
   public LecturaSensor generarLectura(Integer frecuenciaMinima, Integer frecuenciaMaxima) {
@@ -44,6 +47,10 @@ public class SimuladorCollarService {
     lectura.setGyroX(generarGyroSegun(estadoSimulado));
     lectura.setGyroY(generarGyroSegun(estadoSimulado));
     lectura.setGyroZ(generarGyroSegun(estadoSimulado));
+
+    actualizarGpsSegun(estadoSimulado);
+    lectura.setLatitud(latitudActual);
+    lectura.setLongitud(longitudActual);
 
     return lectura;
   }
@@ -101,5 +108,14 @@ public class SimuladorCollarService {
       default:
         return BASE_GYRO_CORRIENDO + random.nextDouble() * RANGO_GYRO_CORRIENDO;
     }
+  }
+
+  private void actualizarGpsSegun(EstadoMascota estado) {
+    if (estado == EstadoMascota.CAMINANDO || estado == EstadoMascota.CORRIENDO) {
+      double factor = (estado == EstadoMascota.CORRIENDO) ? 0.002 : 0.001;
+      latitudActual += (random.nextDouble() - 0.5) * factor;
+      longitudActual += (random.nextDouble() - 0.5) * factor;
+    }
+    // Si esta DURMIENDO o en REPOSO, las coordenadas no cambian
   }
 }

@@ -4,21 +4,27 @@ import java.time.LocalDateTime;
 import javax.persistence.*;
 
 @Entity
-public class Actividad {
+public class Analisis {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id_analisis")
   private Long id;
 
-  private Double distanciaRecorrida;
-
+  private Double latitud;
+  private Double longitud;
   private LocalDateTime fechaYHora;
+
+  @Embedded
+  private DatosAnalisis datos;
 
   @ManyToOne
   @JoinColumn(name = "mascota_id", nullable = false)
   private Mascota mascota;
 
-  public Actividad() {}
+  public Analisis() {
+    this.datos = new DatosAnalisis();
+  }
 
   public Long getId() {
     return this.id;
@@ -28,12 +34,20 @@ public class Actividad {
     this.id = id;
   }
 
-  public Double getDistanciaRecorrida() {
-    return this.distanciaRecorrida;
+  public Double getLatitud() {
+    return this.latitud;
   }
 
-  public void setDistanciaRecorrida(Double distanciaRecorrida) {
-    this.distanciaRecorrida = distanciaRecorrida;
+  public void setLatitud(Double latitud) {
+    this.latitud = latitud;
+  }
+
+  public Double getLongitud() {
+    return this.longitud;
+  }
+
+  public void setLongitud(Double longitud) {
+    this.longitud = longitud;
   }
 
   public LocalDateTime getFechaYHora() {
@@ -50,5 +64,13 @@ public class Actividad {
 
   public void setMascota(Mascota mascota) {
     this.mascota = mascota;
+  }
+
+  public DatosAnalisis getDatos() {
+    return this.datos;
+  }
+
+  public void setDatos(DatosAnalisis datos) {
+    this.datos = datos;
   }
 }
