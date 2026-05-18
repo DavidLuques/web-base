@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Estado de la mascota</title>
+</head>
+<body>
+
+  <h2>Estado de actividad</h2>
+  <p>Mascota ID: <span th:text="${idMascota}"></span></p>
+  <p>Nombre: <span id="nombre">cargando...</span></p>
+  <p>Estado: <span id="estado">cargando...</span></p>
+  <p>Ultima actualizacion: <span id="hora">-</span></p>
+
+  <script th:inline="javascript">
+    const idMascota = [[${idMascota}]];
+
+    function actualizarEstado() {
+        fetch('/spring/simulacion/estado/' + idMascota)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('nombre').textContent = data.nombreMascota;
+                document.getElementById('estado').textContent = data.estado;
+                document.getElementById('hora').textContent = new Date().toLocaleTimeString();
+            });
+    }
+
+    actualizarEstado();
+    setInterval(actualizarEstado, 10000);
+  </script>
+
+</body>
+</html>

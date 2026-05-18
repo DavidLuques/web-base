@@ -12,6 +12,8 @@ import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
+import java.util.Arrays;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,8 +65,50 @@ public class SimulacionActividadServiceTest {
     ResultadoSimulacionDto resultado = simulacionActividadService.simularDetalle(mascotaId);
 
     assertThat(resultado.getEstado(), equalTo(EstadoMascota.REPOSO));
-
     verify(mascotaDaoMock).modificar(mascota);
     assertThat(mascota.getEstadoActual(), equalTo(EstadoMascota.REPOSO));
+  }
+
+  @Test
+  public void dadoQueHayMascotasCuandoSimuloTodasEntoncesSeSimulaCadaUna() {
+    Mascota mascota1 = new Mascota();
+    mascota1.setId(1L);
+    mascota1.setNombre("Toby");
+    mascota1.setTamano(TamanoMascota.MEDIANO);
+
+    Mascota mascota2 = new Mascota();
+    mascota2.setId(2L);
+    mascota2.setNombre("Rex");
+    mascota2.setTamano(TamanoMascota.GRANDE);
+
+    RangoVitalPorTamano rango = new RangoVitalPorTamano();
+    rango.setFrecuenciaMinima(80);
+    rango.setFrecuenciaMaxima(120);
+
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(90);
+
+    when(mascotaDaoMock.buscarTodas()).thenReturn(Arrays.asList(mascota1, mascota2));
+    when(mascotaDaoMock.buscarPorId(anyLong()))
+      .thenAnswer(inv -> {
+        Long id = inv.getArgument(0);
+        return id == 1L ? mascota1 : mascota2;
+      });
+    when(rangoVitalDaoMock.buscarPorTamano(any())).thenReturn(rango);
+    when(simuladorCollarServiceMock.generarLectura(anyInt(), anyInt())).thenReturn(lectura);
+    when(motorActividadServiceMock.analizar(any(), any())).thenReturn(EstadoMascota.CAMINANDO);
+
+    simulacionActividadService.simularDetalleParaTodas();
+
+    verify(mascotaDaoMock, times(2)).modificar(any());
+  }
+
+  @Test
+  public void dadoQueNoHayMascotasCuandoSimuloTodasEntoncesNoSeModificaNada() {
+    when(mascotaDaoMock.buscarTodas()).thenReturn(Collections.emptyList());
+
+    simulacionActividadService.simularDetalleParaTodas();
+
+    verify(mascotaDaoMock, never()).modificar(any());
   }
 }

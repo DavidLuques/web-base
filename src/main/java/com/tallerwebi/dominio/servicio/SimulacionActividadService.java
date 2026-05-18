@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,5 +50,17 @@ public class SimulacionActividadService {
     mascotaDao.modificar(mascota);
 
     return new ResultadoSimulacionDto(mascota.getNombre(), estado);
+  }
+
+  public void simularDetalleParaTodas() {
+    List<Mascota> mascotas = mascotaDao.buscarTodas();
+    for (Mascota mascota : mascotas) {
+      simularDetalle(mascota.getId());
+    }
+  }
+
+  public ResultadoSimulacionDto obtenerEstadoActual(Long mascotaId) {
+    Mascota mascota = mascotaDao.buscarPorId(mascotaId);
+    return new ResultadoSimulacionDto(mascota.getNombre(), mascota.getEstadoActual());
   }
 }
