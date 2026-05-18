@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.RepositorioActividad;
+import com.tallerwebi.dominio.modelo.Actividad;
 // import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
@@ -9,8 +11,6 @@ import com.tallerwebi.infraestructura.RepositorioAnalisisImpl;
 import com.tallerwebi.infraestructura.RepositorioMascotaImpl;
 import java.time.LocalDateTime;
 import javax.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioAnalisisImpl implements ServicioAnalisis {
 
-  private static final Logger logger = LoggerFactory.getLogger(ServicioAnalisisImpl.class);
   private final RepositorioAnalisisImpl repositorioAnalisis;
   private final RepositorioMascotaImpl repositorioMascota;
   private final SimuladorCollarService simuladorCollar;
+  private final RepositorioActividad repositorioActividad;
 
   //   private final MotorActividadService motorActividad;
 
@@ -30,44 +30,48 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
   public ServicioAnalisisImpl(
     RepositorioAnalisisImpl repositorioAnalisis,
     RepositorioMascotaImpl repositorioMascota,
-    SimuladorCollarService simuladorCollar
+    SimuladorCollarService simuladorCollar,
+    RepositorioActividad repositorioActividad
   ) {
     this.repositorioAnalisis = repositorioAnalisis;
     this.repositorioMascota = repositorioMascota;
     this.simuladorCollar = simuladorCollar;
     // this.motorActividad = motorActividad;
+    this.repositorioActividad = repositorioActividad;
   }
 
-  @Scheduled(fixedRate = 60000) // 1 minuto
+  @Scheduled(fixedRate = 10000) // 1 minuto
   @Override
   public void simularGeolocalizacion() {
-    logger.info("1. Ejecutando el motor de simulación...");
     Mascota perro = repositorioMascota.buscarPorId(1L);
 
     if (perro != null) {
-      logger.info("2. Mascota encontrada. Generando datos...");
-      // 1. Pedimos al hardware simulado que escupa una nueva lectura (asumiendo rangos de 60-120 lpm)
       LecturaSensor lecturaCruda = simuladorCollar.generarLectura(60, 120);
 
-      // 2. Le preguntamos al motor qué significa esa lectura
       // EstadoMascota estadoActual = motorActividad.analizar(perro, lecturaCruda);
 
-      // 3. Calculamos la distancia usando tu fórmula (mantenemos tu método calcularDistancia)
-      // Analisis ultimoAnalisis = repositorioAnalisis.obtenerUltimoAnalisis(perro.getId());
-      // Double distancia = 0.0;
-      // if (ultimoAnalisis != null) {
-      //     distancia = calcularDistancia(
-      //         ultimoAnalisis.getLatitud(), ultimoAnalisis.getLongitud(),
-      //         lecturaCruda.getLatitud(), lecturaCruda.getLongitud()
-      //     );
-      // }
+      Analisis ultimoAnalisis = repositorioAnalisis.obtenerUltimoAnalisis(perro.getId());
+      Double distancia = (ultimoAnalisis != null)
+        ? calcularDistancia(
+          ultimoAnalisis.getLatitud(),
+          ultimoAnalisis.getLongitud(),
+          lecturaCruda.getLatitud(),
+          lecturaCruda.getLongitud()
+        )
+        : 0.0;
 
-      // 4. Mapeamos el DTO a tu Entidad de base de datos
+      // se mapea el DTO
       Analisis nuevoAnalisis = armarEntidad(lecturaCruda, perro);
       repositorioAnalisis.guardar(nuevoAnalisis);
-      logger.info("3. Datos guardados en MySQL exitosamente.");
-    } else {
-      logger.warn("ERROR SILENCIOSO: No existe ninguna mascota con ID 1 en la base de datos.");
+
+      if (distancia > 0) {
+        Actividad actividad = new Actividad();
+        actividad.setDistanciaRecorrida(distancia);
+        actividad.setFechaYHora(LocalDateTime.now());
+        actividad.setMascota(perro);
+
+        repositorioActividad.guardar(actividad);
+      }
     }
   }
 
@@ -104,6 +108,9 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
 
     double car = 2 * Math.atan2(Math.sqrt(ald), Math.sqrt(1 - ald));
 
-    return RADIO_TIERRA * car;
+    double distanciaEnKm = RADIO_TIERRA * car;
+
+    // redondeo a 3 decimales
+    return Math.round(distanciaEnKm * 1000.0) / 1000.0;
   }
 }
