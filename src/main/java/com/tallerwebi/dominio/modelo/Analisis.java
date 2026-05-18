@@ -15,11 +15,16 @@ public class Analisis {
   private Double longitud;
   private LocalDateTime fechaYHora;
 
+  @Embedded
+  private DatosAnalisis datos;
+
   @ManyToOne
   @JoinColumn(name = "mascota_id", nullable = false)
   private Mascota mascota;
 
-  public Analisis() {}
+  public Analisis() {
+    this.datos = new DatosAnalisis();
+  }
 
   public Long getId() {
     return this.id;
@@ -59,5 +64,13 @@ public class Analisis {
 
   public void setMascota(Mascota mascota) {
     this.mascota = mascota;
+  }
+
+  public DatosAnalisis getDatos() {
+    return this.datos;
+  }
+
+  public void setDatos(DatosAnalisis datos) {
+    this.datos = datos;
   }
 }

@@ -22,11 +22,12 @@ public class RepositorioAnalisisImpl implements RepositorioAnalisis {
   }
 
   @Override
-  public Analisis obtenerUltimoAnalisis(Long id){
-    return (Analisis) sessionFactory.getCurrentSession()
-        .createQuery("FROM Analisis a WHERE a.mascota.id = :id ORDER BY a.fechaYHora DESC")
-        .setParameter("id", id)
-        .setMaxResults(1)
-        .uniqueResult();
+  public Analisis obtenerUltimoAnalisis(Long id) {
+    return (Analisis) sessionFactory
+      .getCurrentSession()
+      .createQuery("FROM Analisis a WHERE a.mascota.id = :id ORDER BY a.fechaYHora DESC")
+      .setParameter("id", id)
+      .setMaxResults(1)
+      .uniqueResult();
   }
 }

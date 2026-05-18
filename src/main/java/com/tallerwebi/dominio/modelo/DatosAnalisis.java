@@ -1,24 +1,22 @@
 package com.tallerwebi.dominio.modelo;
 
-public class LecturaSensor {
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class DatosAnalisis {
 
   private Integer frecuenciaCardiaca;
-
   private Double accelX;
   private Double accelY;
   private Double accelZ;
-
   private Double gyroX;
   private Double gyroY;
   private Double gyroZ;
 
-  private Double latitud;
-  private Double longitud;
-
-  public LecturaSensor() {}
+  public DatosAnalisis() {}
 
   public Integer getFrecuenciaCardiaca() {
-    return frecuenciaCardiaca;
+    return this.frecuenciaCardiaca;
   }
 
   public void setFrecuenciaCardiaca(Integer frecuenciaCardiaca) {
@@ -26,7 +24,7 @@ public class LecturaSensor {
   }
 
   public Double getAccelX() {
-    return accelX;
+    return this.accelX;
   }
 
   public void setAccelX(Double accelX) {
@@ -34,7 +32,7 @@ public class LecturaSensor {
   }
 
   public Double getAccelY() {
-    return accelY;
+    return this.accelY;
   }
 
   public void setAccelY(Double accelY) {
@@ -42,7 +40,7 @@ public class LecturaSensor {
   }
 
   public Double getAccelZ() {
-    return accelZ;
+    return this.accelZ;
   }
 
   public void setAccelZ(Double accelZ) {
@@ -50,7 +48,7 @@ public class LecturaSensor {
   }
 
   public Double getGyroX() {
-    return gyroX;
+    return this.gyroX;
   }
 
   public void setGyroX(Double gyroX) {
@@ -58,7 +56,7 @@ public class LecturaSensor {
   }
 
   public Double getGyroY() {
-    return gyroY;
+    return this.gyroY;
   }
 
   public void setGyroY(Double gyroY) {
@@ -66,26 +64,10 @@ public class LecturaSensor {
   }
 
   public Double getGyroZ() {
-    return gyroZ;
+    return this.gyroZ;
   }
 
   public void setGyroZ(Double gyroZ) {
     this.gyroZ = gyroZ;
-  }
-
-  public Double getLatitud() {
-    return this.latitud;
-  }
-
-  public void setLatitud(Double latitud) {
-    this.latitud = latitud;
-  }
-
-  public Double getLongitud() {
-    return this.longitud;
-  }
-
-  public void setLongitud(Double longitud) {
-    this.longitud = longitud;
   }
 }

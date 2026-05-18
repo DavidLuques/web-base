@@ -16,9 +16,11 @@ public class Mascota {
   private String nombre;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "estado_actual")
   private EstadoMascota estadoActual;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "tamano")
   private TamanoMascota tamano;
 
   @Embedded
