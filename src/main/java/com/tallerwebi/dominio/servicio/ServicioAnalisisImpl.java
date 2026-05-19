@@ -1,12 +1,13 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioActividad;
+import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.modelo.Actividad;
-// import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import com.tallerwebi.infraestructura.RepositorioAnalisisImpl;
 import com.tallerwebi.infraestructura.RepositorioMascotaImpl;
 import java.time.LocalDateTime;
@@ -23,32 +24,41 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
   private final RepositorioMascotaImpl repositorioMascota;
   private final SimuladorCollarService simuladorCollar;
   private final RepositorioActividad repositorioActividad;
-
-  //   private final MotorActividadService motorActividad;
+  private final RangoVitalDao rangoVitalDao;
 
   @Autowired
   public ServicioAnalisisImpl(
     RepositorioAnalisisImpl repositorioAnalisis,
     RepositorioMascotaImpl repositorioMascota,
     SimuladorCollarService simuladorCollar,
-    RepositorioActividad repositorioActividad
+    RepositorioActividad repositorioActividad,
+    RangoVitalDao rangoVitalDao
   ) {
     this.repositorioAnalisis = repositorioAnalisis;
     this.repositorioMascota = repositorioMascota;
     this.simuladorCollar = simuladorCollar;
-    // this.motorActividad = motorActividad;
     this.repositorioActividad = repositorioActividad;
+    this.rangoVitalDao = rangoVitalDao;
   }
 
-  @Scheduled(fixedRate = 10000) // 1 minuto
+  @Scheduled(fixedRate = 10000)
   @Override
   public void simularGeolocalizacion() {
     Mascota perro = repositorioMascota.buscarPorId(1L);
 
     if (perro != null) {
-      LecturaSensor lecturaCruda = simuladorCollar.generarLectura(60, 120);
+      RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(perro.getTamano());
 
-      // EstadoMascota estadoActual = motorActividad.analizar(perro, lecturaCruda);
+      LecturaSensor lecturaCruda = simuladorCollar.generarLectura(
+        perro.getId(),
+        perro.getEstadoActual(),
+        rango.getFrecuenciaMinima(),
+        rango.getFrecuenciaMaxima(),
+        rango.getSistolicaMinima(),
+        rango.getSistolicaMaxima(),
+        rango.getDiastolicaMinima(),
+        rango.getDiastolicaMaxima()
+      );
 
       Analisis ultimoAnalisis = repositorioAnalisis.obtenerUltimoAnalisis(perro.getId());
       Double distancia = (ultimoAnalisis != null)
@@ -60,7 +70,6 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
         )
         : 0.0;
 
-      // se mapea el DTO
       Analisis nuevoAnalisis = armarEntidad(lecturaCruda, perro);
       repositorioAnalisis.guardar(nuevoAnalisis);
 
@@ -69,7 +78,6 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
         actividad.setDistanciaRecorrida(distancia);
         actividad.setFechaYHora(LocalDateTime.now());
         actividad.setMascota(perro);
-
         repositorioActividad.guardar(actividad);
       }
     }
@@ -81,6 +89,7 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
     analisis.setLongitud(lectura.getLongitud());
     analisis.setFechaYHora(LocalDateTime.now());
     analisis.setMascota(perro);
+
     DatosAnalisis datos = new DatosAnalisis();
     datos.setFrecuenciaCardiaca(lectura.getFrecuenciaCardiaca());
     datos.setAccelX(lectura.getAccelX());
@@ -89,6 +98,9 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
     datos.setGyroX(lectura.getGyroX());
     datos.setGyroY(lectura.getGyroY());
     datos.setGyroZ(lectura.getGyroZ());
+    datos.setPresionSistolica(lectura.getPresionSistolica());
+    datos.setPresionDiastolica(lectura.getPresionDiastolica());
+    datos.setTemperatura(lectura.getTemperatura());
 
     analisis.setDatos(datos);
     return analisis;
@@ -108,9 +120,6 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
 
     double car = 2 * Math.atan2(Math.sqrt(ald), Math.sqrt(1 - ald));
 
-    double distanciaEnKm = RADIO_TIERRA * car;
-
-    // redondeo a 3 decimales
-    return Math.round(distanciaEnKm * 1000.0) / 1000.0;
+    return Math.round(RADIO_TIERRA * car * 1000.0) / 1000.0;
   }
 }

@@ -33,7 +33,7 @@ public class ControladorSimulacion {
     return "simulacion";
   }
 
-  @GetMapping("/estado/{idMascota}")
+  @GetMapping(value = "/estado/{idMascota}", produces = "application/json;charset=UTF-8")
   @ResponseBody
   public ResultadoSimulacionDto obtenerEstado(@PathVariable Long idMascota) {
     return simulacionActividadService.obtenerEstadoActual(idMascota);

@@ -10,19 +10,26 @@
   <p>Mascota ID: <span th:text="${idMascota}"></span></p>
   <p>Nombre: <span id="nombre">cargando...</span></p>
   <p>Estado: <span id="estado">cargando...</span></p>
+  <p>Frecuencia cardiaca: <span id="frecuencia">-</span> bpm</p>
+  <p>Presión arterial: <span id="sistolica">-</span> / <span id="diastolica">-</span> mmHg</p>
+  <p>Temperatura: <span id="temperatura">-</span> °C</p>
   <p>Ultima actualizacion: <span id="hora">-</span></p>
 
   <script th:inline="javascript">
     const idMascota = [[${idMascota}]];
 
     function actualizarEstado() {
-        fetch('/spring/simulacion/estado/' + idMascota)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('nombre').textContent = data.nombreMascota;
-                document.getElementById('estado').textContent = data.estado;
-                document.getElementById('hora').textContent = new Date().toLocaleTimeString();
-            });
+      fetch('/spring/simulacion/estado/' + idMascota)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('nombre').textContent    = data.nombreMascota;
+          document.getElementById('estado').textContent    = data.estado;
+          document.getElementById('frecuencia').textContent = data.frecuenciaCardiaca ?? '-';
+          document.getElementById('sistolica').textContent  = data.presionSistolica ?? '-';
+          document.getElementById('diastolica').textContent = data.presionDiastolica ?? '-';
+          document.getElementById('temperatura').textContent = data.temperatura ?? '-';
+          document.getElementById('hora').textContent      = new Date().toLocaleTimeString();
+        });
     }
 
     actualizarEstado();

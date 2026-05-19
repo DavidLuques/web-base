@@ -15,8 +15,13 @@ public class RangoVitalPorTamano {
   private TamanoMascota tamano;
 
   private Integer frecuenciaMinima;
-
   private Integer frecuenciaMaxima;
+
+  private Integer sistolicaMinima;
+  private Integer sistolicaMaxima;
+
+  private Integer diastolicaMinima;
+  private Integer diastolicaMaxima;
 
   public RangoVitalPorTamano() {}
 
@@ -46,5 +51,37 @@ public class RangoVitalPorTamano {
 
   public void setFrecuenciaMaxima(Integer frecuenciaMaxima) {
     this.frecuenciaMaxima = frecuenciaMaxima;
+  }
+
+  public Integer getSistolicaMinima() {
+    return sistolicaMinima;
+  }
+
+  public void setSistolicaMinima(Integer sistolicaMinima) {
+    this.sistolicaMinima = sistolicaMinima;
+  }
+
+  public Integer getSistolicaMaxima() {
+    return sistolicaMaxima;
+  }
+
+  public void setSistolicaMaxima(Integer sistolicaMaxima) {
+    this.sistolicaMaxima = sistolicaMaxima;
+  }
+
+  public Integer getDiastolicaMinima() {
+    return diastolicaMinima;
+  }
+
+  public void setDiastolicaMinima(Integer diastolicaMinima) {
+    this.diastolicaMinima = diastolicaMinima;
+  }
+
+  public Integer getDiastolicaMaxima() {
+    return diastolicaMaxima;
+  }
+
+  public void setDiastolicaMaxima(Integer diastolicaMaxima) {
+    this.diastolicaMaxima = diastolicaMaxima;
   }
 }
