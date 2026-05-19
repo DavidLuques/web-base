@@ -2,8 +2,14 @@ package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
@@ -26,6 +32,8 @@ public class SimulacionActividadServiceTest {
   private RangoVitalDao rangoVitalDaoMock;
   private SimuladorCollarService simuladorCollarServiceMock;
   private MotorActividadService motorActividadServiceMock;
+  private RepositorioActividad repositorioActividadMock;
+  private ServicioAnalisis servicioAnalisisMock;
   private RepositorioAnalisis repositorioAnalisisMock;
 
   private static final int SISTOLICA_MINIMA = 115;
@@ -39,6 +47,8 @@ public class SimulacionActividadServiceTest {
     rangoVitalDaoMock = mock(RangoVitalDao.class);
     simuladorCollarServiceMock = mock(SimuladorCollarService.class);
     motorActividadServiceMock = mock(MotorActividadService.class);
+    repositorioActividadMock = mock(RepositorioActividad.class);
+    servicioAnalisisMock = mock(ServicioAnalisis.class);
 
     simulacionActividadService =
       new SimulacionActividadService(
@@ -46,6 +56,8 @@ public class SimulacionActividadServiceTest {
         rangoVitalDaoMock,
         simuladorCollarServiceMock,
         motorActividadServiceMock,
+        repositorioActividadMock,
+        servicioAnalisisMock,
         repositorioAnalisisMock
       );
   }

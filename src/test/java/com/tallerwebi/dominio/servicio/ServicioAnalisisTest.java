@@ -64,6 +64,7 @@ public class ServicioAnalisisTest {
   public void queSimuleGeolocalizacionYGuardeActividadSiHayMovimiento() {
     Mascota mascotaReal = new Mascota();
     mascotaReal.setId(1L);
+    mascotaReal.setEstadoActual(EstadoMascota.CAMINANDO);
     mascotaReal.setTamano(TamanoMascota.MEDIANO);
 
     RangoVitalPorTamano rango = new RangoVitalPorTamano();
@@ -99,7 +100,7 @@ public class ServicioAnalisisTest {
       .thenReturn(lecturaFalsa);
     when(repositorioAnalisisMock.obtenerUltimoAnalisis(1L)).thenReturn(analisisAnterior);
 
-    servicioAnalisis.simularGeolocalizacion();
+    servicioAnalisis.simularGeolocalizacion(1L);
 
     verify(repositorioAnalisisMock, times(1)).guardar(any());
     verify(repositorioActividadMock, times(1)).guardar(any());
@@ -109,7 +110,7 @@ public class ServicioAnalisisTest {
   public void queNoHagaNadaSiLaMascotaNoExiste() {
     when(repositorioMascotaMock.buscarPorId(1L)).thenReturn(null);
 
-    servicioAnalisis.simularGeolocalizacion();
+    servicioAnalisis.simularGeolocalizacion(1L);
 
     verify(simuladorCollarMock, never()).generarLectura(anyInt(), anyInt());
     verify(repositorioAnalisisMock, never()).guardar(any());
@@ -151,7 +152,7 @@ public class ServicioAnalisisTest {
       .thenReturn(lecturaFalsa);
     when(repositorioAnalisisMock.obtenerUltimoAnalisis(1L)).thenReturn(null);
 
-    servicioAnalisis.simularGeolocalizacion();
+    servicioAnalisis.simularGeolocalizacion(1L);
 
     verify(repositorioAnalisisMock, times(1)).guardar(any(Analisis.class));
     verify(repositorioActividadMock, never()).guardar(any(Actividad.class));
@@ -196,7 +197,7 @@ public class ServicioAnalisisTest {
       .thenReturn(lecturaFalsa);
     when(repositorioAnalisisMock.obtenerUltimoAnalisis(1L)).thenReturn(analisisAnterior);
 
-    servicioAnalisis.simularGeolocalizacion();
+    servicioAnalisis.simularGeolocalizacion(1L);
 
     verify(repositorioAnalisisMock, times(1)).guardar(any(Analisis.class));
     verify(repositorioActividadMock, never()).guardar(any(Actividad.class));

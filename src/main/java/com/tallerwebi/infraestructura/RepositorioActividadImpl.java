@@ -20,4 +20,16 @@ public class RepositorioActividadImpl implements RepositorioActividad {
   public void guardar(Actividad actividad) {
     sessionFactory.getCurrentSession().save(actividad);
   }
+
+  @Override
+  public Double obtenerDistanciaTotalPorMascota(Long mascotaId) {
+    String hql =
+      "SELECT SUM(a.distanciaRecorrida) FROM Actividad a WHERE a.mascota.id = :mascotaId";
+    Double resultado = (Double) sessionFactory
+      .getCurrentSession()
+      .createQuery(hql)
+      .setParameter("mascotaId", mascotaId)
+      .uniqueResult();
+    return (resultado != null) ? resultado : 0.0;
+  }
 }

@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
@@ -22,6 +23,8 @@ public class SimulacionActividadService {
   private final RangoVitalDao rangoVitalDao;
   private final SimuladorCollarService simuladorCollarService;
   private final MotorActividadService motorActividadService;
+  private final RepositorioActividad repositorioActividad;
+  private final ServicioAnalisis servicioAnalisis;
   private final RepositorioAnalisis repositorioAnalisis;
 
   @Autowired
@@ -30,12 +33,16 @@ public class SimulacionActividadService {
     RangoVitalDao rangoVitalDao,
     SimuladorCollarService simuladorCollarService,
     MotorActividadService motorActividadService,
+    RepositorioActividad repositorioActividad,
+    ServicioAnalisis servicioAnalisis,
     RepositorioAnalisis repositorioAnalisis
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
     this.simuladorCollarService = simuladorCollarService;
     this.motorActividadService = motorActividadService;
+    this.repositorioActividad = repositorioActividad;
+    this.servicioAnalisis = servicioAnalisis;
     this.repositorioAnalisis = repositorioAnalisis;
   }
 
@@ -57,14 +64,15 @@ public class SimulacionActividadService {
     EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
-
+    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
       estado,
       lectura.getFrecuenciaCardiaca(),
       lectura.getPresionSistolica(),
       lectura.getPresionDiastolica(),
-      lectura.getTemperatura()
+      lectura.getTemperatura(),
+      distanciaTotal
     );
   }
 
@@ -72,6 +80,7 @@ public class SimulacionActividadService {
     List<Mascota> mascotas = mascotaDao.buscarTodas();
     for (Mascota mascota : mascotas) {
       simularDetalle(mascota.getId());
+      servicioAnalisis.simularGeolocalizacion(mascota.getId());
     }
   }
 
@@ -90,13 +99,19 @@ public class SimulacionActividadService {
 
   public ResultadoSimulacionDto obtenerEstadoActual(Long mascotaId) {
     Mascota mascota = mascotaDao.buscarPorId(mascotaId);
+
     if (mascota == null) {
-      return new ResultadoSimulacionDto("No encontrada", null);
+      return new ResultadoSimulacionDto("No encontrada", null, null);
     }
+    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
 
     Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(mascotaId);
     if (ultimo == null) {
-      return new ResultadoSimulacionDto(mascota.getNombre(), mascota.getEstadoActual());
+      return new ResultadoSimulacionDto(
+        mascota.getNombre(),
+        mascota.getEstadoActual(),
+        distanciaTotal
+      );
     }
 
     return new ResultadoSimulacionDto(
@@ -105,7 +120,8 @@ public class SimulacionActividadService {
       ultimo.getDatos().getFrecuenciaCardiaca(),
       ultimo.getDatos().getPresionSistolica(),
       ultimo.getDatos().getPresionDiastolica(),
-      ultimo.getDatos().getTemperatura()
+      ultimo.getDatos().getTemperatura(),
+      distanciaTotal
     );
   }
 }

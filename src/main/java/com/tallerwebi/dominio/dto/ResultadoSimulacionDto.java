@@ -6,6 +6,7 @@ public class ResultadoSimulacionDto {
 
   private String nombreMascota;
   private EstadoMascota estado;
+  private Double distanciaRecorrida;
   private Integer frecuenciaCardiaca;
   private Integer presionSistolica;
   private Integer presionDiastolica;
@@ -13,9 +14,14 @@ public class ResultadoSimulacionDto {
 
   public ResultadoSimulacionDto() {}
 
-  public ResultadoSimulacionDto(String nombreMascota, EstadoMascota estado) {
+  public ResultadoSimulacionDto(
+    String nombreMascota,
+    EstadoMascota estado,
+    Double distanciaRecorrida
+  ) {
     this.nombreMascota = nombreMascota;
     this.estado = estado;
+    this.distanciaRecorrida = distanciaRecorrida;
   }
 
   public ResultadoSimulacionDto(
@@ -24,7 +30,8 @@ public class ResultadoSimulacionDto {
     Integer frecuenciaCardiaca,
     Integer presionSistolica,
     Integer presionDiastolica,
-    Double temperatura
+    Double temperatura,
+    Double distanciaRecorrida
   ) {
     this.nombreMascota = nombreMascota;
     this.estado = estado;
@@ -32,6 +39,7 @@ public class ResultadoSimulacionDto {
     this.presionSistolica = presionSistolica;
     this.presionDiastolica = presionDiastolica;
     this.temperatura = temperatura;
+    this.distanciaRecorrida = distanciaRecorrida;
   }
 
   public String getNombreMascota() {
@@ -48,6 +56,14 @@ public class ResultadoSimulacionDto {
 
   public void setEstado(EstadoMascota estado) {
     this.estado = estado;
+  }
+
+  public Double getDistanciaRecorrida() {
+    return this.distanciaRecorrida;
+  }
+
+  public void setDistanciaRecorrida(Double distanciaRecorrida) {
+    this.distanciaRecorrida = distanciaRecorrida;
   }
 
   public Integer getFrecuenciaCardiaca() {
