@@ -34,7 +34,7 @@ public class SimulacionActividadService {
     SimuladorCollarService simuladorCollarService,
     MotorActividadService motorActividadService,
     RepositorioActividad repositorioActividad,
-    ServicioAnalisis servicioAnalisis
+    ServicioAnalisis servicioAnalisis,
     RepositorioAnalisis repositorioAnalisis
   ) {
     this.mascotaDao = mascotaDao;
@@ -64,7 +64,6 @@ public class SimulacionActividadService {
     EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
-    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
 
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
@@ -72,8 +71,7 @@ public class SimulacionActividadService {
       lectura.getFrecuenciaCardiaca(),
       lectura.getPresionSistolica(),
       lectura.getPresionDiastolica(),
-      lectura.getTemperatura(),
-      distanciaTotal
+      lectura.getTemperatura()
     );
   }
 
@@ -103,12 +101,12 @@ public class SimulacionActividadService {
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
       
     if (mascota == null) {
-      return new ResultadoSimulacionDto("No encontrada", null);
+      return new ResultadoSimulacionDto("No encontrada", null, null);
     }
 
     Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(mascotaId);
     if (ultimo == null) {
-      return new ResultadoSimulacionDto(mascota.getNombre(), mascota.getEstadoActual());
+      return new ResultadoSimulacionDto(mascota.getNombre(), mascota.getEstadoActual(), distanciaTotal);
     }
 
     return new ResultadoSimulacionDto(
@@ -117,8 +115,7 @@ public class SimulacionActividadService {
       ultimo.getDatos().getFrecuenciaCardiaca(),
       ultimo.getDatos().getPresionSistolica(),
       ultimo.getDatos().getPresionDiastolica(),
-      ultimo.getDatos().getTemperatura(),
-      distanciaTotal
+      ultimo.getDatos().getTemperatura()
     );
   }
 }

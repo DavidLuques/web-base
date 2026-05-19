@@ -61,7 +61,8 @@ public class ResultadoSimulacionDto {
   }
 
   public void setDistanciaRecorrida(Double distanciaRecorrida) {
-    this.distanciaRecorrida = distanciaRecorrida;
+  this.distanciaRecorrida = distanciaRecorrida;
+  }
   public Integer getFrecuenciaCardiaca() {
     return frecuenciaCardiaca;
   }

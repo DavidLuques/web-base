@@ -58,7 +58,7 @@ public class SimulacionActividadServiceTest {
         simuladorCollarServiceMock,
         motorActividadServiceMock,
         repositorioActividadMock,
-        servicioAnalisisMock
+        servicioAnalisisMock,
         repositorioAnalisisMock
       );
   }
