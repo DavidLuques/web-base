@@ -58,6 +58,7 @@ public class ServicioAnalisisTest {
   public void queSimuleGeolocalizacionYGuardeActividadSiHayMovimiento() {
     Mascota mascotaReal = new Mascota();
     mascotaReal.setId(1L);
+    mascotaReal.setEstadoActual(EstadoMascota.CAMINANDO);
 
     LecturaSensor lecturaFalsa = new LecturaSensor();
     lecturaFalsa.setLatitud(-34.7230);

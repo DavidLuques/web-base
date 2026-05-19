@@ -30,7 +30,7 @@ public class SimulacionActividadServiceTest {
   private SimuladorCollarService simuladorCollarServiceMock;
   private MotorActividadService motorActividadServiceMock;
   private RepositorioActividad repositorioActividadMock;
-  private ServicioAnalisisImpl servicioAnalisisMock;
+  private ServicioAnalisis servicioAnalisisMock;
 
   @BeforeEach
   public void init() {
@@ -39,6 +39,7 @@ public class SimulacionActividadServiceTest {
     simuladorCollarServiceMock = mock(SimuladorCollarService.class);
     motorActividadServiceMock = mock(MotorActividadService.class);
     repositorioActividadMock = mock(RepositorioActividad.class);
+    servicioAnalisisMock = mock(ServicioAnalisis.class);
 
     simulacionActividadService =
       new SimulacionActividadService(

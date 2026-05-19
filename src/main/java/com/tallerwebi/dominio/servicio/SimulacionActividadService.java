@@ -22,7 +22,7 @@ public class SimulacionActividadService {
   private final SimuladorCollarService simuladorCollarService;
   private final MotorActividadService motorActividadService;
   private final RepositorioActividad repositorioActividad;
-  private final ServicioAnalisisImpl servicioAnalisis;
+  private final ServicioAnalisis servicioAnalisis;
 
   @Autowired
   public SimulacionActividadService(
@@ -31,7 +31,7 @@ public class SimulacionActividadService {
     SimuladorCollarService simuladorCollarService,
     MotorActividadService motorActividadService,
     RepositorioActividad repositorioActividad,
-    ServicioAnalisisImpl servicioAnalisis
+    ServicioAnalisis servicioAnalisis
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
