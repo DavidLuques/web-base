@@ -22,6 +22,7 @@ public class SimulacionActividadService {
   private final SimuladorCollarService simuladorCollarService;
   private final MotorActividadService motorActividadService;
   private final RepositorioActividad repositorioActividad;
+  private final ServicioAnalisisImpl servicioAnalisis;
 
   @Autowired
   public SimulacionActividadService(
@@ -29,13 +30,15 @@ public class SimulacionActividadService {
     RangoVitalDao rangoVitalDao,
     SimuladorCollarService simuladorCollarService,
     MotorActividadService motorActividadService,
-    RepositorioActividad repositorioActividad
+    RepositorioActividad repositorioActividad,
+    ServicioAnalisisImpl servicioAnalisis
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
     this.simuladorCollarService = simuladorCollarService;
     this.motorActividadService = motorActividadService;
     this.repositorioActividad = repositorioActividad;
+    this.servicioAnalisis = servicioAnalisis;
   }
 
   public ResultadoSimulacionDto simularDetalle(Long mascotaId) {
@@ -61,6 +64,7 @@ public class SimulacionActividadService {
     List<Mascota> mascotas = mascotaDao.buscarTodas();
     for (Mascota mascota : mascotas) {
       simularDetalle(mascota.getId());
+      servicioAnalisis.simularGeolocalizacion(mascota.getId());
     }
   }
 

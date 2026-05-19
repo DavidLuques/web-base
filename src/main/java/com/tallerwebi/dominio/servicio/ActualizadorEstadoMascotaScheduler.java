@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActualizadorEstadoMascotaScheduler {
 
-  private static final long TRES_MINUTOS_EN_MS = 3 * 60 * 1000;
+  private static final long TRES_MINUTOS_EN_MS = 10000;
 
   private final SimulacionActividadService simulacionActividadService;
 

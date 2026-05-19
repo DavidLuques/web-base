@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioActividad;
+import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Actividad;
 // import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Analisis;
@@ -12,7 +13,6 @@ import com.tallerwebi.infraestructura.RepositorioMascotaImpl;
 import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,7 +24,7 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
   private final SimuladorCollarService simuladorCollar;
   private final RepositorioActividad repositorioActividad;
 
-  //   private final MotorActividadService motorActividad;
+  // private final MotorActividadService motorActividad;
 
   @Autowired
   public ServicioAnalisisImpl(
@@ -40,10 +40,9 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
     this.repositorioActividad = repositorioActividad;
   }
 
-  @Scheduled(fixedRate = 180000) // 3 minuto
   @Override
-  public void simularGeolocalizacion() {
-    Mascota perro = repositorioMascota.buscarPorId(1L);
+  public void simularGeolocalizacion(Long idMascota) {
+    Mascota perro = repositorioMascota.buscarPorId(idMascota);
 
     if (perro != null) {
       LecturaSensor lecturaCruda = simuladorCollar.generarLectura(60, 120);
@@ -64,7 +63,11 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
       Analisis nuevoAnalisis = armarEntidad(lecturaCruda, perro);
       repositorioAnalisis.guardar(nuevoAnalisis);
 
-      if (distancia > 0) {
+      boolean estaActivo =
+        perro.getEstadoActual() == EstadoMascota.CAMINANDO ||
+        perro.getEstadoActual() == EstadoMascota.CORRIENDO;
+
+      if (distancia > 0 && estaActivo) {
         Actividad actividad = new Actividad();
         actividad.setDistanciaRecorrida(distancia);
         actividad.setFechaYHora(LocalDateTime.now());

@@ -30,6 +30,7 @@ public class SimulacionActividadServiceTest {
   private SimuladorCollarService simuladorCollarServiceMock;
   private MotorActividadService motorActividadServiceMock;
   private RepositorioActividad repositorioActividadMock;
+  private ServicioAnalisisImpl servicioAnalisisMock;
 
   @BeforeEach
   public void init() {
@@ -45,7 +46,8 @@ public class SimulacionActividadServiceTest {
         rangoVitalDaoMock,
         simuladorCollarServiceMock,
         motorActividadServiceMock,
-        repositorioActividadMock
+        repositorioActividadMock,
+        servicioAnalisisMock
       );
   }
 
