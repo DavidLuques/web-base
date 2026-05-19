@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
@@ -20,18 +21,21 @@ public class SimulacionActividadService {
   private final RangoVitalDao rangoVitalDao;
   private final SimuladorCollarService simuladorCollarService;
   private final MotorActividadService motorActividadService;
+  private final RepositorioActividad repositorioActividad;
 
   @Autowired
   public SimulacionActividadService(
     MascotaDao mascotaDao,
     RangoVitalDao rangoVitalDao,
     SimuladorCollarService simuladorCollarService,
-    MotorActividadService motorActividadService
+    MotorActividadService motorActividadService,
+    RepositorioActividad repositorioActividad
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
     this.simuladorCollarService = simuladorCollarService;
     this.motorActividadService = motorActividadService;
+    this.repositorioActividad = repositorioActividad;
   }
 
   public ResultadoSimulacionDto simularDetalle(Long mascotaId) {
@@ -48,8 +52,9 @@ public class SimulacionActividadService {
 
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
+    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
 
-    return new ResultadoSimulacionDto(mascota.getNombre(), estado);
+    return new ResultadoSimulacionDto(mascota.getNombre(), estado, distanciaTotal);
   }
 
   public void simularDetalleParaTodas() {
@@ -61,6 +66,11 @@ public class SimulacionActividadService {
 
   public ResultadoSimulacionDto obtenerEstadoActual(Long mascotaId) {
     Mascota mascota = mascotaDao.buscarPorId(mascotaId);
-    return new ResultadoSimulacionDto(mascota.getNombre(), mascota.getEstadoActual());
+    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
+    return new ResultadoSimulacionDto(
+      mascota.getNombre(),
+      mascota.getEstadoActual(),
+      distanciaTotal
+    );
   }
 }

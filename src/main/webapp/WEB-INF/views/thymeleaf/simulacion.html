@@ -10,6 +10,7 @@
   <p>Mascota ID: <span th:text="${idMascota}"></span></p>
   <p>Nombre: <span id="nombre">cargando...</span></p>
   <p>Estado: <span id="estado">cargando...</span></p>
+  <p>Distancia recorrida: <span id="distancia">cargando...</span> km</p>
   <p>Ultima actualizacion: <span id="hora">-</span></p>
 
   <script th:inline="javascript">
@@ -21,6 +22,7 @@
             .then(data => {
                 document.getElementById('nombre').textContent = data.nombreMascota;
                 document.getElementById('estado').textContent = data.estado;
+                document.getElementById('distancia').textContent = data.distanciaRecorrida;
                 document.getElementById('hora').textContent = new Date().toLocaleTimeString();
             });
     }

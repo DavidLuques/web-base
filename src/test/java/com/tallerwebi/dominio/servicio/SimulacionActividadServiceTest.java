@@ -2,8 +2,12 @@ package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
@@ -25,6 +29,7 @@ public class SimulacionActividadServiceTest {
   private RangoVitalDao rangoVitalDaoMock;
   private SimuladorCollarService simuladorCollarServiceMock;
   private MotorActividadService motorActividadServiceMock;
+  private RepositorioActividad repositorioActividadMock;
 
   @BeforeEach
   public void init() {
@@ -32,13 +37,15 @@ public class SimulacionActividadServiceTest {
     rangoVitalDaoMock = mock(RangoVitalDao.class);
     simuladorCollarServiceMock = mock(SimuladorCollarService.class);
     motorActividadServiceMock = mock(MotorActividadService.class);
+    repositorioActividadMock = mock(RepositorioActividad.class);
 
     simulacionActividadService =
       new SimulacionActividadService(
         mascotaDaoMock,
         rangoVitalDaoMock,
         simuladorCollarServiceMock,
-        motorActividadServiceMock
+        motorActividadServiceMock,
+        repositorioActividadMock
       );
   }
 

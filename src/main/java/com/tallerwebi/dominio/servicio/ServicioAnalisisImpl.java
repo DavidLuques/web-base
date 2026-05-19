@@ -40,7 +40,7 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
     this.repositorioActividad = repositorioActividad;
   }
 
-  @Scheduled(fixedRate = 10000) // 1 minuto
+  @Scheduled(fixedRate = 180000) // 3 minuto
   @Override
   public void simularGeolocalizacion() {
     Mascota perro = repositorioMascota.buscarPorId(1L);
