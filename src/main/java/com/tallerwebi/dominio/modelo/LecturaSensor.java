@@ -2,79 +2,24 @@ package com.tallerwebi.dominio.modelo;
 
 public class LecturaSensor {
 
-  private Integer frecuenciaCardiaca;
-
-  private Double accelX;
-  private Double accelY;
-  private Double accelZ;
-
-  private Double gyroX;
-  private Double gyroY;
-  private Double gyroZ;
-
+  private DatosAnalisis datos;
   private Double latitud;
   private Double longitud;
 
-  public LecturaSensor() {}
-
-  public Integer getFrecuenciaCardiaca() {
-    return frecuenciaCardiaca;
+  public LecturaSensor() {
+    this.datos = new DatosAnalisis();
   }
 
-  public void setFrecuenciaCardiaca(Integer frecuenciaCardiaca) {
-    this.frecuenciaCardiaca = frecuenciaCardiaca;
+  public DatosAnalisis getDatos() {
+    return datos;
   }
 
-  public Double getAccelX() {
-    return accelX;
-  }
-
-  public void setAccelX(Double accelX) {
-    this.accelX = accelX;
-  }
-
-  public Double getAccelY() {
-    return accelY;
-  }
-
-  public void setAccelY(Double accelY) {
-    this.accelY = accelY;
-  }
-
-  public Double getAccelZ() {
-    return accelZ;
-  }
-
-  public void setAccelZ(Double accelZ) {
-    this.accelZ = accelZ;
-  }
-
-  public Double getGyroX() {
-    return gyroX;
-  }
-
-  public void setGyroX(Double gyroX) {
-    this.gyroX = gyroX;
-  }
-
-  public Double getGyroY() {
-    return gyroY;
-  }
-
-  public void setGyroY(Double gyroY) {
-    this.gyroY = gyroY;
-  }
-
-  public Double getGyroZ() {
-    return gyroZ;
-  }
-
-  public void setGyroZ(Double gyroZ) {
-    this.gyroZ = gyroZ;
+  public void setDatos(DatosAnalisis datos) {
+    this.datos = datos;
   }
 
   public Double getLatitud() {
-    return this.latitud;
+    return latitud;
   }
 
   public void setLatitud(Double latitud) {
@@ -82,10 +27,90 @@ public class LecturaSensor {
   }
 
   public Double getLongitud() {
-    return this.longitud;
+    return longitud;
   }
 
   public void setLongitud(Double longitud) {
     this.longitud = longitud;
+  }
+
+  public Integer getFrecuenciaCardiaca() {
+    return datos.getFrecuenciaCardiaca();
+  }
+
+  public void setFrecuenciaCardiaca(Integer frecuenciaCardiaca) {
+    datos.setFrecuenciaCardiaca(frecuenciaCardiaca);
+  }
+
+  public Double getAccelX() {
+    return datos.getAccelX();
+  }
+
+  public void setAccelX(Double accelX) {
+    datos.setAccelX(accelX);
+  }
+
+  public Double getAccelY() {
+    return datos.getAccelY();
+  }
+
+  public void setAccelY(Double accelY) {
+    datos.setAccelY(accelY);
+  }
+
+  public Double getAccelZ() {
+    return datos.getAccelZ();
+  }
+
+  public void setAccelZ(Double accelZ) {
+    datos.setAccelZ(accelZ);
+  }
+
+  public Double getGyroX() {
+    return datos.getGyroX();
+  }
+
+  public void setGyroX(Double gyroX) {
+    datos.setGyroX(gyroX);
+  }
+
+  public Double getGyroY() {
+    return datos.getGyroY();
+  }
+
+  public void setGyroY(Double gyroY) {
+    datos.setGyroY(gyroY);
+  }
+
+  public Double getGyroZ() {
+    return datos.getGyroZ();
+  }
+
+  public void setGyroZ(Double gyroZ) {
+    datos.setGyroZ(gyroZ);
+  }
+
+  public Integer getPresionSistolica() {
+    return datos.getPresionSistolica();
+  }
+
+  public void setPresionSistolica(Integer presionSistolica) {
+    datos.setPresionSistolica(presionSistolica);
+  }
+
+  public Integer getPresionDiastolica() {
+    return datos.getPresionDiastolica();
+  }
+
+  public void setPresionDiastolica(Integer presionDiastolica) {
+    datos.setPresionDiastolica(presionDiastolica);
+  }
+
+  public Double getTemperatura() {
+    return datos.getTemperatura();
+  }
+
+  public void setTemperatura(Double temperatura) {
+    datos.setTemperatura(temperatura);
   }
 }

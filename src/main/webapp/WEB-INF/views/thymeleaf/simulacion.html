@@ -147,6 +147,13 @@
               }
             });
           }
+          document.getElementById('nombre').textContent    = data.nombreMascota;
+          document.getElementById('estado').textContent    = data.estado;
+          document.getElementById('frecuencia').textContent = data.frecuenciaCardiaca ?? '-';
+          document.getElementById('sistolica').textContent  = data.presionSistolica ?? '-';
+          document.getElementById('diastolica').textContent = data.presionDiastolica ?? '-';
+          document.getElementById('temperatura').textContent = data.temperatura ?? '-';
+          document.getElementById('hora').textContent      = new Date().toLocaleTimeString();
         });
     }
 
