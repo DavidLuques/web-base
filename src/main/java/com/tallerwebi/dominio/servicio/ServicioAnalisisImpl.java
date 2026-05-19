@@ -1,8 +1,8 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioActividad;
-import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
+import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Actividad;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;

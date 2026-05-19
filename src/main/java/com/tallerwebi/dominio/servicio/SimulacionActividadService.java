@@ -64,14 +64,15 @@ public class SimulacionActividadService {
     EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
-
+    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
       estado,
       lectura.getFrecuenciaCardiaca(),
       lectura.getPresionSistolica(),
       lectura.getPresionDiastolica(),
-      lectura.getTemperatura()
+      lectura.getTemperatura(),
+      distanciaTotal
     );
   }
 
@@ -98,15 +99,19 @@ public class SimulacionActividadService {
 
   public ResultadoSimulacionDto obtenerEstadoActual(Long mascotaId) {
     Mascota mascota = mascotaDao.buscarPorId(mascotaId);
-    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
-      
+
     if (mascota == null) {
       return new ResultadoSimulacionDto("No encontrada", null, null);
     }
+    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
 
     Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(mascotaId);
     if (ultimo == null) {
-      return new ResultadoSimulacionDto(mascota.getNombre(), mascota.getEstadoActual(), distanciaTotal);
+      return new ResultadoSimulacionDto(
+        mascota.getNombre(),
+        mascota.getEstadoActual(),
+        distanciaTotal
+      );
     }
 
     return new ResultadoSimulacionDto(
@@ -115,7 +120,8 @@ public class SimulacionActividadService {
       ultimo.getDatos().getFrecuenciaCardiaca(),
       ultimo.getDatos().getPresionSistolica(),
       ultimo.getDatos().getPresionDiastolica(),
-      ultimo.getDatos().getTemperatura()
+      ultimo.getDatos().getTemperatura(),
+      distanciaTotal
     );
   }
 }

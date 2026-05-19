@@ -1,16 +1,15 @@
 package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-
-import com.tallerwebi.dominio.RepositorioActividad;
-import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
