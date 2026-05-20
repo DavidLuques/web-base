@@ -1,9 +1,11 @@
-INSERT INTO Usuario(id, email, password, rol, activo, nombre, telefono, calle, ciudad, pais, codigoPostal, provincia, fechaCreacion, avatarUrl)
-VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true, 'Test User', null, null, null, null, null, null, null, null);
+-- Usuarios
+INSERT INTO Usuario(email, password, rol, activo, nombre, calle, ciudad, provincia, pais, codigoPostal)
+VALUES('test@unlam.edu.ar', 'test', 'ADMIN', true, 'Test User', null, null, null, null, null);
 
-INSERT INTO Usuario(id, email, password, rol, activo, nombre, telefono, calle, ciudad, pais, codigoPostal, provincia, fechaCreacion, avatarUrl)
-VALUES(null, 'prueba@prueba.com', 'prueba', 'ADMIN', true, 'Usuario prueba', null, null, null, null, null, null, null, null);
+INSERT INTO Usuario(email, password, rol, activo, nombre, calle, ciudad, provincia, pais, codigoPostal)
+VALUES('prueba@prueba.com', 'prueba', 'ADMIN', true, 'Usuario prueba', null, null, null, null, null);
 
+-- Rangos Vitales
 INSERT INTO rango_vital_por_tamano
 (tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima)
 VALUES

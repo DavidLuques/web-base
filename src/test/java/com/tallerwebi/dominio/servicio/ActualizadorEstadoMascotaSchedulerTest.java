@@ -7,28 +7,30 @@ import org.junit.jupiter.api.Test;
 
 public class ActualizadorEstadoMascotaSchedulerTest {
 
-  private ActualizadorEstadoMascotaScheduler scheduler;
-  private SimulacionActividadService simulacionActividadServiceMock;
+    private SimulacionActividadService simulacionActividadServiceMock;
+    private ActualizadorEstadoMascotaScheduler scheduler;
 
-  @BeforeEach
-  public void init() {
-    simulacionActividadServiceMock = mock(SimulacionActividadService.class);
-    scheduler = new ActualizadorEstadoMascotaScheduler(simulacionActividadServiceMock);
-  }
+    @BeforeEach
+    public void init() {
+        simulacionActividadServiceMock = mock(SimulacionActividadService.class);
+        scheduler = new ActualizadorEstadoMascotaScheduler(simulacionActividadServiceMock);
+    }
 
-  @Test
-  public void cuandoActualizoEntoncesSeLlamaASimularDetalleParaTodas() {
-    scheduler.actualizarEstadosDeMascotas();
+    @Test
+    public void cuandoSeEjecutaElSchedulerDeActualizarEstadoEntoncesDebeLlamarAlServicio() {
+        // Ejecución
+        scheduler.actualizarEstadosDeMascotas();
 
-    verify(simulacionActividadServiceMock, times(1)).simularDetalleParaTodas();
-  }
+        // Verificación
+        verify(simulacionActividadServiceMock, times(1)).simularDetalleParaTodas();
+    }
 
-  @Test
-  public void cuandoActualizoVariasVecesEntoncesSeLlamaVariasVeces() {
-    scheduler.actualizarEstadosDeMascotas();
-    scheduler.actualizarEstadosDeMascotas();
-    scheduler.actualizarEstadosDeMascotas();
+    @Test
+    public void cuandoSeEjecutaElSchedulerDeActualizarFrecuenciaEntoncesDebeLlamarAlServicio() {
+        // Ejecución
+        scheduler.actualizarFrecuenciaCardiaca();
 
-    verify(simulacionActividadServiceMock, times(3)).simularDetalleParaTodas();
-  }
+        // Verificación
+        verify(simulacionActividadServiceMock, times(1)).actualizarFrecuenciaParaTodas();
+    }
 }
