@@ -3,6 +3,7 @@ package com.tallerwebi.dominio.modelo;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import java.math.BigDecimal;
 import javax.persistence.*;
 
 @Entity
@@ -29,6 +30,11 @@ public class Mascota {
   @ManyToOne
   @JoinColumn(name = "usuario_id", nullable = false)
   private Usuario usuario;
+
+  // Relaciono con base Tabla Raza
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_id_raza", nullable = false)
+  private Raza raza;
 
   public Mascota() {
     this.datos = new DatosMascota();
@@ -82,13 +88,17 @@ public class Mascota {
     this.datos = datos;
   }
 
-  // Delegación para mantener compatibilidad con el código existente
-  public Double getPeso() {
-    return datos.getPeso();
+  public BigDecimal getPeso() {
+    if (datos.getPeso() == null) return null;
+    return BigDecimal.valueOf(datos.getPeso());
   }
 
-  public void setPeso(Double peso) {
-    datos.setPeso(peso);
+  public void setPeso(BigDecimal peso) {
+    if (peso != null) {
+      datos.setPeso(peso.doubleValue());
+    } else {
+      datos.setPeso(null);
+    }
   }
 
   public Boolean isEsteril() {
@@ -111,12 +121,13 @@ public class Mascota {
     datos.setFechaNacimiento(fechaNacimiento);
   }
 
-  public String getRaza() {
-    return datos.getRaza();
+  // Retorno objeto Raza
+  public Raza getRaza() {
+    return this.raza;
   }
 
-  public void setRaza(String raza) {
-    datos.setRaza(raza);
+  public void setRaza(Raza raza) {
+    this.raza = raza;
   }
 
   public String getGenero() {

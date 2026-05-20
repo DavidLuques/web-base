@@ -7,7 +7,6 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class DatosMascota {
 
-  private String raza;
   private String genero;
   private String tipo;
   private Double peso;
@@ -21,14 +20,7 @@ public class DatosMascota {
 
   public DatosMascota() {}
 
-  public String getRaza() {
-    return raza;
-  }
-
-  public void setRaza(String raza) {
-    this.raza = raza;
-  }
-
+  //Saco los getters y setter de Raza
   public String getGenero() {
     return genero;
   }

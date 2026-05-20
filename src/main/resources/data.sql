@@ -19,6 +19,12 @@ INSERT INTO rango_vital_por_tamano
 VALUES
 ('GRANDE', 60, 100, 120, 150, 80, 95);
 
-INSERT INTO mascota(nombre, estado_actual, tamano, raza, genero, tipo, peso, esteril, usuario_id)
-VALUES ('Firulais', 'CAMINANDO', 'MEDIANO', 'Labrador', 'Macho', 'Perro', 10.5, true, 2);
+INSERT INTO Raza (pk_id_raza, nombre, tipo, peso_min_macho, peso_max_macho, peso_min_hembra, peso_max_hembra)
+VALUES (1, 'Labrador', 'Grande', 10.00, 20.00, 8.00, 18.00);
+
+INSERT INTO mascota(nombre, estado_actual, tamano, fk_id_raza, genero, tipo, peso, esteril, usuario_id)
+VALUES ('Firulais', 'CAMINANDO', 'MEDIANO', 1, 'Macho', 'Perro', 10.5, true, 2);
+
+INSERT INTO mascota (nombre, estado_actual, tamano, fk_id_raza, genero, tipo, peso, esteril, usuario_id)
+VALUES ('Firulais2', 'SALUDABLE', 'GRANDE', 1, 'Macho', 'Perro', 15.00, true,2);
 
