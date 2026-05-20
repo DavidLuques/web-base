@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
@@ -16,6 +15,8 @@ import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.modelo.Analisis;
+import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -49,6 +50,7 @@ public class SimulacionActividadServiceTest {
     motorActividadServiceMock = mock(MotorActividadService.class);
     repositorioActividadMock = mock(RepositorioActividad.class);
     servicioAnalisisMock = mock(ServicioAnalisis.class);
+    repositorioAnalisisMock = mock(RepositorioAnalisis.class);
 
     simulacionActividadService =
       new SimulacionActividadService(
@@ -228,5 +230,101 @@ public class SimulacionActividadServiceTest {
 
     verify(simuladorCollarServiceMock, never())
       .actualizarFrecuencia(anyLong(), any(), anyInt(), anyInt());
+  }
+
+  @Test
+  public void dadoUnaMascotaCuandoSimuloAlertaDetalleEntoncesSeGeneraLecturaCriticaYSePersiste() {
+    Long mascotaId = 1L;
+    Mascota mascota = new Mascota();
+    mascota.setId(mascotaId);
+    mascota.setNombre("Boby");
+    mascota.setTamano(TamanoMascota.MEDIANO);
+
+    LecturaSensor lecturaCritica = lecturaCompleta();
+    lecturaCritica.setFrecuenciaCardiaca(160);
+
+    when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(mascota);
+    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rangoCompleto());
+    when(
+      simuladorCollarServiceMock.generarLecturaCritica(
+        eq(mascotaId),
+        any(),
+        eq(120),
+        eq(SISTOLICA_MAXIMA),
+        eq(DIASTOLICA_MAXIMA)
+      )
+    )
+      .thenReturn(lecturaCritica);
+    when(motorActividadServiceMock.analizar(eq(mascota), any())).thenReturn(EstadoMascota.CORRIENDO);
+    when(repositorioActividadMock.obtenerDistanciaTotalPorMascota(mascotaId)).thenReturn(10.5);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.simularAlertaDetalle(mascotaId);
+
+    assertThat(resultado.getEstado(), equalTo(EstadoMascota.CORRIENDO));
+    assertThat(resultado.getFrecuenciaCardiaca(), equalTo(160));
+    assertThat(resultado.getDistanciaRecorrida(), equalTo(10.5));
+    verify(mascotaDaoMock).modificar(mascota);
+  }
+
+  @Test
+  public void dadoUnaMascotaQueNoExisteCuandoObtengoEstadoActualEntoncesDevuelveNoEncontrada() {
+    Long mascotaId = 1L;
+    when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(null);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.obtenerEstadoActual(mascotaId);
+
+    assertThat(resultado.getNombreMascota(), equalTo("No encontrada"));
+    assertThat(resultado.getEstado(), nullValue());
+  }
+
+  @Test
+  public void dadoUnaMascotaSinAnalisisPreviosCuandoObtengoEstadoActualEntoncesDevuelveDtoBasico() {
+    Long mascotaId = 1L;
+    Mascota mascota = new Mascota();
+    mascota.setId(mascotaId);
+    mascota.setNombre("Luna");
+    mascota.setEstadoActual(EstadoMascota.DURMIENDO);
+
+    when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(mascota);
+    when(repositorioActividadMock.obtenerDistanciaTotalPorMascota(mascotaId)).thenReturn(2.0);
+    when(repositorioAnalisisMock.obtenerUltimoAnalisis(mascotaId)).thenReturn(null);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.obtenerEstadoActual(mascotaId);
+
+    assertThat(resultado.getNombreMascota(), equalTo("Luna"));
+    assertThat(resultado.getEstado(), equalTo(EstadoMascota.DURMIENDO));
+    assertThat(resultado.getDistanciaRecorrida(), equalTo(2.0));
+    assertThat(resultado.getFrecuenciaCardiaca(), nullValue());
+  }
+
+  @Test
+  public void dadoUnaMascotaConAnalisisPreviosCuandoObtengoEstadoActualEntoncesDevuelveDtoCompleto() {
+    Long mascotaId = 1L;
+    Mascota mascota = new Mascota();
+    mascota.setId(mascotaId);
+    mascota.setNombre("Luna");
+    mascota.setEstadoActual(EstadoMascota.DURMIENDO);
+
+    Analisis analisis = new Analisis();
+    DatosAnalisis datos = new DatosAnalisis();
+    datos.setFrecuenciaCardiaca(70);
+    datos.setPresionSistolica(110);
+    datos.setPresionDiastolica(70);
+    datos.setTemperatura(38.0);
+    analisis.setDatos(datos);
+
+    when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(mascota);
+    when(repositorioActividadMock.obtenerDistanciaTotalPorMascota(mascotaId)).thenReturn(2.0);
+    when(repositorioAnalisisMock.obtenerUltimoAnalisis(mascotaId)).thenReturn(analisis);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.obtenerEstadoActual(mascotaId);
+
+    assertThat(resultado.getNombreMascota(), equalTo("Luna"));
+    assertThat(resultado.getEstado(), equalTo(EstadoMascota.DURMIENDO));
+    assertThat(resultado.getDistanciaRecorrida(), equalTo(2.0));
+    assertThat(resultado.getFrecuenciaCardiaca(), equalTo(70));
+    assertThat(resultado.getPresionSistolica(), equalTo(110));
+    assertThat(resultado.getPresionDiastolica(), equalTo(70));
+    assertThat(resultado.getTemperatura(), equalTo(38.0));
   }
 }
