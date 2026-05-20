@@ -15,8 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MotorActividadService {
 
-  private final RangoVitalDao rangoVitalDao;
+  private static final int ORDEN_DURMIENDO = 0;
+  private static final int ORDEN_REPOSO = 1;
+  private static final int ORDEN_CAMINANDO = 2;
+  private static final int ORDEN_CORRIENDO = 3;
 
+  private final RangoVitalDao rangoVitalDao;
   private final Map<Long, EstadoMascota> memoriaEstados = new HashMap<>();
 
   @Autowired
@@ -28,31 +32,28 @@ public class MotorActividadService {
     RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
 
     int frecuencia = lectura.getFrecuenciaCardiaca();
-
     double movimiento = calcularMagnitud(
       lectura.getAccelX(),
       lectura.getAccelY(),
       lectura.getAccelZ()
     );
-
     double rotacion = calcularMagnitud(lectura.getGyroX(), lectura.getGyroY(), lectura.getGyroZ());
 
     int min = rango.getFrecuenciaMinima();
     int max = rango.getFrecuenciaMaxima();
-
     int rangoFreq = max - min;
 
-    int dormido = min + (rangoFreq / 4);
-    int reposo = min + (rangoFreq / 2);
-    int caminando = min + ((rangoFreq * 3) / 4);
+    int limiteDormido = min + (rangoFreq / 4);
+    int limiteReposo = min + (rangoFreq / 2);
+    int limiteCaminando = min + ((rangoFreq * 3) / 4);
 
     EstadoMascota nuevoEstado = evaluarEstado(
       frecuencia,
       movimiento,
       rotacion,
-      dormido,
-      reposo,
-      caminando
+      limiteDormido,
+      limiteReposo,
+      limiteCaminando
     );
 
     return aplicarTransicionRealista(mascota.getId(), nuevoEstado);
@@ -66,19 +67,48 @@ public class MotorActividadService {
       return nuevoEstado;
     }
 
-    if (esSaltoBrusco(anterior, nuevoEstado)) {
-      return anterior;
-    }
-
-    memoriaEstados.put(idMascota, nuevoEstado);
-    return nuevoEstado;
+    EstadoMascota estadoPermitido = avanzarUnPaso(anterior, nuevoEstado);
+    memoriaEstados.put(idMascota, estadoPermitido);
+    return estadoPermitido;
   }
 
-  private boolean esSaltoBrusco(EstadoMascota anterior, EstadoMascota nuevo) {
-    return (
-      (anterior == EstadoMascota.CORRIENDO && nuevo == EstadoMascota.DURMIENDO) ||
-      (anterior == EstadoMascota.DURMIENDO && nuevo == EstadoMascota.CORRIENDO)
-    );
+  private EstadoMascota avanzarUnPaso(EstadoMascota anterior, EstadoMascota objetivo) {
+    int ordenAnterior = ordenDe(anterior);
+    int ordenObjetivo = ordenDe(objetivo);
+
+    if (ordenObjetivo > ordenAnterior) {
+      return estadoConOrden(ordenAnterior + 1);
+    } else if (ordenObjetivo < ordenAnterior) {
+      return estadoConOrden(ordenAnterior - 1);
+    } else {
+      return anterior;
+    }
+  }
+
+  private int ordenDe(EstadoMascota estado) {
+    switch (estado) {
+      case DURMIENDO:
+        return ORDEN_DURMIENDO;
+      case REPOSO:
+        return ORDEN_REPOSO;
+      case CAMINANDO:
+        return ORDEN_CAMINANDO;
+      default:
+        return ORDEN_CORRIENDO;
+    }
+  }
+
+  private EstadoMascota estadoConOrden(int orden) {
+    switch (orden) {
+      case ORDEN_DURMIENDO:
+        return EstadoMascota.DURMIENDO;
+      case ORDEN_REPOSO:
+        return EstadoMascota.REPOSO;
+      case ORDEN_CAMINANDO:
+        return EstadoMascota.CAMINANDO;
+      default:
+        return EstadoMascota.CORRIENDO;
+    }
   }
 
   private EstadoMascota evaluarEstado(

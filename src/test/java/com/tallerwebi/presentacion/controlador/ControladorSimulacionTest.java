@@ -28,7 +28,8 @@ public class ControladorSimulacionTest {
 
     ResultadoSimulacionDto resultadoEsperado = new ResultadoSimulacionDto(
       "Toby",
-      EstadoMascota.CAMINANDO
+      EstadoMascota.CAMINANDO,
+      null
     );
 
     when(simulacionActividadServiceMock.simularDetalle(mascotaId)).thenReturn(resultadoEsperado);

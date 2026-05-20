@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Simulador de Actividad - PetTracker</title>
+
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ApexCharts CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    /* Subtle custom scrollbar for clean premium dashboard feel */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
+
+  <!-- Nav Bar Superior -->
+  <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100 h-16">
+    <div class="max-w-7xl mx-auto h-full px-4 md:px-8 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-2 font-black text-xl text-indigo-600 tracking-tight cursor-pointer">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+          <i data-lucide="paw-print" class="w-5 h-5 fill-indigo-100"></i>
+        </div>
+        <span>PetTracker</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex items-center gap-1.5">
+        <a href="#" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="text-slate-500 hover:text-slate-800 hover:bg-slate-50 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all">
+          <i data-lucide="dog" class="w-4 h-4"></i>
+          <span>Mascotas</span>
+        </a>
+        <a href="#" class="text-slate-500 hover:text-slate-800 hover:bg-slate-50 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all">
+          <i data-lucide="radio" class="w-4 h-4"></i>
+          <span>Collar</span>
+        </a>
+        <a href="#" class="text-slate-500 hover:text-slate-800 hover:bg-slate-50 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span>Perfil</span>
+        </a>
+      </div>
+
+      <!-- Right Actions (Logout) -->
+      <div class="flex items-center gap-4">
+        <a href="/spring/login" class="flex items-center gap-1.5 text-sm text-slate-500 hover:text-red-600 font-medium py-2 px-3 rounded-xl hover:bg-red-50 transition-all duration-150">
+          <span>Cerrar sesión</span>
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 md:px-8 py-8">
+
+    <!-- Encabezado de Página & Selector de Mascota -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard</h1>
+        <p class="text-slate-500 text-sm mt-1">Monitorea el estado de tus mascotas en tiempo real</p>
+      </div>
+
+      <!-- Selector de Mascota Estilizado -->
+      <div class="flex items-center gap-3 bg-white border border-slate-100 shadow-sm rounded-2xl p-3 pr-5 self-start md:self-auto">
+        <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-lg">
+          <i data-lucide="dog" class="w-5 h-5 text-amber-600"></i>
+        </div>
+        <div>
+          <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <span id="nombre">Firulais</span>
+            <span id="badge-estado-header" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold">
+              <span class="w-1.5 h-1.5 mr-1 rounded-full bg-slate-400 animate-pulse" id="dot-estado-header"></span>
+              <span id="header-estado-texto">Cargando...</span>
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-medium mt-0.5">Labrador Retriever</p>
+        </div>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 ml-4 cursor-pointer hover:text-slate-600 transition-colors"></i>
+      </div>
+    </div>
+
+    <!-- Panel de Control de Alertas -->
+    <div class="bg-red-50 rounded-3xl p-6 border border-red-100 shadow-sm mb-8 flex flex-col md:flex-row items-center justify-between gap-6 transition-all duration-200">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center text-red-500 flex-shrink-0">
+          <i data-lucide="siren" class="w-6 h-6 text-red-600"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-red-800">Prueba de Alertas</h3>
+          <p class="text-xs md:text-sm text-red-600 mt-0.5">Inyectar valores críticos (taquicardia, fiebre alta) para verificar el sistema de emergencias.</p>
+        </div>
+      </div>
+      <div class="w-full md:w-auto flex items-center gap-3">
+        <button id="btn-forzar-alerta" class="w-full md:w-auto bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold px-6 py-3.5 rounded-2xl shadow-lg shadow-red-200 flex items-center justify-center gap-2 transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0">
+          <i data-lucide="triangle-alert" class="w-4 h-4 fill-current"></i>
+          <span>Forzar Valores Críticos</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 4 Tarjetas de Métricas Principales (Quick Stats) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      
+      <!-- Tarjeta 1: Ubicación -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center justify-between transition-all duration-200 hover:shadow-md">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ubicación</p>
+          <h3 class="text-2xl font-bold text-slate-800 mt-1.5 tracking-tight" id="card-ubicacion-valor">En casa</h3>
+          <p class="text-[11px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span id="card-ubicacion-update">Actualizado recién</span>
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+          <i data-lucide="map-pin" class="w-6 h-6 text-emerald-600"></i>
+        </div>
+      </div>
+
+      <!-- Tarjeta 2: Frecuencia Cardíaca -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center justify-between transition-all duration-200 hover:shadow-md">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Frecuencia Cardíaca</p>
+          <h3 class="text-2xl font-bold text-slate-800 mt-1.5 tracking-tight">
+            <span id="frecuencia">--</span> <span class="text-xs font-normal text-slate-400">bpm</span>
+          </h3>
+          <p class="text-[11px] font-semibold mt-1 flex items-center gap-1">
+            <i data-lucide="heart" class="w-3 h-3 text-blue-500 fill-current"></i>
+            <span id="badge-actividad" class="text-blue-500">Nivel de Actividad</span>
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
+          <i data-lucide="activity" class="w-6 h-6 text-blue-600"></i>
+        </div>
+      </div>
+
+      <!-- Tarjeta 3: Temperatura -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center justify-between transition-all duration-200 hover:shadow-md">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Temperatura</p>
+          <h3 class="text-2xl font-bold text-slate-800 mt-1.5 tracking-tight">
+            <span id="temperatura">--</span> <span class="text-xs font-normal text-slate-400">°C</span>
+          </h3>
+          <p class="text-[11px] font-semibold text-amber-500 mt-1 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span id="status-temperatura">Estable</span>
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500">
+          <i data-lucide="thermometer" class="w-6 h-6 text-amber-600"></i>
+        </div>
+      </div>
+
+      <!-- Tarjeta 4: Presión Arterial -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center justify-between transition-all duration-200 hover:shadow-md">
+        <div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Presión Arterial</p>
+          <h3 class="text-2xl font-bold text-slate-800 mt-1.5 tracking-tight">
+            <span id="sistolica">--</span>/<span id="diastolica">--</span> <span class="text-xs font-normal text-slate-400">mmHg</span>
+          </h3>
+          <p class="text-[11px] font-medium text-purple-500 mt-1 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+            <span>Promedio normal</span>
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-500">
+          <i data-lucide="heart" class="w-6 h-6 text-purple-600"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sección de Gráficos (2 Columnas) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      
+      <!-- Gráfico Izquierdo: Actividad diaria (Distancia) -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col transition-all duration-200 hover:shadow-md">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-bold text-slate-800 text-lg">Actividad diaria</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Distancia total recorrida hoy (km)</p>
+          </div>
+          <span class="bg-emerald-50 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+            <span>+12% vs ayer</span>
+          </span>
+        </div>
+        <div id="chart-historial-distancia" class="w-full mt-4 min-h-[300px]"></div>
+      </div>
+
+      <!-- Gráfico Derecho: Frecuencia Cardíaca Dinámica -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col transition-all duration-200 hover:shadow-md">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-bold text-slate-800 text-lg">Frecuencia cardíaca</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Monitoreo de latidos por minuto en tiempo real</p>
+          </div>
+          <span class="bg-slate-100 text-slate-600 text-[11px] font-medium px-2.5 py-1 rounded-lg flex items-center gap-1">
+            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+            <span id="hora">00:00:00</span>
+          </span>
+        </div>
+        <div id="chart-frecuencia-cardiaca-realtime" class="w-full mt-4 min-h-[300px]"></div>
+      </div>
+
+    </div>
+
+    <!-- Mapa de Ubicación -->
+    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm mb-8 transition-all duration-200 hover:shadow-md">
+      <h3 class="font-bold text-slate-800 text-lg mb-4">Mapa de ubicación</h3>
+      
+      <!-- Canvas de Mapa Estilizado -->
+      <div class="relative w-full h-80 rounded-2xl bg-gradient-to-br from-emerald-50 via-emerald-100/50 to-teal-50 border border-slate-100 overflow-hidden flex flex-col items-center justify-center">
+        
+        <!-- Líneas y cuadrícula para estilo de mapa digital -->
+        <div class="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        
+        <!-- Elementos del mapa abstracto -->
+        <div class="absolute w-48 h-12 bg-white/40 border border-white/20 rounded-full blur-sm top-12 left-16"></div>
+        <div class="absolute w-32 h-32 bg-emerald-200/30 rounded-full blur-md bottom-10 right-20"></div>
+
+        <!-- Indicador de Ubicación Pulsante -->
+        <div class="relative flex items-center justify-center">
+          <span class="absolute inline-flex h-20 w-20 rounded-full bg-emerald-500/20 animate-ping opacity-75"></span>
+          <span class="absolute inline-flex h-10 w-10 rounded-full bg-emerald-500/30 animate-pulse"></span>
+          <div class="relative w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-200 border-2 border-white text-white">
+            <i data-lucide="map-pin" class="w-5 h-5 animate-bounce"></i>
+          </div>
+        </div>
+
+        <!-- Tarjeta de Detalles del Mapa -->
+        <div class="absolute bottom-6 bg-white/95 backdrop-blur-sm border border-slate-100 px-6 py-4 rounded-2xl shadow-xl shadow-slate-900/5 text-center flex flex-col items-center gap-1 mx-4 max-w-sm">
+          <p class="text-sm font-medium text-slate-500">
+            Ubicación actual: <span id="map-location" class="font-extrabold text-slate-800">Cargando...</span>
+          </p>
+          <p class="text-xs text-slate-400 font-mono mt-0.5 tracking-tight" id="lbl-coordenadas">
+            19.4326° N, 99.1332° W
+          </p>
+          <a href="#" class="mt-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-all duration-150 shadow-md shadow-indigo-100">
+            Ver en mapa completo
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerta: Recordatorio de Geocerca -->
+    <div class="bg-amber-50/70 border border-amber-100 rounded-3xl p-5 flex items-start gap-4 transition-all duration-200 hover:bg-amber-50">
+      <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+        <i data-lucide="alert-triangle" class="w-5 h-5 fill-amber-50"></i>
+      </div>
+      <div class="flex-1">
+        <h4 class="font-bold text-amber-800 text-sm tracking-tight">Recordatorio de geocerca</h4>
+        <p class="text-xs text-amber-700 mt-0.5 leading-relaxed">
+          No has configurado una geocerca. Te recomendamos configurar una para recibir alertas si tu mascota sale de zonas seguras.
+        </p>
+        <a href="#" class="inline-flex items-center text-xs font-bold text-amber-900 hover:underline mt-2 gap-1">
+          <span>Configurar geocerca</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Lógica JavaScript e Integración -->
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const idMascota = [[${idMascota}]];
+    
+    // Historial dinámico para el gráfico de latidos
+    let heartbeatHistory = [72, 75, 71, 74, 80, 85, 83, 79, 75, 77];
+    let heartbeatTimes = ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00'];
+    
+    // Coordenadas base de simulación
+    let latBase = 19.4326;
+    let lngBase = -99.1332;
+
+    // Configuración inicial del Gráfico de Actividad Diaria (Área suave azul degradada)
+    const optionsActividad = {
+      series: [{
+        name: "Distancia (km)",
+        data: [0.0, 0.2, 0.3, 0.8, 1.4, 2.1, 2.5]
+      }],
+      chart: {
+        height: 290,
+        type: 'area',
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        fontFamily: 'Inter, sans-serif'
+      },
+      dataLabels: { enabled: false },
+      stroke: {
+        curve: 'smooth',
+        width: 3.5,
+        colors: ['#4f46e5'] // Indigo
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.45,
+          opacityTo: 0.05,
+          stops: [0, 90, 100],
+          colorStops: [
+            {
+              offset: 0,
+              color: '#4f46e5',
+              opacity: 0.4
+            },
+            {
+              offset: 100,
+              color: '#4f46e5',
+              opacity: 0.01
+            }
+          ]
+        }
+      },
+      colors: ['#4f46e5'],
+      xaxis: {
+        categories: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+        labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 500 } },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      yaxis: {
+        labels: {
+          style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 500 },
+          formatter: function (value) { return value.toFixed(1) + " km"; }
+        }
+      },
+      grid: {
+        borderColor: '#f1f5f9',
+        strokeDashArray: 4,
+        yaxis: { lines: { show: true } },
+        xaxis: { lines: { show: false } }
+      },
+      tooltip: {
+        theme: 'light',
+        x: { show: true },
+        y: { formatter: function (val) { return val.toFixed(2) + " km"; } }
+      }
+    };
+
+    // Configuración del Gráfico de Frecuencia Cardíaca Real-time (Línea roja con puntos)
+    const optionsFrecuencia = {
+      series: [{
+        name: "Frecuencia Cardíaca (bpm)",
+        data: heartbeatHistory
+      }],
+      chart: {
+        height: 290,
+        type: 'line',
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        fontFamily: 'Inter, sans-serif'
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 3,
+        colors: ['#ef4444'] // Red
+      },
+      colors: ['#ef4444'],
+      markers: {
+        size: 5,
+        colors: ['#ef4444'],
+        strokeColors: '#ffffff',
+        strokeWidth: 2,
+        hover: { size: 7 }
+      },
+      xaxis: {
+        categories: heartbeatTimes,
+        labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 500 } },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+      },
+      yaxis: {
+        min: 40,
+        max: 180,
+        labels: {
+          style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 500 },
+          formatter: function (value) { return Math.round(value) + " bpm"; }
+        }
+      },
+      grid: {
+        borderColor: '#f1f5f9',
+        strokeDashArray: 4,
+        yaxis: { lines: { show: true } }
+      },
+      tooltip: {
+        theme: 'light',
+        x: { show: true },
+        y: { formatter: function (val) { return val + " bpm"; } }
+      }
+    };
+
+    // Renderizado inicial de los gráficos
+    const chartActividad = new ApexCharts(document.querySelector("#chart-historial-distancia"), optionsActividad);
+    const chartFrecuencia = new ApexCharts(document.querySelector("#chart-frecuencia-cardiaca-realtime"), optionsFrecuencia);
+
+    chartActividad.render();
+    chartFrecuencia.render();
+
+    // Mapeo adaptativo y dinámico de los estados biológicos y visuales de la mascota
+    function actualizarVisualesEstado(estado) {
+      const headerBadge = document.getElementById('badge-estado-header');
+      const headerDot = document.getElementById('dot-estado-header');
+      const headerTexto = document.getElementById('header-estado-texto');
+      const cardUbicacionVal = document.getElementById('card-ubicacion-valor');
+      const mapLocationVal = document.getElementById('map-location');
+
+      if (!estado) return;
+
+      let badgeClasses = "";
+      let dotClasses = "w-1.5 h-1.5 mr-1 rounded-full animate-pulse ";
+      let textoStr = "";
+      let ubicacionStr = "";
+      let mapStr = "";
+
+      switch(estado) {
+        case 'DURMIENDO':
+          badgeClasses = "bg-slate-100 text-slate-700 border border-slate-200";
+          dotClasses += "bg-slate-400";
+          textoStr = "Durmiendo";
+          ubicacionStr = "En casa";
+          mapStr = "Casa (Dormido)";
+          break;
+        case 'REPOSO':
+          badgeClasses = "bg-blue-50 text-blue-700 border border-blue-100";
+          dotClasses += "bg-blue-500";
+          textoStr = "En reposo";
+          ubicacionStr = "En casa";
+          mapStr = "Casa (Descansando)";
+          break;
+        case 'CAMINANDO':
+          badgeClasses = "bg-green-50 text-green-700 border border-green-100";
+          dotClasses += "bg-green-500";
+          textoStr = "Caminando";
+          ubicacionStr = "En movimiento";
+          mapStr = "Calle / Paseo";
+          break;
+        case 'CORRIENDO':
+          badgeClasses = "bg-red-50 text-red-700 border border-red-100";
+          dotClasses += "bg-red-500";
+          textoStr = "Corriendo";
+          ubicacionStr = "Parque";
+          mapStr = "Parque (Activo)";
+          break;
+        default:
+          badgeClasses = "bg-slate-100 text-slate-700 border border-slate-200";
+          dotClasses += "bg-slate-400";
+          textoStr = estado;
+          ubicacionStr = "Desconocido";
+          mapStr = "Desconocido";
+      }
+
+      headerBadge.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeClasses}`;
+      headerDot.className = dotClasses;
+      headerTexto.textContent = textoStr;
+      cardUbicacionVal.textContent = ubicacionStr;
+      mapLocationVal.textContent = mapStr;
+    }
+
+    // Procesa los datos y los vuelca a la pantalla y gráficos
+    function actualizarValoresPantalla(data, esForzado) {
+      if (!data) return;
+
+      // Actualizar datos del header e información básica
+      if (data.nombreMascota) {
+        document.getElementById('nombre').textContent = data.nombreMascota;
+      }
+      
+      // Actualizar visuales del estado
+      actualizarVisualesEstado(data.estado);
+
+      // Actualizar tarjeta de Frecuencia Cardíaca
+      const bpm = data.frecuenciaCardiaca || 0;
+      document.getElementById('frecuencia').textContent = bpm;
+      
+      const badgeActividad = document.getElementById('badge-actividad');
+      if (bpm > 120 || data.estado === 'CORRIENDO') {
+        badgeActividad.textContent = "Nivel Alto de Actividad";
+        badgeActividad.className = "text-red-500 font-semibold";
+      } else if (bpm > 0) {
+        badgeActividad.textContent = data.estado === 'DURMIENDO' ? "En reposo (Sueño)" : "Nivel Normal";
+        badgeActividad.className = "text-blue-500 font-semibold";
+      } else {
+        badgeActividad.textContent = "Sin señal de sensor";
+        badgeActividad.className = "text-slate-400 font-semibold";
+      }
+
+      // Actualizar tarjeta de Temperatura
+      const temp = data.temperatura || 38.5;
+      document.getElementById('temperatura').textContent = temp.toFixed(1);
+      const statusTemp = document.getElementById('status-temperatura');
+      if (temp > 39.2) {
+        statusTemp.textContent = "Temperatura Elevada";
+        statusTemp.className = "text-red-500 font-semibold";
+      } else {
+        statusTemp.textContent = "Estable";
+        statusTemp.className = "text-emerald-500 font-semibold";
+      }
+
+      // Actualizar tarjeta de Presión Arterial
+      document.getElementById('sistolica').textContent = data.presionSistolica || 120;
+      document.getElementById('diastolica').textContent = data.presionDiastolica || 80;
+
+      // Actualizar última hora de recarga
+      document.getElementById('hora').textContent = new Date().toLocaleTimeString();
+
+      // Simulación de coordenadas de movimiento en el mapa
+      if (data.estado === 'CAMINANDO' || data.estado === 'CORRIENDO') {
+        const offsetMultiplier = data.estado === 'CORRIENDO' ? 0.0009 : 0.0004;
+        let randomLat = latBase + (Math.random() - 0.5) * offsetMultiplier;
+        let randomLng = lngBase + (Math.random() - 0.5) * offsetMultiplier;
+        document.getElementById('lbl-coordenadas').textContent = `${randomLat.toFixed(4)}° N, ${Math.abs(randomLng).toFixed(4)}° W`;
+      } else {
+        document.getElementById('lbl-coordenadas').textContent = `${latBase.toFixed(4)}° N, ${Math.abs(lngBase).toFixed(4)}° W`;
+      }
+
+      // Actualizar Gráfico Histórico de Frecuencia Cardíaca (Real-time moving)
+      if (bpm > 0) {
+        heartbeatHistory.push(bpm);
+        if (heartbeatHistory.length > 10) heartbeatHistory.shift();
+
+        const currentTimeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        heartbeatTimes.push(currentTimeStr);
+        if (heartbeatTimes.length > 10) heartbeatTimes.shift();
+
+        chartFrecuencia.updateOptions({
+          xaxis: { categories: heartbeatTimes }
+        });
+        chartFrecuencia.updateSeries([{
+          data: heartbeatHistory
+        }]);
+      }
+
+      // Actualizar Gráfico de Actividad/Distancia
+      if (data.distanciaRecorrida != null) {
+        // Genera valores de progreso incremental realistas
+        let dist = data.distanciaRecorrida;
+        let chartData = [
+          0.0,
+          dist * 0.1,
+          dist * 0.25,
+          dist * 0.4,
+          dist * 0.65,
+          dist * 0.85,
+          dist
+        ];
+        chartActividad.updateSeries([{
+          name: "Distancia (km)",
+          data: chartData
+        }]);
+      }
+    }
+
+    // Consulta de Estado Pasivo (Polling)
+    function consultarEstado() {
+      fetch('/spring/simulacion/estado/' + idMascota)
+        .then(response => response.json())
+        .then(data => {
+          actualizarValoresPantalla(data, false);
+        })
+        .catch(err => console.error("Error consultando estado de mascota:", err));
+    }
+
+    // Función de inicialización
+    function iniciar() {
+      consultarEstado();
+      // Re-trigger de íconos vectoriales
+      lucide.createIcons();
+    }
+
+    iniciar();
+    // Ejecutar polling automático cada 5 segundos para mantenerlo fresco con el Scheduler
+    const pollingInterval = setInterval(consultarEstado, 5000);
+
+    // Lógica para Botón de Forzar Alerta
+    const btnForzar = document.getElementById('btn-forzar-alerta');
+    if (btnForzar) {
+      btnForzar.addEventListener('click', function() {
+        btnForzar.disabled = true;
+        const originalHTML = btnForzar.innerHTML;
+        btnForzar.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Inyectando crisis...</span>`;
+        
+        fetch('/spring/simulacion/alerta/' + idMascota)
+          .then(response => response.json())
+          .then(data => {
+            actualizarValoresPantalla(data, true);
+            // Destello rojo para confirmar alerta
+            const cards = document.querySelectorAll('.grid > div');
+            cards.forEach(card => {
+              card.classList.add('ring-4', 'ring-red-500', 'border-red-500');
+              setTimeout(() => {
+                card.classList.remove('ring-4', 'ring-red-500', 'border-red-500');
+              }, 1000);
+            });
+          })
+          .catch(err => console.error("Error forzando alerta:", err))
+          .finally(() => {
+            setTimeout(() => {
+              btnForzar.disabled = false;
+              btnForzar.innerHTML = originalHTML;
+              lucide.createIcons();
+            }, 800);
+          });
+      });
+    }
+
+    /*]]>*/
+  </script>
+</body>
+
+</html>
