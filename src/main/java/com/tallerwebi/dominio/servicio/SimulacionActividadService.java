@@ -76,6 +76,33 @@ public class SimulacionActividadService {
     );
   }
 
+  public ResultadoSimulacionDto simularAlertaDetalle(Long mascotaId) {
+    Mascota mascota = mascotaDao.buscarPorId(mascotaId);
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
+
+    LecturaSensor lectura = simuladorCollarService.generarLecturaCritica(
+      mascota.getId(),
+      mascota.getEstadoActual(),
+      rango.getFrecuenciaMaxima(),
+      rango.getSistolicaMaxima(),
+      rango.getDiastolicaMaxima()
+    );
+
+    EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
+    mascota.setEstadoActual(estado);
+    mascotaDao.modificar(mascota);
+    Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
+    return new ResultadoSimulacionDto(
+      mascota.getNombre(),
+      estado,
+      lectura.getFrecuenciaCardiaca(),
+      lectura.getPresionSistolica(),
+      lectura.getPresionDiastolica(),
+      lectura.getTemperatura(),
+      distanciaTotal
+    );
+  }
+
   public void simularDetalleParaTodas() {
     List<Mascota> mascotas = mascotaDao.buscarTodas();
     for (Mascota mascota : mascotas) {

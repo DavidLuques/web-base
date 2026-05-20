@@ -54,7 +54,6 @@ public class SimuladorCollarService {
 
   private final Random random = new Random();
 
-  // Sobrecarga sin presión ni frecuencia incremental (usada por ServicioAnalisisImpl)
   public LecturaSensor generarLectura(Integer frecuenciaMinima, Integer frecuenciaMaxima) {
     EstadoMascota estadoSimulado = sortearEstado();
 
@@ -76,7 +75,6 @@ public class SimuladorCollarService {
     return lectura;
   }
 
-  // Método completo con frecuencia incremental por mascota, presión y temperatura
   public LecturaSensor generarLectura(
     Long idMascota,
     EstadoMascota estadoActual,
@@ -121,6 +119,44 @@ public class SimuladorCollarService {
     lectura.setTemperatura(Math.round(temperaturaActual * 10.0) / 10.0);
 
     actualizarGpsSegun(estadoSimulado);
+    lectura.setLatitud(latitudActual);
+    lectura.setLongitud(longitudActual);
+
+    return lectura;
+  }
+
+  public LecturaSensor generarLecturaCritica(
+    Long idMascota,
+    EstadoMascota estadoActual,
+    Integer frecuenciaMaxima,
+    Integer sistolicaMaxima,
+    Integer diastolicaMaxima
+  ) {
+    if (sistolicaActual == null) sistolicaActual = 120.0;
+    if (diastolicaActual == null) diastolicaActual = 80.0;
+
+    LecturaSensor lectura = new LecturaSensor();
+
+    int frecuenciaCritica = frecuenciaMaxima + 40; // Taquicardia severa
+    frecuenciaPorMascota.put(idMascota, (double) frecuenciaCritica);
+    lectura.setFrecuenciaCardiaca(frecuenciaCritica);
+
+    lectura.setAccelX(generarMovimientoSegun(EstadoMascota.CORRIENDO) * 2);
+    lectura.setAccelY(generarMovimientoSegun(EstadoMascota.CORRIENDO) * 2);
+    lectura.setAccelZ(generarMovimientoSegun(EstadoMascota.CORRIENDO) * 2);
+    lectura.setGyroX(generarGyroSegun(EstadoMascota.CORRIENDO) * 2);
+    lectura.setGyroY(generarGyroSegun(EstadoMascota.CORRIENDO) * 2);
+    lectura.setGyroZ(generarGyroSegun(EstadoMascota.CORRIENDO) * 2);
+
+    sistolicaActual = sistolicaMaxima + 30.0; // Hipertensión
+    diastolicaActual = diastolicaMaxima + 20.0;
+    lectura.setPresionSistolica(sistolicaActual.intValue());
+    lectura.setPresionDiastolica(diastolicaActual.intValue());
+
+    temperaturaActual = 41.5; // Fiebre muy alta / Golpe de calor
+    lectura.setTemperatura(temperaturaActual);
+
+    actualizarGpsSegun(EstadoMascota.CORRIENDO);
     lectura.setLatitud(latitudActual);
     lectura.setLongitud(longitudActual);
 
