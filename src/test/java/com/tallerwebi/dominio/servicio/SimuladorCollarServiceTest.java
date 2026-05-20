@@ -297,4 +297,47 @@ public class SimuladorCollarServiceTest {
     int diferencia = Math.abs(primera - segunda);
     assertThat(diferencia, lessThanOrEqualTo(10));
   }
+
+  @Test
+  public void dadoUnaMascotaCuandoGeneroUnaLecturaCriticaEntoncesLaFrecuenciaCardiacaEsSevera() {
+    Long idMascota = 1L;
+    LecturaSensor lectura = simuladorCollarService.generarLecturaCritica(
+      idMascota,
+      EstadoMascota.REPOSO,
+      FRECUENCIA_MAXIMA,
+      SISTOLICA_MAXIMA,
+      DIASTOLICA_MAXIMA
+    );
+
+    assertThat(lectura.getFrecuenciaCardiaca(), equalTo(FRECUENCIA_MAXIMA + 40));
+  }
+
+  @Test
+  public void dadoUnaMascotaCuandoGeneroUnaLecturaCriticaEntoncesLaPresionEsAlta() {
+    Long idMascota = 1L;
+    LecturaSensor lectura = simuladorCollarService.generarLecturaCritica(
+      idMascota,
+      EstadoMascota.REPOSO,
+      FRECUENCIA_MAXIMA,
+      SISTOLICA_MAXIMA,
+      DIASTOLICA_MAXIMA
+    );
+
+    assertThat(lectura.getPresionSistolica(), equalTo(SISTOLICA_MAXIMA + 30));
+    assertThat(lectura.getPresionDiastolica(), equalTo(DIASTOLICA_MAXIMA + 20));
+  }
+
+  @Test
+  public void dadoUnaMascotaCuandoGeneroUnaLecturaCriticaEntoncesLaTemperaturaEsMuyAlta() {
+    Long idMascota = 1L;
+    LecturaSensor lectura = simuladorCollarService.generarLecturaCritica(
+      idMascota,
+      EstadoMascota.REPOSO,
+      FRECUENCIA_MAXIMA,
+      SISTOLICA_MAXIMA,
+      DIASTOLICA_MAXIMA
+    );
+
+    assertThat(lectura.getTemperatura(), equalTo(41.5));
+  }
 }
