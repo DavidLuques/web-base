@@ -3,7 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Analisis de Actividad</title>
+  <title>Análisis de Actividad</title>
+
+  <!-- IMPORTANTE PARA Ñ Y TILDES -->
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
@@ -11,87 +15,184 @@
 <body class="bg-slate-50 p-8 font-sans text-gray-800">
 
   <div class="max-w-5xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6 text-slate-800">Analisis de Actividad y Comportamiento - Firulais</h1>
 
+    <h1 class="text-2xl font-bold mb-6 text-slate-800">
+      Análisis de Actividad y Comportamiento - Firulais
+    </h1>
+
+    <!-- ESTADO -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex justify-between items-center">
+
       <div>
         <p class="text-sm text-gray-400 font-medium mb-1">Estado Actual</p>
-        <h2 id="estado" class="text-3xl font-semibold text-gray-800">Cargando...</h2>
+
+        <h2 id="estado" class="text-3xl font-semibold text-gray-800">
+          Cargando...
+        </h2>
       </div>
+
       <div id="badge-actividad"
         class="bg-red-100 text-red-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
+
         <div class="w-2 h-2 rounded-full bg-red-500"></div>
-        <span id="nivel-actividad">Nivel de Actividad</span>
+
+        <span id="nivel-actividad">
+          Nivel de Actividad
+        </span>
       </div>
     </div>
 
+    <!-- RESUMEN -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h3 class="text-lg font-bold mb-6">Resumen</h3>
+
+      <h3 class="text-lg font-bold mb-6">
+        Resumen
+      </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
 
+        <!-- DISTANCIA -->
         <div class="flex flex-col items-center">
           <div id="chart-distancia"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Distancia Recorrida</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
+
+          <p class="text-sm font-medium text-gray-700 mt-2">
+            Distancia Recorrida
+          </p>
+
+          <a href="#" class="text-xs text-blue-500 hover:underline">
+            Click para historial
+          </a>
         </div>
 
+        <!-- CALORIAS -->
         <div class="flex flex-col items-center">
           <div id="chart-calorias"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Calorias Quemadas</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
+
+          <p class="text-sm font-medium text-gray-700 mt-2">
+            Calorías Quemadas
+          </p>
+
+          <a href="#" class="text-xs text-blue-500 hover:underline">
+            Click para historial
+          </a>
         </div>
 
+        <!-- SUEÑO -->
         <div class="flex flex-col items-center">
           <div id="chart-sueno"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Tiempo de Sueño</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
+
+          <p class="text-sm font-medium text-gray-700 mt-2">
+            Tiempo de Sueño
+          </p>
+
+          <a href="#" class="text-xs text-blue-500 hover:underline">
+            Click para historial
+          </a>
         </div>
 
+        <!-- PASOS -->
         <div class="flex flex-col items-center">
           <div id="chart-pasos"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Pasos Hoy</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
+
+          <p class="text-sm font-medium text-gray-700 mt-2">
+            Pasos Hoy
+          </p>
+
+          <a href="#" class="text-xs text-blue-500 hover:underline">
+            Click para historial
+          </a>
         </div>
 
       </div>
     </div>
+
+    <!-- HISTORIAL DISTANCIA -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-            <h3 class="text-lg font-bold mb-4 text-slate-800">Distancia Recorrida - Hoy</h3>
-            <div id="chart-historial-distancia"></div>
-        </div>
+
+      <h3 class="text-lg font-bold mb-4 text-slate-800">
+        Distancia Recorrida - Hoy
+      </h3>
+
+      <div id="chart-historial-distancia"></div>
+    </div>
+
   </div>
 
   <script th:inline="javascript">
-    const idMascota = [[${ idMascota }]];
+
+    const idMascota = [[${idMascota}]];
+
+    // =========================
+    // DATOS HISTORICOS
+    // =========================
+
+    let historialDistancias = [0];
+    let historialHoras = [new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    })];
+
+    // =========================
+    // FORMATEAR ENUM
+    // =========================
+
+    function formatearEstado(estado) {
+
+      return estado
+        .toLowerCase()
+        .replace("_", " ")
+        .replace(/\b\w/g, letra => letra.toUpperCase());
+    }
+
+    // =========================
+    // CONFIG GRAFICOS RADIALES
+    // =========================
 
     function getConfiguracionGrafico(colorPrincipal, etiqueta, valorMostrar, porcentajeLlenado) {
+
       return {
+
         series: [porcentajeLlenado],
+
         chart: {
           type: 'radialBar',
           height: 200,
-          sparkline: { enabled: true }
+          sparkline: {
+            enabled: true
+          }
         },
+
         colors: [colorPrincipal],
+
         plotOptions: {
           radialBar: {
-            hollow: { size: '65%' },
-            track: { background: '#f1f5f9' },
+
+            hollow: {
+              size: '65%'
+            },
+
+            track: {
+              background: '#f1f5f9'
+            },
+
             dataLabels: {
+
               show: true,
+
               name: {
                 show: true,
                 color: '#94a3b8',
                 fontSize: '12px',
                 offsetY: 20
               },
+
               value: {
                 show: true,
                 color: '#1e293b',
                 fontSize: '22px',
                 fontWeight: '600',
                 offsetY: -10,
+
                 formatter: function () {
                   return valorMostrar;
                 }
@@ -99,112 +200,244 @@
             }
           }
         },
-        stroke: { lineCap: 'round' },
+
+        stroke: {
+          lineCap: 'round'
+        },
+
         labels: [etiqueta]
       };
     }
 
-    // Inicializamos los gráficos con valores en cero
-    let chartDistancia = new ApexCharts(document.querySelector("#chart-distancia"), getConfiguracionGrafico('#3b82f6', 'km', '0', 0));
-    let chartCalorias = new ApexCharts(document.querySelector("#chart-calorias"), getConfiguracionGrafico('#10b981', 'kcal', '0', 0));
-    let chartSueno = new ApexCharts(document.querySelector("#chart-sueno"), getConfiguracionGrafico('#f59e0b', 'horas', '0', 0));
-    let chartPasos = new ApexCharts(document.querySelector("#chart-pasos"), getConfiguracionGrafico('#ec4899', 'pasos', '0', 0));
+    // =========================
+    // GRAFICOS RADIALES
+    // =========================
+
+    let chartDistancia = new ApexCharts(
+      document.querySelector("#chart-distancia"),
+      getConfiguracionGrafico('#3b82f6', 'km', '0', 0)
+    );
+
+    let chartCalorias = new ApexCharts(
+      document.querySelector("#chart-calorias"),
+      getConfiguracionGrafico('#10b981', 'kcal', '0', 0)
+    );
+
+    let chartSueno = new ApexCharts(
+      document.querySelector("#chart-sueno"),
+      getConfiguracionGrafico('#f59e0b', 'horas', '0', 0)
+    );
+
+    let chartPasos = new ApexCharts(
+      document.querySelector("#chart-pasos"),
+      getConfiguracionGrafico('#ec4899', 'pasos', '0', 0)
+    );
 
     chartDistancia.render();
     chartCalorias.render();
     chartSueno.render();
     chartPasos.render();
 
-    function actualizarEstado() {
-      fetch('/spring/simulacion/estado/' + idMascota)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('estado').textContent = data.estado;
+    // =========================
+    // GRAFICO HISTORIAL
+    // =========================
 
-          // modifica color del badge segun el estado (para que haya algo)
+    let opcionesHistorial = {
+
+      series: [{
+        name: "Distancia (km)",
+        data: historialDistancias
+      }],
+
+      chart: {
+        height: 300,
+        type: 'line',
+        toolbar: {
+          show: false
+        },
+        zoom: {
+          enabled: false
+        }
+      },
+
+      stroke: {
+        curve: 'smooth',
+        width: 3
+      },
+
+      colors: ['#3b82f6'],
+
+      xaxis: {
+
+        categories: historialHoras,
+
+        labels: {
+          style: {
+            colors: '#94a3b8'
+          }
+        },
+
+        axisBorder: {
+          show: false
+        },
+
+        axisTicks: {
+          show: false
+        }
+      },
+
+      yaxis: {
+        min: 0,
+
+        tickAmount: 4,
+
+        labels: {
+          style: {
+            colors: '#94a3b8'
+          }
+        }
+      },
+
+      grid: {
+        borderColor: '#f1f5f9',
+        strokeDashArray: 4,
+
+        yaxis: {
+          lines: {
+            show: true
+          }
+        }
+      }
+    };
+
+    let chartHistorial = new ApexCharts(
+      document.querySelector("#chart-historial-distancia"),
+      opcionesHistorial
+    );
+
+    chartHistorial.render();
+
+    // =========================
+    // ACTUALIZAR DATOS
+    // =========================
+
+    function actualizarEstado() {
+
+      fetch('/spring/simulacion/estado/' + idMascota)
+
+        .then(response => response.json())
+
+        .then(data => {
+
+          // =========================
+          // ESTADO
+          // =========================
+
+          const estadoFormateado = formatearEstado(data.estado);
+
+          document.getElementById('estado').textContent = estadoFormateado;
+
+          // =========================
+          // BADGE
+          // =========================
+
           const badge = document.getElementById('badge-actividad');
+
           if (data.estado === 'CORRIENDO' || data.estado === 'CAMINANDO') {
-            badge.className = 'bg-red-100 text-red-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
-            badge.innerHTML = '<div class="w-2 h-2 rounded-full bg-red-500"></div> Nivel Alto de Actividad';
+
+            badge.className =
+              'bg-red-100 text-red-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
+
+            badge.innerHTML =
+              '<div class="w-2 h-2 rounded-full bg-red-500"></div> Nivel Alto de Actividad';
+
           } else {
-            badge.className = 'bg-blue-100 text-blue-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
-            badge.innerHTML = '<div class="w-2 h-2 rounded-full bg-blue-500"></div> En Reposo';
+
+            badge.className =
+              'bg-blue-100 text-blue-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
+
+            badge.innerHTML =
+              '<div class="w-2 h-2 rounded-full bg-blue-500"></div> En Reposo';
           }
 
-          // actualiza el grafico de distancia (requiere calcular el porcentaje respecto a una meta, ahora le puse 5km)
+          // =========================
+          // DISTANCIA RADIAL
+          // =========================
+
           if (data.distanciaRecorrida != null) {
+
             let metaDistancia = 5.0;
-            let porcentaje = (data.distanciaRecorrida / metaDistancia) * 100;
+
+            let porcentaje =
+              (data.distanciaRecorrida / metaDistancia) * 100;
 
             chartDistancia.updateOptions({
+
               series: [porcentaje > 100 ? 100 : porcentaje],
+
               plotOptions: {
+
                 radialBar: {
+
                   dataLabels: {
-                    value: { formatter: function () { return data.distanciaRecorrida.toFixed(1); } }
+
+                    value: {
+
+                      formatter: function () {
+                        return data.distanciaRecorrida.toFixed(1);
+                      }
+                    }
                   }
                 }
               }
             });
+
+            // =========================
+            // ACTUALIZAR HISTORIAL
+            // =========================
+
+            const horaActual = new Date().toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+
+            historialDistancias.push(data.distanciaRecorrida);
+            historialHoras.push(horaActual);
+
+            // Limita cantidad de puntos
+            if (historialDistancias.length > 20) {
+              historialDistancias.shift();
+              historialHoras.shift();
+            }
+
+            chartHistorial.updateOptions({
+
+              series: [{
+                data: historialDistancias
+              }],
+
+              xaxis: {
+                categories: historialHoras
+              }
+            });
           }
-          document.getElementById('nombre').textContent    = data.nombreMascota;
-          document.getElementById('estado').textContent    = data.estado;
-          document.getElementById('frecuencia').textContent = data.frecuenciaCardiaca ?? '-';
-          document.getElementById('sistolica').textContent  = data.presionSistolica ?? '-';
-          document.getElementById('diastolica').textContent = data.presionDiastolica ?? '-';
-          document.getElementById('temperatura').textContent = data.temperatura ?? '-';
-          document.getElementById('hora').textContent      = new Date().toLocaleTimeString();
         });
     }
 
+    // =========================
+    // INICIAL
+    // =========================
+
     actualizarEstado();
-    setInterval(actualizarEstado, 10000);
+
+    // =========================
+    // ACTUALIZA CADA 2 MINUTOS
+    // =========================
+
+    setInterval(actualizarEstado, 120000);
+
   </script>
 
-  <script>
-    // GRAFICO DE DISTANCIAS EN EL DIA
-        var opcionesHistorial = {
-            series: [{
-                name: "Distancia (km)",
-                // datos de prueba
-                data: [0, 0.1, 0.1, 0.3, 0.8, 1.4, 1.8, 2.1, 2.5, 3.0, 3.2, 3.2]
-            }],
-            chart: {
-                height: 300,
-                type: 'line',
-                toolbar: { show: false },
-                zoom: { enabled: false }
-            },
-            stroke: {
-                curve: 'smooth', // Hace que la línea sea curva en lugar de recta entre los puntos
-                width: 3
-            },
-            colors: ['#3b82f6'],
-            xaxis: {
-                categories: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
-                labels: {
-                    style: { colors: '#94a3b8' }
-                },
-                axisBorder: { show: false },
-                axisTicks: { show: false }
-            },
-            yaxis: {
-                min: 0,
-                tickAmount: 4, // Cantidad de divisiones en el eje vertical
-                labels: {
-                    style: { colors: '#94a3b8' }
-                }
-            },
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4, // Hace que las líneas de fondo sean punteadas
-                yaxis: { lines: { show: true } }
-            }
-        };
-
-        var chartHistorial = new ApexCharts(document.querySelector("#chart-historial-distancia"), opcionesHistorial);
-        chartHistorial.render();
-  </script>
 </body>
 
 </html>
