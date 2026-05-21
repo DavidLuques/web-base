@@ -12,6 +12,7 @@ public class ResultadoSimulacionDto {
   private Integer presionDiastolica;
   private Double temperatura;
   private Integer pasos;
+  private Double calorias;
 
   public ResultadoSimulacionDto() {}
 
@@ -25,6 +26,7 @@ public class ResultadoSimulacionDto {
     this.estado = estado;
     this.distanciaRecorrida = distanciaRecorrida;
     this.pasos = pasos;
+    this.calorias = 0.0;
   }
 
   public ResultadoSimulacionDto(
@@ -35,7 +37,8 @@ public class ResultadoSimulacionDto {
     Integer presionDiastolica,
     Double temperatura,
     Double distanciaRecorrida,
-    Integer pasos
+    Integer pasos,
+    Double calorias // nuevo
   ) {
     this.nombreMascota = nombreMascota;
     this.estado = estado;
@@ -45,6 +48,15 @@ public class ResultadoSimulacionDto {
     this.temperatura = temperatura;
     this.distanciaRecorrida = distanciaRecorrida;
     this.pasos = pasos;
+    this.calorias = calorias;
+  }
+
+  public Double getCalorias() {
+    return calorias;
+  }
+
+  public void setCalorias(Double calorias) {
+    this.calorias = calorias;
   }
 
   public String getNombreMascota() {

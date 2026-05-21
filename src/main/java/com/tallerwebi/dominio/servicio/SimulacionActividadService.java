@@ -28,6 +28,13 @@ public class SimulacionActividadService {
   private final ServicioAnalisis servicioAnalisis;
   private final RepositorioAnalisis repositorioAnalisis;
 
+  private static final double MET_DURMIENDO = 1.0;
+  private static final double MET_REPOSO = 1.5;
+  private static final double MET_CAMINANDO = 3.0;
+  private static final double MET_CORRIENDO = 6.0;
+  private static final double VEL_CAMINANDO = 5.0;
+  private static final double VEL_CORRIENDO = 15.0;
+
   @Autowired
   public SimulacionActividadService(
     MascotaDao mascotaDao,
@@ -65,8 +72,11 @@ public class SimulacionActividadService {
     EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
+
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
     Integer pasosCalculados = calcularPasos(distanciaTotal, mascota.getTamano());
+    Double calorias = calcularCalorias(distanciaTotal, estado, mascota.getPeso());
+
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
       estado,
@@ -75,7 +85,8 @@ public class SimulacionActividadService {
       lectura.getPresionDiastolica(),
       lectura.getTemperatura(),
       distanciaTotal,
-      pasosCalculados
+      pasosCalculados,
+      calorias
     );
   }
 
@@ -106,10 +117,12 @@ public class SimulacionActividadService {
     if (mascota == null) {
       return new ResultadoSimulacionDto("No encontrada", null, null, null);
     }
+
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
     Integer pasosCalculados = calcularPasos(distanciaTotal, mascota.getTamano());
 
     Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(mascotaId);
+
     if (ultimo == null) {
       return new ResultadoSimulacionDto(
         mascota.getNombre(),
@@ -119,6 +132,12 @@ public class SimulacionActividadService {
       );
     }
 
+    Double calorias = calcularCalorias(
+      distanciaTotal,
+      mascota.getEstadoActual(),
+      mascota.getPeso()
+    );
+
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
       mascota.getEstadoActual(),
@@ -127,8 +146,47 @@ public class SimulacionActividadService {
       ultimo.getDatos().getPresionDiastolica(),
       ultimo.getDatos().getTemperatura(),
       distanciaTotal,
-      pasosCalculados
+      pasosCalculados,
+      calorias
     );
+  }
+
+  private Double calcularCalorias(Double distanciaEnKm, EstadoMascota estado, Double pesoKg) {
+    if (
+      distanciaEnKm == null ||
+      distanciaEnKm == 0.0 ||
+      estado == null ||
+      pesoKg == null ||
+      pesoKg == 0.0
+    ) {
+      return 0.0;
+    }
+
+    double met;
+    double velocidadKmH;
+
+    switch (estado) {
+      case DURMIENDO:
+        met = MET_DURMIENDO;
+        velocidadKmH = 1.0;
+        break;
+      case REPOSO:
+        met = MET_REPOSO;
+        velocidadKmH = 1.0;
+        break;
+      case CAMINANDO:
+        met = MET_CAMINANDO;
+        velocidadKmH = VEL_CAMINANDO;
+        break;
+      default: // CORRIENDO
+        met = MET_CORRIENDO;
+        velocidadKmH = VEL_CORRIENDO;
+        break;
+    }
+
+    double duracionHoras = distanciaEnKm / velocidadKmH;
+    double calorias = met * pesoKg * duracionHoras;
+    return Math.round(calorias * 10.0) / 10.0;
   }
 
   private Integer calcularPasos(Double distanciaEnKm, TamanoMascota tamano) {

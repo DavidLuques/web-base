@@ -16,6 +16,7 @@ import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -49,6 +50,7 @@ public class SimulacionActividadServiceTest {
     motorActividadServiceMock = mock(MotorActividadService.class);
     repositorioActividadMock = mock(RepositorioActividad.class);
     servicioAnalisisMock = mock(ServicioAnalisis.class);
+    repositorioAnalisisMock = mock(RepositorioAnalisis.class);
 
     simulacionActividadService =
       new SimulacionActividadService(
@@ -80,6 +82,74 @@ public class SimulacionActividadServiceTest {
     lectura.setPresionDiastolica(80);
     lectura.setTemperatura(38.3);
     return lectura;
+  }
+
+  @Test
+  public void siLaDistanciaEsNullLosPasosSonCero() {
+    Mascota mascota = new Mascota();
+    mascota.setId(1L);
+    mascota.setNombre("Toby");
+    mascota.setTamano(TamanoMascota.MEDIANO);
+    mascota.setEstadoActual(EstadoMascota.REPOSO);
+
+    when(mascotaDaoMock.buscarPorId(1L)).thenReturn(mascota);
+
+    when(repositorioActividadMock.obtenerDistanciaTotalPorMascota(1L)).thenReturn(null);
+
+    when(repositorioAnalisisMock.obtenerUltimoAnalisis(1L)).thenReturn(null);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.obtenerEstadoActual(1L);
+
+    assertThat(resultado.getPasos(), equalTo(0));
+  }
+
+  @Test
+  public void debeCalcularCorrectamentePasosParaMascotaPequena() {
+    Mascota mascota = new Mascota();
+    mascota.setId(1L);
+    mascota.setNombre("Toby");
+    mascota.setTamano(TamanoMascota.PEQUENO);
+    mascota.setEstadoActual(EstadoMascota.CAMINANDO);
+    mascota.setPeso(10.0);
+
+    when(mascotaDaoMock.buscarPorId(1L)).thenReturn(mascota);
+
+    when(repositorioActividadMock.obtenerDistanciaTotalPorMascota(1L)).thenReturn(1.0);
+
+    when(repositorioAnalisisMock.obtenerUltimoAnalisis(1L)).thenReturn(null);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.obtenerEstadoActual(1L);
+
+    assertThat(resultado.getPasos(), equalTo(3200));
+  }
+
+  @Test
+  public void cuandoNoHayAnalisisDevuelveEstadoActualSinSignosVitales() {
+    Mascota mascota = new Mascota();
+    mascota.setId(1L);
+    mascota.setNombre("Toby");
+    mascota.setTamano(TamanoMascota.MEDIANO);
+    mascota.setEstadoActual(EstadoMascota.REPOSO);
+
+    when(mascotaDaoMock.buscarPorId(1L)).thenReturn(mascota);
+
+    when(repositorioActividadMock.obtenerDistanciaTotalPorMascota(1L)).thenReturn(2.0);
+
+    when(repositorioAnalisisMock.obtenerUltimoAnalisis(1L)).thenReturn(null);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.obtenerEstadoActual(1L);
+
+    assertThat(resultado.getEstado(), equalTo(EstadoMascota.REPOSO));
+    assertThat(resultado.getDistanciaRecorrida(), equalTo(2.0));
+  }
+
+  @Test
+  public void cuandoLaMascotaNoExisteDevuelveDtoNoEncontrada() {
+    when(mascotaDaoMock.buscarPorId(1L)).thenReturn(null);
+
+    ResultadoSimulacionDto resultado = simulacionActividadService.obtenerEstadoActual(1L);
+
+    assertThat(resultado.getNombreMascota(), equalTo("No encontrada"));
   }
 
   @Test

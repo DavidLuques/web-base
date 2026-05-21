@@ -242,73 +242,92 @@
     // GRAFICO HISTORIAL
     // =========================
 
-    let opcionesHistorial = {
+let opcionesHistorial = {
 
-      series: [{
-        name: "Distancia (km)",
-        data: historialDistancias
-      }],
+  series: [{
+    name: "Distancia (km)",
+    data: historialDistancias
+  }],
 
-      chart: {
-        height: 300,
-        type: 'line',
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        }
-      },
+  chart: {
+    height: 300,
+    type: 'line',
 
-      stroke: {
-        curve: 'smooth',
-        width: 3
-      },
+    toolbar: {
+      show: false
+    },
 
-      colors: ['#3b82f6'],
+    zoom: {
+      enabled: false
+    }
+  },
 
-      xaxis: {
+  stroke: {
+    curve: 'smooth',
+    width: 3
+  },
 
-        categories: historialHoras,
+  colors: ['#3b82f6'],
 
-        labels: {
-          style: {
-            colors: '#94a3b8'
-          }
-        },
+  xaxis: {
 
-        axisBorder: {
-          show: false
-        },
+    categories: historialHoras,
 
-        axisTicks: {
-          show: false
-        }
-      },
-
-      yaxis: {
-        min: 0,
-
-        tickAmount: 4,
-
-        labels: {
-          style: {
-            colors: '#94a3b8'
-          }
-        }
-      },
-
-      grid: {
-        borderColor: '#f1f5f9',
-        strokeDashArray: 4,
-
-        yaxis: {
-          lines: {
-            show: true
-          }
-        }
+    labels: {
+      style: {
+        colors: '#94a3b8'
       }
-    };
+    },
+
+    axisBorder: {
+      show: false
+    },
+
+    axisTicks: {
+      show: false
+    }
+  },
+
+  yaxis: {
+
+    min: 0,
+
+    tickAmount: 4,
+
+    labels: {
+
+      formatter: function (value) {
+        return value.toFixed(2) + " km";
+      },
+
+      style: {
+        colors: '#94a3b8'
+      }
+    }
+  },
+
+  tooltip: {
+
+    y: {
+      formatter: function (value) {
+        return value.toFixed(2) + " km";
+      }
+    }
+  },
+
+  grid: {
+
+    borderColor: '#f1f5f9',
+
+    strokeDashArray: 4,
+
+    yaxis: {
+      lines: {
+        show: true
+      }
+    }
+  }
+};
 
     let chartHistorial = new ApexCharts(
       document.querySelector("#chart-historial-distancia"),
@@ -401,8 +420,9 @@
               minute: '2-digit'
             });
 
-            historialDistancias.push(data.distanciaRecorrida);
-            historialHoras.push(horaActual);
+            historialDistancias.push(
+            		  Number(data.distanciaRecorrida.toFixed(2))
+            		);            historialHoras.push(horaActual);
 
             // Limita cantidad de puntos
             if (historialDistancias.length > 20) {
@@ -421,13 +441,42 @@
               }
             });
           }
+
+          // =========================
+          // CALORIAS RADIAL
+          // =========================
+
+          if (data.calorias != null) {
+
+            let metaCalorias = 200.0;
+
+            let porcentajeCalorias = (data.calorias / metaCalorias) * 100;
+
+            chartCalorias.updateOptions({
+
+              series: [porcentajeCalorias > 100 ? 100 : porcentajeCalorias],
+
+              plotOptions: {
+                radialBar: {
+                  dataLabels: {
+                    value: {
+                      formatter: function () {
+                        return data.calorias.toFixed(1);
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          }
+
           // =========================
           // PASOS RADIAL
           // =========================
 
           if (data.pasos != null) {
 
-            let metaPasos = 10000; 
+            let metaPasos = 10000;
 
             let porcentajePasos = (data.pasos / metaPasos) * 100;
 
@@ -440,7 +489,7 @@
                   dataLabels: {
                     value: {
                       formatter: function () {
-                        return data.pasos.toLocaleString('es-AR'); 
+                        return data.pasos.toLocaleString('es-AR');
                       }
                     }
                   }
