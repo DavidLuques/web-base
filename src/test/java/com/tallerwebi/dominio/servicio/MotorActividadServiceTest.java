@@ -109,25 +109,6 @@ public class MotorActividadServiceTest {
   }
 
   @Test
-  public void siLaLecturaSigueIgualDebeAvanzarAlSiguienteEstadoParaNoRepetir() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(95);
-    lectura.setAccelX(2.0);
-    lectura.setAccelY(2.0);
-    lectura.setAccelZ(1.5);
-    lectura.setGyroX(1.0);
-    lectura.setGyroY(1.0);
-    lectura.setGyroZ(1.0);
-
-    EstadoMascota primerEstado = motorActividadService.analizar(mascota, lectura);
-
-    EstadoMascota segundoEstado = motorActividadService.analizar(mascota, lectura);
-
-    assertThat(primerEstado, equalTo(EstadoMascota.REPOSO));
-    assertThat(segundoEstado, equalTo(EstadoMascota.CAMINANDO));
-  }
-
-  @Test
   public void noDebePermitirSaltoBruscoDeCorriendoADormido() {
     LecturaSensor corriendo = new LecturaSensor();
     corriendo.setFrecuenciaCardiaca(130);

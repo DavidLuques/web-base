@@ -12,10 +12,48 @@ let historialHoras = [new Date().toLocaleTimeString([], {
   minute: "2-digit"
 })];
 
-/* ── Niveles de actividad cada 5 minutos ── */
-/* Cada entrada es { hora: "HH:MM", intenso: N, moderado: N, liviano: N } */
 let nivelesHoras = {};
 
+/* ─────────────────────────────────────────
+   Persistencia en sessionStorage
+───────────────────────────────────────── */
+const STORAGE_KEY = `simulacion_${idMascota}`;
+
+function cargarEstado() {
+  try {
+    const guardado = sessionStorage.getItem(STORAGE_KEY);
+    if (!guardado) return;
+    const s = JSON.parse(guardado);
+    historialDistancias = s.historialDistancias ?? [0];
+    historialCalorias   = s.historialCalorias   ?? [0];
+    historialSueno      = s.historialSueno      ?? [0];
+    historialPasos      = s.historialPasos      ?? [0];
+    historialHoras      = s.historialHoras      ?? [new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })];
+    nivelesHoras        = s.nivelesHoras        ?? {};
+  } catch (e) {
+    console.warn("No se pudo cargar el estado guardado:", e);
+  }
+}
+
+function guardarEstado() {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+      historialDistancias,
+      historialCalorias,
+      historialSueno,
+      historialPasos,
+      historialHoras,
+      nivelesHoras
+    }));
+  } catch (e) {
+    console.warn("No se pudo guardar el estado:", e);
+  }
+}
+
+/* ── Cargar antes de inicializar los charts ── */
+cargarEstado();
+
+/* ── Niveles de actividad cada 5 minutos ── */
 function getHoraRedondeada() {
   const ahora = new Date();
   const hh = ahora.getHours().toString().padStart(2, "0");
@@ -152,6 +190,7 @@ chartPasos.render();
 
 /* ─────────────────────────────────────────
    Historial line charts
+   — se inicializan con los datos ya cargados del sessionStorage
 ───────────────────────────────────────── */
 let chartHistorialDistancia = new ApexCharts(
   document.querySelector("#chart-historial-distancia"),
@@ -190,13 +229,15 @@ chartHistorialPasos.render();
 /* ─────────────────────────────────────────
    Chart niveles de actividad (barras apiladas)
 ───────────────────────────────────────── */
+const nivelesIniciales = getNivelesSeriesYCategorias();
+
 let chartNiveles = new ApexCharts(
   document.querySelector("#chart-niveles-actividad"),
   {
     series: [
-      { name: "Intenso",   data: [] },
-      { name: "Moderado",  data: [] },
-      { name: "Liviano",   data: [] }
+      { name: "Intenso",  data: nivelesIniciales.intenso  },
+      { name: "Moderado", data: nivelesIniciales.moderado },
+      { name: "Liviano",  data: nivelesIniciales.liviano  }
     ],
     chart: {
       type: "bar",
@@ -222,7 +263,7 @@ let chartNiveles = new ApexCharts(
       labels: { colors: "#64748b" }
     },
     xaxis: {
-      categories: [],
+      categories: nivelesIniciales.categorias,
       labels: { style: { colors: "#94a3b8" } },
       axisBorder: { show: false },
       axisTicks:  { show: false }
@@ -277,7 +318,7 @@ const CONFIG_BADGE = {
 function actualizarBadge(estado) {
   const cfg = CONFIG_BADGE[estado] || CONFIG_BADGE["_DEFAULT"];
   const badge = document.getElementById("badge-actividad");
-  badge.className = cfg.clase +  " px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2";
+  badge.className = cfg.clase + " px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2";
   badge.innerHTML = `<div class="w-2 h-2 rounded-full ${cfg.dot}"></div> ${cfg.texto}`;
 }
 
@@ -292,9 +333,8 @@ function actualizarEstado() {
       document.getElementById("estado").textContent = formatearEstado(data.estado);
       actualizarBadge(data.estado);
       registrarNivel(data.estado);
-      
-      // Nombre mascota
-      if(data.nombreMascota) {
+
+      if (data.nombreMascota) {
         document.getElementById("nombre-mascota").textContent = data.nombreMascota;
       }
 
@@ -367,6 +407,9 @@ function actualizarEstado() {
         ],
         xaxis: { categories: categorias }
       });
+
+      /* Guardar estado actualizado */
+      guardarEstado();
     });
 }
 
