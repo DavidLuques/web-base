@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -77,7 +78,7 @@ public class MotorActividadServiceTest {
   }
 
   @Test
-  public void siLaLecturaSigueIgualDebeMantenerElEstado() {
+  public void siLaLecturaSigueIgualDebeAvanzarAlSiguienteEstadoParaNoRepetir() {
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(95);
     lectura.setAccelX(2.0);
@@ -92,7 +93,7 @@ public class MotorActividadServiceTest {
     EstadoMascota segundoEstado = motorActividadService.analizar(mascota, lectura);
 
     assertThat(primerEstado, equalTo(EstadoMascota.REPOSO));
-    assertThat(segundoEstado, equalTo(EstadoMascota.REPOSO));
+    assertThat(segundoEstado, equalTo(EstadoMascota.CAMINANDO));
   }
 
   @Test
