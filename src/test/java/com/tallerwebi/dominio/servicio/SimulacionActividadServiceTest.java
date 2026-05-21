@@ -1,22 +1,20 @@
 package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
+import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
-import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -36,6 +34,7 @@ public class SimulacionActividadServiceTest {
   private RepositorioActividad repositorioActividadMock;
   private ServicioAnalisis servicioAnalisisMock;
   private RepositorioAnalisis repositorioAnalisisMock;
+  private RepositorioSueno repositorioSuenoMock;
 
   private static final int SISTOLICA_MINIMA = 115;
   private static final int SISTOLICA_MAXIMA = 140;
@@ -51,6 +50,7 @@ public class SimulacionActividadServiceTest {
     repositorioActividadMock = mock(RepositorioActividad.class);
     servicioAnalisisMock = mock(ServicioAnalisis.class);
     repositorioAnalisisMock = mock(RepositorioAnalisis.class);
+    repositorioSuenoMock = mock(RepositorioSueno.class);
 
     simulacionActividadService =
       new SimulacionActividadService(
@@ -60,7 +60,8 @@ public class SimulacionActividadServiceTest {
         motorActividadServiceMock,
         repositorioActividadMock,
         servicioAnalisisMock,
-        repositorioAnalisisMock
+        repositorioAnalisisMock,
+        repositorioSuenoMock
       );
   }
 
@@ -82,6 +83,50 @@ public class SimulacionActividadServiceTest {
     lectura.setPresionDiastolica(80);
     lectura.setTemperatura(38.3);
     return lectura;
+  }
+  
+  @Test
+  public void cuandoLaMascotaEstaDurmiendoEntoncesSeGuardaRegistroDeSueno() {
+    Long mascotaId = 1L;
+
+    Mascota mascota = new Mascota();
+    mascota.setId(mascotaId);
+    mascota.setNombre("Toby");
+    mascota.setTamano(TamanoMascota.MEDIANO);
+    mascota.setEstadoActual(EstadoMascota.DURMIENDO);
+    mascota.setPeso(20.0);
+
+    when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(mascota);
+
+    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO))
+      .thenReturn(rangoCompleto());
+
+    when(
+      simuladorCollarServiceMock.generarLectura(
+        eq(mascotaId),
+        any(),
+        eq(80),
+        eq(120),
+        eq(SISTOLICA_MINIMA),
+        eq(SISTOLICA_MAXIMA),
+        eq(DIASTOLICA_MINIMA),
+        eq(DIASTOLICA_MAXIMA)
+      )
+    ).thenReturn(lecturaCompleta());
+
+    when(motorActividadServiceMock.analizar(any(), any()))
+      .thenReturn(EstadoMascota.DURMIENDO);
+
+    when(repositorioSuenoMock.obtenerTotalMinutosDormidosPorMascota(mascotaId))
+      .thenReturn(2);
+
+    ResultadoSimulacionDto resultado =
+      simulacionActividadService.simularDetalle(mascotaId);
+
+    verify(repositorioSuenoMock, times(1)).guardar(any());
+
+    assertThat(resultado.getEstado(), equalTo(EstadoMascota.DURMIENDO));
+    assertThat(resultado.getMinutosDormidos(), equalTo(2));
   }
 
   @Test
@@ -155,13 +200,16 @@ public class SimulacionActividadServiceTest {
   @Test
   public void debeSimularYPersistirEstadoDeMascota() {
     Long mascotaId = 1L;
+
     Mascota mascota = new Mascota();
     mascota.setId(mascotaId);
     mascota.setNombre("Toby");
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(mascota);
+
     when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rangoCompleto());
+
     when(
       simuladorCollarServiceMock.generarLectura(
         eq(mascotaId),
@@ -175,18 +223,24 @@ public class SimulacionActividadServiceTest {
       )
     )
       .thenReturn(lecturaCompleta());
+
     when(motorActividadServiceMock.analizar(eq(mascota), any())).thenReturn(EstadoMascota.REPOSO);
+
+    when(repositorioSuenoMock.obtenerTotalMinutosDormidosPorMascota(mascotaId)).thenReturn(0);
 
     ResultadoSimulacionDto resultado = simulacionActividadService.simularDetalle(mascotaId);
 
     assertThat(resultado.getEstado(), equalTo(EstadoMascota.REPOSO));
+
     verify(mascotaDaoMock).modificar(mascota);
+
     assertThat(mascota.getEstadoActual(), equalTo(EstadoMascota.REPOSO));
   }
 
   @Test
   public void cuandoSimuloDetalleEntoncesDtoIncluyeFrecuenciaPresionYTemperatura() {
     Long mascotaId = 1L;
+
     Mascota mascota = new Mascota();
     mascota.setId(mascotaId);
     mascota.setNombre("Toby");
@@ -195,7 +249,9 @@ public class SimulacionActividadServiceTest {
     LecturaSensor lectura = lecturaCompleta();
 
     when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(mascota);
+
     when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rangoCompleto());
+
     when(
       simuladorCollarServiceMock.generarLectura(
         eq(mascotaId),
@@ -209,7 +265,10 @@ public class SimulacionActividadServiceTest {
       )
     )
       .thenReturn(lectura);
+
     when(motorActividadServiceMock.analizar(any(), any())).thenReturn(EstadoMascota.REPOSO);
+
+    when(repositorioSuenoMock.obtenerTotalMinutosDormidosPorMascota(mascotaId)).thenReturn(0);
 
     ResultadoSimulacionDto resultado = simulacionActividadService.simularDetalle(mascotaId);
 
@@ -232,12 +291,15 @@ public class SimulacionActividadServiceTest {
     mascota2.setTamano(TamanoMascota.GRANDE);
 
     when(mascotaDaoMock.buscarTodas()).thenReturn(Arrays.asList(mascota1, mascota2));
+
     when(mascotaDaoMock.buscarPorId(anyLong()))
       .thenAnswer(inv -> {
         Long id = inv.getArgument(0);
         return id.equals(1L) ? mascota1 : mascota2;
       });
+
     when(rangoVitalDaoMock.buscarPorTamano(any())).thenReturn(rangoCompleto());
+
     when(
       simuladorCollarServiceMock.generarLectura(
         anyLong(),
@@ -251,7 +313,10 @@ public class SimulacionActividadServiceTest {
       )
     )
       .thenReturn(lecturaCompleta());
+
     when(motorActividadServiceMock.analizar(any(), any())).thenReturn(EstadoMascota.CAMINANDO);
+
+    when(repositorioSuenoMock.obtenerTotalMinutosDormidosPorMascota(anyLong())).thenReturn(0);
 
     simulacionActividadService.simularDetalleParaTodas();
 
@@ -280,12 +345,14 @@ public class SimulacionActividadServiceTest {
     mascota2.setEstadoActual(EstadoMascota.CAMINANDO);
 
     when(mascotaDaoMock.buscarTodas()).thenReturn(Arrays.asList(mascota1, mascota2));
+
     when(rangoVitalDaoMock.buscarPorTamano(any())).thenReturn(rangoCompleto());
 
     simulacionActividadService.actualizarFrecuenciaParaTodas();
 
     verify(simuladorCollarServiceMock, times(1))
       .actualizarFrecuencia(eq(1L), eq(EstadoMascota.REPOSO), eq(80), eq(120));
+
     verify(simuladorCollarServiceMock, times(1))
       .actualizarFrecuencia(eq(2L), eq(EstadoMascota.CAMINANDO), eq(80), eq(120));
   }

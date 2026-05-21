@@ -67,9 +67,20 @@ public class MotorActividadService {
       return nuevoEstado;
     }
 
-    EstadoMascota estadoPermitido = avanzarUnPaso(anterior, nuevoEstado);
-    memoriaEstados.put(idMascota, estadoPermitido);
-    return estadoPermitido;
+    EstadoMascota estadoFinal;
+    if (nuevoEstado == anterior) {
+      int orden = ordenDe(anterior);
+      if (orden < ORDEN_CORRIENDO) {
+        estadoFinal = estadoConOrden(orden + 1);
+      } else {
+        estadoFinal = estadoConOrden(orden - 1);
+      }
+    } else {
+      estadoFinal = avanzarUnPaso(anterior, nuevoEstado);
+    }
+
+    memoriaEstados.put(idMascota, estadoFinal);
+    return estadoFinal;
   }
 
   private EstadoMascota avanzarUnPaso(EstadoMascota anterior, EstadoMascota objetivo) {

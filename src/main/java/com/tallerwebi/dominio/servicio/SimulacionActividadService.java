@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
+import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
@@ -11,6 +12,8 @@ import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
+import com.tallerwebi.dominio.modelo.RegistroSueno;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SimulacionActividadService {
 
+  private static final int MINUTOS_POR_TICK = 2;
+
   private final MascotaDao mascotaDao;
   private final RangoVitalDao rangoVitalDao;
   private final SimuladorCollarService simuladorCollarService;
@@ -27,6 +32,7 @@ public class SimulacionActividadService {
   private final RepositorioActividad repositorioActividad;
   private final ServicioAnalisis servicioAnalisis;
   private final RepositorioAnalisis repositorioAnalisis;
+  private final RepositorioSueno repositorioSueno;
 
   private static final double MET_DURMIENDO = 1.0;
   private static final double MET_REPOSO = 1.5;
@@ -43,7 +49,8 @@ public class SimulacionActividadService {
     MotorActividadService motorActividadService,
     RepositorioActividad repositorioActividad,
     ServicioAnalisis servicioAnalisis,
-    RepositorioAnalisis repositorioAnalisis
+    RepositorioAnalisis repositorioAnalisis,
+    RepositorioSueno repositorioSueno
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
@@ -52,6 +59,7 @@ public class SimulacionActividadService {
     this.repositorioActividad = repositorioActividad;
     this.servicioAnalisis = servicioAnalisis;
     this.repositorioAnalisis = repositorioAnalisis;
+    this.repositorioSueno = repositorioSueno;
   }
 
   public ResultadoSimulacionDto simularDetalle(Long mascotaId) {
@@ -73,9 +81,18 @@ public class SimulacionActividadService {
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
 
+    if (estado == EstadoMascota.DURMIENDO) {
+      RegistroSueno registro = new RegistroSueno();
+      registro.setMinutosDormido(MINUTOS_POR_TICK);
+      registro.setFechaYHora(LocalDateTime.now());
+      registro.setMascota(mascota);
+      repositorioSueno.guardar(registro);
+    }
+
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
     Integer pasosCalculados = calcularPasos(distanciaTotal, mascota.getTamano());
     Double calorias = calcularCalorias(distanciaTotal, estado, mascota.getPeso());
+    Integer minutosDormidos = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(mascotaId);
 
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
@@ -86,7 +103,8 @@ public class SimulacionActividadService {
       lectura.getTemperatura(),
       distanciaTotal,
       pasosCalculados,
-      calorias
+      calorias,
+      minutosDormidos
     );
   }
 
@@ -137,6 +155,7 @@ public class SimulacionActividadService {
       mascota.getEstadoActual(),
       mascota.getPeso()
     );
+    Integer minutosDormidos = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(mascotaId);
 
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
@@ -147,7 +166,8 @@ public class SimulacionActividadService {
       ultimo.getDatos().getTemperatura(),
       distanciaTotal,
       pasosCalculados,
-      calorias
+      calorias,
+      minutosDormidos
     );
   }
 
@@ -178,7 +198,7 @@ public class SimulacionActividadService {
         met = MET_CAMINANDO;
         velocidadKmH = VEL_CAMINANDO;
         break;
-      default: // CORRIENDO
+      default:
         met = MET_CORRIENDO;
         velocidadKmH = VEL_CORRIENDO;
         break;
@@ -195,9 +215,6 @@ public class SimulacionActividadService {
     }
 
     int pasosPorKm;
-    // Pequeño: 0.30 metros por paso (aprox. 3200 pasos por kilometro)
-    // Mediano: 0.45 metros por paso (aprox. 2100 pasos por kilometro)
-    // Grande: 0.65 metros por paso (aprox. 1500 pasos por kilometro)
     switch (tamano) {
       case PEQUENO:
         pasosPorKm = 3200;

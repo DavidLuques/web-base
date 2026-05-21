@@ -13,6 +13,7 @@ public class ResultadoSimulacionDto {
   private Double temperatura;
   private Integer pasos;
   private Double calorias;
+  private Integer minutosDormidos;
 
   public ResultadoSimulacionDto() {}
 
@@ -27,6 +28,7 @@ public class ResultadoSimulacionDto {
     this.distanciaRecorrida = distanciaRecorrida;
     this.pasos = pasos;
     this.calorias = 0.0;
+    this.minutosDormidos = 0;
   }
 
   public ResultadoSimulacionDto(
@@ -38,7 +40,8 @@ public class ResultadoSimulacionDto {
     Double temperatura,
     Double distanciaRecorrida,
     Integer pasos,
-    Double calorias // nuevo
+    Double calorias,
+    Integer minutosDormidos
   ) {
     this.nombreMascota = nombreMascota;
     this.estado = estado;
@@ -49,6 +52,15 @@ public class ResultadoSimulacionDto {
     this.distanciaRecorrida = distanciaRecorrida;
     this.pasos = pasos;
     this.calorias = calorias;
+    this.minutosDormidos = minutosDormidos;
+  }
+
+  public Integer getMinutosDormidos() {
+    return minutosDormidos;
+  }
+
+  public void setMinutosDormidos(Integer minutosDormidos) {
+    this.minutosDormidos = minutosDormidos;
   }
 
   public Double getCalorias() {

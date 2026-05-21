@@ -469,6 +469,43 @@ let opcionesHistorial = {
               }
             });
           }
+          
+       // =========================
+       // SUEÑO RADIAL
+       // =========================
+
+       if (data.minutosDormidos != null) {
+
+         let metaMinutos = 480; // meta: 8 horas = 480 minutos
+
+         let porcentajeSueno = (data.minutosDormidos / metaMinutos) * 100;
+
+         let etiquetaSueno;
+         if (data.minutosDormidos >= 60) {
+           let horas = Math.floor(data.minutosDormidos / 60);
+           let minutos = data.minutosDormidos % 60;
+           etiquetaSueno = minutos > 0 ? horas + 'h ' + minutos + 'm' : horas + 'h';
+         } else {
+           etiquetaSueno = data.minutosDormidos + 'm';
+         }
+
+         chartSueno.updateOptions({
+
+           series: [porcentajeSueno > 100 ? 100 : porcentajeSueno],
+
+           plotOptions: {
+             radialBar: {
+               dataLabels: {
+                 value: {
+                   formatter: function () {
+                     return etiquetaSueno;
+                   }
+                 }
+               }
+             }
+           }
+         });
+       }
 
           // =========================
           // PASOS RADIAL
@@ -507,11 +544,10 @@ let opcionesHistorial = {
     actualizarEstado();
 
     // =========================
-    // ACTUALIZA CADA 2 MINUTOS
+    // ACTUALIZA CADA 1 MINUTO
     // =========================
 
-    setInterval(actualizarEstado, 120000);
-
+	setInterval(actualizarEstado, 60000);
   </script>
 
 </body>
