@@ -19,7 +19,7 @@ function getHoraRedondeada() {
   const ahora = new Date();
   const hh = ahora.getHours().toString().padStart(2, "0");
   const mm = (Math.floor(ahora.getMinutes() / 5) * 5).toString().padStart(2, "0");
-  return hh + "":" + mm;
+  return hh + ":" + mm;
 }
 
 function registrarNivel(estado) {
