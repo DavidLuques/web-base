@@ -6,6 +6,7 @@ import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
+import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
@@ -65,6 +66,7 @@ public class SimulacionActividadService {
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
+    Integer pasosCalculados = calcularPasos(distanciaTotal, mascota.getTamano());
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
       estado,
@@ -72,7 +74,8 @@ public class SimulacionActividadService {
       lectura.getPresionSistolica(),
       lectura.getPresionDiastolica(),
       lectura.getTemperatura(),
-      distanciaTotal
+      distanciaTotal,
+      pasosCalculados
     );
   }
 
@@ -101,16 +104,18 @@ public class SimulacionActividadService {
     Mascota mascota = mascotaDao.buscarPorId(mascotaId);
 
     if (mascota == null) {
-      return new ResultadoSimulacionDto("No encontrada", null, null);
+      return new ResultadoSimulacionDto("No encontrada", null, null, null);
     }
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
+    Integer pasosCalculados = calcularPasos(distanciaTotal, mascota.getTamano());
 
     Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(mascotaId);
     if (ultimo == null) {
       return new ResultadoSimulacionDto(
         mascota.getNombre(),
         mascota.getEstadoActual(),
-        distanciaTotal
+        distanciaTotal,
+        pasosCalculados
       );
     }
 
@@ -121,7 +126,35 @@ public class SimulacionActividadService {
       ultimo.getDatos().getPresionSistolica(),
       ultimo.getDatos().getPresionDiastolica(),
       ultimo.getDatos().getTemperatura(),
-      distanciaTotal
+      distanciaTotal,
+      pasosCalculados
     );
+  }
+
+  private Integer calcularPasos(Double distanciaEnKm, TamanoMascota tamano) {
+    if (distanciaEnKm == null || distanciaEnKm == 0.0 || tamano == null) {
+      return 0;
+    }
+
+    int pasosPorKm;
+    // Pequeño: 0.30 metros por paso (aprox. 3200 pasos por kilometro)
+    // Mediano: 0.45 metros por paso (aprox. 2100 pasos por kilometro)
+    // Grande: 0.65 metros por paso (aprox. 1500 pasos por kilometro)
+    switch (tamano) {
+      case PEQUENO:
+        pasosPorKm = 3200;
+        break;
+      case MEDIANO:
+        pasosPorKm = 2100;
+        break;
+      case GRANDE:
+        pasosPorKm = 1500;
+        break;
+      default:
+        pasosPorKm = 2100;
+        break;
+    }
+
+    return (int) Math.round(distanciaEnKm * pasosPorKm);
   }
 }

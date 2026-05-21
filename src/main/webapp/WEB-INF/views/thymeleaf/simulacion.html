@@ -421,6 +421,33 @@
               }
             });
           }
+          // =========================
+          // PASOS RADIAL
+          // =========================
+
+          if (data.pasos != null) {
+
+            let metaPasos = 10000; 
+
+            let porcentajePasos = (data.pasos / metaPasos) * 100;
+
+            chartPasos.updateOptions({
+
+              series: [porcentajePasos > 100 ? 100 : porcentajePasos],
+
+              plotOptions: {
+                radialBar: {
+                  dataLabels: {
+                    value: {
+                      formatter: function () {
+                        return data.pasos.toLocaleString('es-AR'); 
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          }
         });
     }
 

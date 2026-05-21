@@ -29,6 +29,7 @@ public class ControladorSimulacionTest {
     ResultadoSimulacionDto resultadoEsperado = new ResultadoSimulacionDto(
       "Toby",
       EstadoMascota.CAMINANDO,
+      null,
       null
     );
 
