@@ -8,6 +8,7 @@ import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.modelo.Actividad;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
@@ -62,6 +63,25 @@ public class SimulacionActividadService {
     this.repositorioSueno = repositorioSueno;
   }
 
+  private void registrarActividadSegunEstado(Mascota mascota, EstadoMascota estado) {
+    double velocidadKmH;
+    if (estado == EstadoMascota.CAMINANDO) {
+      velocidadKmH = VEL_CAMINANDO;
+    } else if (estado == EstadoMascota.CORRIENDO) {
+      velocidadKmH = VEL_CORRIENDO;
+    } else {
+      return;
+    }
+
+    double distanciaEnKm = velocidadKmH * (MINUTOS_POR_TICK / 60.0);
+
+    Actividad actividad = new Actividad();
+    actividad.setDistanciaRecorrida(distanciaEnKm);
+    actividad.setFechaYHora(LocalDateTime.now());
+    actividad.setMascota(mascota);
+    repositorioActividad.guardar(actividad);
+  }
+
   public ResultadoSimulacionDto simularDetalle(Long mascotaId) {
     Mascota mascota = mascotaDao.buscarPorId(mascotaId);
     RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
@@ -88,6 +108,8 @@ public class SimulacionActividadService {
       registro.setMascota(mascota);
       repositorioSueno.guardar(registro);
     }
+
+    registrarActividadSegunEstado(mascota, estado);
 
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
     Integer pasosCalculados = calcularPasos(distanciaTotal, mascota.getTamano());
@@ -138,6 +160,7 @@ public class SimulacionActividadService {
 
     Double distanciaTotal = repositorioActividad.obtenerDistanciaTotalPorMascota(mascotaId);
     Integer pasosCalculados = calcularPasos(distanciaTotal, mascota.getTamano());
+    Integer minutosDormidos = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(mascotaId);
 
     Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(mascotaId);
 
@@ -146,7 +169,9 @@ public class SimulacionActividadService {
         mascota.getNombre(),
         mascota.getEstadoActual(),
         distanciaTotal,
-        pasosCalculados
+        pasosCalculados,
+        0.0,
+        minutosDormidos
       );
     }
 
@@ -155,7 +180,6 @@ public class SimulacionActividadService {
       mascota.getEstadoActual(),
       mascota.getPeso()
     );
-    Integer minutosDormidos = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(mascotaId);
 
     return new ResultadoSimulacionDto(
       mascota.getNombre(),
@@ -205,8 +229,7 @@ public class SimulacionActividadService {
     }
 
     double duracionHoras = distanciaEnKm / velocidadKmH;
-    double calorias = met * pesoKg * duracionHoras;
-    return Math.round(calorias * 10.0) / 10.0;
+    return Math.round(met * pesoKg * duracionHoras * 10.0) / 10.0;
   }
 
   private Integer calcularPasos(Double distanciaEnKm, TamanoMascota tamano) {

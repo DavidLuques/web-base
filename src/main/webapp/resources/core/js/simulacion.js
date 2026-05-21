@@ -371,4 +371,4 @@ function actualizarEstado() {
 }
 
 actualizarEstado();
-setInterval(actualizarEstado, 60000);
+setInterval(actualizarEstado, 30000);
