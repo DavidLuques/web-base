@@ -291,6 +291,11 @@ function actualizarEstado() {
       document.getElementById('estado').textContent = formatearEstado(data.estado);
       actualizarBadge(data.estado);
       registrarNivel(data.estado);
+      
+      // Nombre mascota
+      if(data.nombreMascota) {
+            document.getElementById('nombre-mascota').textContent = data.nombreMascota;
+          }
 
       const horaActual = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 

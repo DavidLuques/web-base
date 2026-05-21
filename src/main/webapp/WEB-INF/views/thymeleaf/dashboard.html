@@ -183,7 +183,7 @@
     }
 
     const chartFrecuencia = new ApexCharts(document.querySelector("#chart-frecuencia"), 
-      getRadialConfig('#3b82f6', 'bpm', function(val) { return Math.round(val * 1.8); }) // Ajuste visual inverso
+      getRadialConfig('#3b82f6', 'ppm', function(val) { return Math.round(val * 1.8); }) // Ajuste visual inverso
     );
     
     const chartTemperatura = new ApexCharts(document.querySelector("#chart-temperatura"), 
@@ -242,9 +242,9 @@
             // ACTUALIZAR FRECUENTA CARDIACA
             // =========================
           if(data.frecuenciaCardiaca != null) {
-            let porcentajeBpm = (data.frecuenciaCardiaca / 180) * 100;
+            let porcentajePpm = (data.frecuenciaCardiaca / 180) * 100;
             chartFrecuencia.updateOptions({
-              series: [porcentajeBpm],
+              series: [porcentajePpm],
               plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.frecuenciaCardiaca } } } }
             });
 
