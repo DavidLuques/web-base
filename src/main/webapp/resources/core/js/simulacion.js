@@ -1,3 +1,4 @@
+/* global ApexCharts, idMascota */
 /* ── simulacion.js ── */
 
 /* idMascota es inyectado desde el HTML con th:inline="javascript" antes de cargar este script */
@@ -294,8 +295,8 @@ function actualizarEstado() {
       
       // Nombre mascota
       if(data.nombreMascota) {
-            document.getElementById("nombre-mascota").textContent = data.nombreMascota;
-          }
+        document.getElementById("nombre-mascota").textContent = data.nombreMascota;
+      }
 
       const horaActual = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
