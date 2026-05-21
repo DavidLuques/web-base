@@ -40,7 +40,6 @@ public class RepositorioSuenoTest {
 
   @Test
   public void queObtengaTotalMinutosDormidosPorMascota() {
-
     String hql =
       "SELECT SUM(r.minutosDormido) FROM RegistroSueno r WHERE r.mascota.id = :mascotaId";
 
@@ -50,8 +49,7 @@ public class RepositorioSuenoTest {
 
     when(queryMock.uniqueResult()).thenReturn(10L);
 
-    Integer resultado =
-      repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L);
+    Integer resultado = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L);
 
     assertEquals(10, resultado);
 
@@ -62,7 +60,6 @@ public class RepositorioSuenoTest {
 
   @Test
   public void queDevuelvaCeroCuandoNoHayMinutosDormidos() {
-
     String hql =
       "SELECT SUM(r.minutosDormido) FROM RegistroSueno r WHERE r.mascota.id = :mascotaId";
 
@@ -72,8 +69,7 @@ public class RepositorioSuenoTest {
 
     when(queryMock.uniqueResult()).thenReturn(null);
 
-    Integer resultado =
-      repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L);
+    Integer resultado = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L);
 
     assertEquals(0, resultado);
   }

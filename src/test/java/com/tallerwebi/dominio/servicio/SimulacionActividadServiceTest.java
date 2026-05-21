@@ -84,7 +84,7 @@ public class SimulacionActividadServiceTest {
     lectura.setTemperatura(38.3);
     return lectura;
   }
-  
+
   @Test
   public void cuandoLaMascotaEstaDurmiendoEntoncesSeGuardaRegistroDeSueno() {
     Long mascotaId = 1L;
@@ -98,8 +98,7 @@ public class SimulacionActividadServiceTest {
 
     when(mascotaDaoMock.buscarPorId(mascotaId)).thenReturn(mascota);
 
-    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO))
-      .thenReturn(rangoCompleto());
+    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rangoCompleto());
 
     when(
       simuladorCollarServiceMock.generarLectura(
@@ -112,16 +111,14 @@ public class SimulacionActividadServiceTest {
         eq(DIASTOLICA_MINIMA),
         eq(DIASTOLICA_MAXIMA)
       )
-    ).thenReturn(lecturaCompleta());
+    )
+      .thenReturn(lecturaCompleta());
 
-    when(motorActividadServiceMock.analizar(any(), any()))
-      .thenReturn(EstadoMascota.DURMIENDO);
+    when(motorActividadServiceMock.analizar(any(), any())).thenReturn(EstadoMascota.DURMIENDO);
 
-    when(repositorioSuenoMock.obtenerTotalMinutosDormidosPorMascota(mascotaId))
-      .thenReturn(2);
+    when(repositorioSuenoMock.obtenerTotalMinutosDormidosPorMascota(mascotaId)).thenReturn(2);
 
-    ResultadoSimulacionDto resultado =
-      simulacionActividadService.simularDetalle(mascotaId);
+    ResultadoSimulacionDto resultado = simulacionActividadService.simularDetalle(mascotaId);
 
     verify(repositorioSuenoMock, times(1)).guardar(any());
 
