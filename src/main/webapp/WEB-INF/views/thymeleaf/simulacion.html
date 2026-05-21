@@ -8,6 +8,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="stylesheet" th:href="@{/css/simulacion.css}">
 </head>
 
 <body class="bg-slate-50 p-8 font-sans text-gray-800">
@@ -25,9 +26,9 @@
         <h2 id="estado" class="text-3xl font-semibold text-gray-800">Cargando...</h2>
       </div>
       <div id="badge-actividad"
-        class="bg-red-100 text-red-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-        <span id="nivel-actividad">Nivel de Actividad</span>
+        class="bg-blue-100 text-blue-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+        <span>Nivel liviano de actividad</span>
       </div>
     </div>
 
@@ -85,6 +86,12 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
       <h3 class="text-lg font-bold mb-4 text-slate-800">Pasos - Hoy</h3>
       <div id="chart-historial-pasos"></div>
+    </div>
+
+    <!-- NIVELES DE ACTIVIDAD -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+      <h3 class="text-lg font-bold mb-4 text-slate-800">Niveles de Actividad</h3>
+      <div id="chart-niveles-actividad"></div>
     </div>
 
   </div>

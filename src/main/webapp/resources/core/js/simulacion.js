@@ -11,6 +11,44 @@ let historialHoras = [new Date().toLocaleTimeString([], {
   minute: '2-digit'
 })];
 
+/* ── Niveles de actividad cada 5 minutos ── */
+/* Cada entrada es { hora: "HH:MM", intenso: N, moderado: N, liviano: N } */
+let nivelesHoras = {};
+
+function getHoraRedondeada() {
+  const ahora = new Date();
+  const hh = ahora.getHours().toString().padStart(2, '0');
+  const mm = (Math.floor(ahora.getMinutes() / 5) * 5).toString().padStart(2, '0');
+  return hh + ':' + mm;
+}
+
+function registrarNivel(estado) {
+  const hora = getHoraRedondeada();
+  if (!nivelesHoras[hora]) {
+    nivelesHoras[hora] = { intenso: 0, moderado: 0, liviano: 0 };
+  }
+  if (estado === 'CORRIENDO') {
+    nivelesHoras[hora].intenso++;
+  } else if (estado === 'CAMINANDO') {
+    nivelesHoras[hora].moderado++;
+  } else {
+    nivelesHoras[hora].liviano++;
+  }
+}
+
+function getNivelesSeriesYCategorias() {
+  const horas = Object.keys(nivelesHoras).sort();
+  return {
+    categorias: horas,
+    intenso:    horas.map(h => nivelesHoras[h].intenso),
+    moderado:   horas.map(h => nivelesHoras[h].moderado),
+    liviano:    horas.map(h => nivelesHoras[h].liviano),
+  };
+}
+
+/* ─────────────────────────────────────────
+   Helpers de configuración de charts
+───────────────────────────────────────── */
 function formatearEstado(estado) {
   return estado
     .toLowerCase()
@@ -86,7 +124,9 @@ function getOpcionesHistorial(nombreSerie, datos, horas, color, formatterFn) {
   };
 }
 
-/* ── Radial charts ── */
+/* ─────────────────────────────────────────
+   Radial charts
+───────────────────────────────────────── */
 let chartDistancia = new ApexCharts(
   document.querySelector("#chart-distancia"),
   getConfiguracionGrafico('#3b82f6', 'km', '0', 0)
@@ -109,7 +149,9 @@ chartCalorias.render();
 chartSueno.render();
 chartPasos.render();
 
-/* ── Historial line charts ── */
+/* ─────────────────────────────────────────
+   Historial line charts
+───────────────────────────────────────── */
 let chartHistorialDistancia = new ApexCharts(
   document.querySelector("#chart-historial-distancia"),
   getOpcionesHistorial("Distancia (km)", historialDistancias, historialHoras, '#3b82f6',
@@ -144,22 +186,111 @@ let chartHistorialPasos = new ApexCharts(
 );
 chartHistorialPasos.render();
 
-/* ── Polling ── */
+/* ─────────────────────────────────────────
+   Chart niveles de actividad (barras apiladas)
+───────────────────────────────────────── */
+let chartNiveles = new ApexCharts(
+  document.querySelector("#chart-niveles-actividad"),
+  {
+    series: [
+      { name: 'Intenso',   data: [] },
+      { name: 'Moderado',  data: [] },
+      { name: 'Liviano',   data: [] }
+    ],
+    chart: {
+      type: 'bar',
+      height: 300,
+      stacked: true,
+      toolbar: { show: false },
+      zoom:    { enabled: false }
+    },
+    colors: ['#ef4444', '#d97706', '#3b82f6'],
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '55%',
+        borderRadius: 4,
+        borderRadiusApplication: 'end',
+        borderRadiusWhenStacked: 'last'
+      }
+    },
+    dataLabels: { enabled: false },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'right',
+      labels: { colors: '#64748b' }
+    },
+    xaxis: {
+      categories: [],
+      labels: { style: { colors: '#94a3b8' } },
+      axisBorder: { show: false },
+      axisTicks:  { show: false }
+    },
+    yaxis: {
+      min: 0,
+      tickAmount: 4,
+      labels: {
+        formatter: v => Math.round(v),
+        style: { colors: '#94a3b8' }
+      }
+    },
+    tooltip: {
+      y: { formatter: v => Math.round(v) + ' min' }
+    },
+    grid: {
+      borderColor: '#f1f5f9',
+      strokeDashArray: 4,
+      yaxis: { lines: { show: true } }
+    },
+    fill: { opacity: 1 }
+  }
+);
+chartNiveles.render();
+
+/* ─────────────────────────────────────────
+   Badge helpers
+───────────────────────────────────────── */
+const CONFIG_BADGE = {
+  CORRIENDO: {
+    clase: 'bg-red-100 text-red-600',
+    dot:   'bg-red-500',
+    texto: 'Nivel alto de actividad'
+  },
+  CAMINANDO: {
+    clase: 'bg-yellow-100 text-yellow-700',
+    dot:   'bg-yellow-600',
+    texto: 'Nivel moderado de actividad'
+  },
+  DURMIENDO: {
+    clase: 'bg-blue-100 text-blue-600',
+    dot:   'bg-blue-500',
+    texto: 'Nivel liviano de actividad'
+  },
+  _DEFAULT: {
+    clase: 'bg-blue-100 text-blue-600',
+    dot:   'bg-blue-500',
+    texto: 'Nivel liviano de actividad'
+  }
+};
+
+function actualizarBadge(estado) {
+  const cfg = CONFIG_BADGE[estado] || CONFIG_BADGE['_DEFAULT'];
+  const badge = document.getElementById('badge-actividad');
+  badge.className = cfg.clase + ' px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
+  badge.innerHTML = `<div class="w-2 h-2 rounded-full ${cfg.dot}"></div> ${cfg.texto}`;
+}
+
+/* ─────────────────────────────────────────
+   Polling principal
+───────────────────────────────────────── */
 function actualizarEstado() {
   fetch('/spring/simulacion/estado/' + idMascota)
     .then(response => response.json())
     .then(data => {
 
       document.getElementById('estado').textContent = formatearEstado(data.estado);
-
-      const badge = document.getElementById('badge-actividad');
-      if (data.estado === 'CORRIENDO' || data.estado === 'CAMINANDO') {
-        badge.className = 'bg-red-100 text-red-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
-        badge.innerHTML = '<div class="w-2 h-2 rounded-full bg-red-500"></div> Nivel Alto de Actividad';
-      } else {
-        badge.className = 'bg-blue-100 text-blue-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
-        badge.innerHTML = '<div class="w-2 h-2 rounded-full bg-blue-500"></div> En Reposo';
-      }
+      actualizarBadge(data.estado);
+      registrarNivel(data.estado);
 
       const horaActual = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -210,7 +341,7 @@ function actualizarEstado() {
         if (historialPasos.length > 20) historialPasos.shift();
       }
 
-      /* Horas (eje X compartido) */
+      /* Horas eje X compartido */
       historialHoras.push(horaActual);
       if (historialHoras.length > 20) historialHoras.shift();
 
@@ -219,6 +350,17 @@ function actualizarEstado() {
       chartHistorialCalorias.updateOptions({  series: [{ data: historialCalorias }],   xaxis: { categories: historialHoras } });
       chartHistorialSueno.updateOptions({     series: [{ data: historialSueno }],       xaxis: { categories: historialHoras } });
       chartHistorialPasos.updateOptions({     series: [{ data: historialPasos }],       xaxis: { categories: historialHoras } });
+
+      /* Actualizar chart de niveles */
+      const { categorias, intenso, moderado, liviano } = getNivelesSeriesYCategorias();
+      chartNiveles.updateOptions({
+        series: [
+          { name: 'Intenso',  data: intenso  },
+          { name: 'Moderado', data: moderado },
+          { name: 'Liviano',  data: liviano  }
+        ],
+        xaxis: { categories: categorias }
+      });
     });
 }
 
