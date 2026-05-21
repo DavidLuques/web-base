@@ -184,33 +184,33 @@
     function getRadialConfig(color, label, formatFunction) {
       return {
         series: [0],
-        chart: { type: 'radialBar', height: 220, sparkline: { enabled: true } },
+        chart: { type: "radialBar", height: 220, sparkline: { enabled: true } },
         colors: [color],
         plotOptions: {
           radialBar: {
-            hollow: { size: '60%' },
-            track: { background: '#f1f5f9', strokeWidth: '100%' },
+            hollow: { size: "60%" },
+            track: { background: "#f1f5f9", strokeWidth: "100%" },
             dataLabels: {
               show: true,
-              name: { show: true, color: '#94a3b8', fontSize: '10px', offsetY: 20 },
+              name: { show: true, color: "#94a3b8", fontSize: "10px", offsetY: 20 },
               value: {
-                show: true, color: '#1e293b', fontSize: '24px', fontWeight: 'bold', offsetY: -5,
+                show: true, color: "#1e293b", fontSize: "24px", fontWeight: "bold", offsetY: -5,
                 formatter: formatFunction
               }
             }
           }
         },
-        stroke: { lineCap: 'round' },
+        stroke: { lineCap: "round" },
         labels: [label]
       };
     }
 
-    const chartFrecuencia = new ApexCharts(document.querySelector("#chart-frecuencia"), getRadialConfig('#3b82f6', 'bpm', (val) => Math.round(val * 1.8)));
-    const chartTemperatura = new ApexCharts(document.querySelector("#chart-temperatura"), getRadialConfig('#10b981', '°C', (val) => (val / 100 * 50).toFixed(1)));
-    const chartPresion = new ApexCharts(document.querySelector("#chart-presion"), getRadialConfig('#f59e0b', 'mmHg', (val) => val + "/80"));
-    const chartPasos = new ApexCharts(document.querySelector("#chart-pasos"), getRadialConfig('#8b5cf6', 'pasos', (val) => {
+    const chartFrecuencia = new ApexCharts(document.querySelector("#chart-frecuencia"), getRadialConfig("#3b82f6", "bpm", (val) => Math.round(val * 1.8)));
+    const chartTemperatura = new ApexCharts(document.querySelector("#chart-temperatura"), getRadialConfig("#10b981", "°C", (val) => (val / 100 * 50).toFixed(1)));
+    const chartPresion = new ApexCharts(document.querySelector("#chart-presion"), getRadialConfig("#f59e0b", "mmHg", (val) => val + "/80"));
+    const chartPasos = new ApexCharts(document.querySelector("#chart-pasos"), getRadialConfig("#8b5cf6", "pasos", (val) => {
       let pasosReales = Math.round((val / 100) * 10000);
-      return pasosReales > 1000 ? (pasosReales/1000).toFixed(1) + 'k' : pasosReales;
+      return pasosReales > 1000 ? (pasosReales/1000).toFixed(1) + "k" : pasosReales;
     }));
 
     chartFrecuencia.render();
@@ -224,44 +224,44 @@
     function getLineaConfig(color, nombreSerie) {
       return {
         series: [{ name: nombreSerie, data: [] }],
-        chart: { type: 'area', height: 200, toolbar: { show: false } },
+        chart: { type: "area", height: 200, toolbar: { show: false } },
         colors: [color],
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02, stops: [0, 100] } },
+        fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02, stops: [0, 100] } },
         dataLabels: { enabled: false },
-        stroke: { curve: 'smooth', width: 3 },
-        xaxis: { categories: [], labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+        stroke: { curve: "smooth", width: 3 },
+        xaxis: { categories: [], labels: { style: { colors: "#94a3b8" } }, axisBorder: { show: false }, axisTicks: { show: false } },
         yaxis: {
           forceNiceScale: true, // Fuerza a que la escala sea estéticamente linda
           labels: {
-            style: { colors: '#94a3b8' },
+            style: { colors: "#94a3b8" },
             formatter: (val) => val.toFixed(1) // Muestra un decimal para notar variaciones chicas
           }
         },
-        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+        grid: { borderColor: "#f1f5f9", strokeDashArray: 4 }
       };
     }
 
     // Inicialización de Gráficos de Líneas
-    const chartLineaFrecuencia = new ApexCharts(document.querySelector("#chart-historial-frecuencia"), getLineaConfig('#60a5fa', 'Frecuencia'));
-    const chartLineaTemperatura = new ApexCharts(document.querySelector("#chart-historial-temperatura"), getLineaConfig('#34d399', 'Temperatura'));
+    const chartLineaFrecuencia = new ApexCharts(document.querySelector("#chart-historial-frecuencia"), getLineaConfig("#60a5fa", "Frecuencia"));
+    const chartLineaTemperatura = new ApexCharts(document.querySelector("#chart-historial-temperatura"), getLineaConfig("#34d399", "Temperatura"));
     const chartLineaPresion = new ApexCharts(document.querySelector("#chart-historial-presion"), {
       series: [
-        { name: 'Sistólica', data: [] },
-        { name: 'Diastólica', data: [] }
+        { name: "Sistólica", data: [] },
+        { name: "Diastólica", data: [] }
       ],
-      chart: { type: 'area', height: 200, toolbar: { show: false } },
-      colors: ['#fbbf24', '#f59e0b'],
-      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02, stops: [0, 100] } },
+      chart: { type: "area", height: 200, toolbar: { show: false } },
+      colors: ["#fbbf24", "#f59e0b"],
+      fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02, stops: [0, 100] } },
       dataLabels: { enabled: false },
-      stroke: { curve: 'smooth', width: 3 },
-      xaxis: { categories: [], labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+      stroke: { curve: "smooth", width: 3 },
+      xaxis: { categories: [], labels: { style: { colors: "#94a3b8" } }, axisBorder: { show: false }, axisTicks: { show: false } },
       yaxis: {
         forceNiceScale: true, // <-- Activamos zoom automático para las dos curvas
-        labels: { style: { colors: '#94a3b8' } }
+        labels: { style: { colors: "#94a3b8" } }
       },
-      grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+      grid: { borderColor: "#f1f5f9", strokeDashArray: 4 }
     });
-    const chartLineaPasos = new ApexCharts(document.querySelector("#chart-historial-pasos"), getLineaConfig('#a78bfa', 'Pasos'));
+    const chartLineaPasos = new ApexCharts(document.querySelector("#chart-historial-pasos"), getLineaConfig("#a78bfa", "Pasos"));
 
     chartLineaFrecuencia.render();
     chartLineaTemperatura.render();
@@ -272,15 +272,15 @@
     // FUNCIÓN DE CONEXIÓN Y ACTUALIZACIÓN
     // =========================
     function conectarYActualizar() {
-      fetch('/spring/simulacion/estado/' + idMascota)
+      fetch("/spring/simulacion/estado/" + idMascota)
               .then(response => response.json())
               .then(data => {
 
                 if(data.nombreMascota) {
-                  document.getElementById('nombre-mascota').textContent = data.nombreMascota;
+                  document.getElementById("nombre-mascota").textContent = data.nombreMascota;
                 }
 
-                const horaActual = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const horaActual = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
                 historialHoras.push(horaActual);
                 if(historialHoras.length > MAX_PUNTOS) { historialHoras.shift(); }
 
@@ -327,8 +327,8 @@
                   }
 
                   chartLineaPresion.updateSeries([
-                    { name: 'Sistólica', data: historialSistolica },
-                    { name: 'Diastólica', data: historialDiastolica }
+                    { name: "Sistólica", data: historialSistolica },
+                    { name: "Diastólica", data: historialDiastolica }
                   ]);
                   chartLineaPresion.updateOptions({ xaxis: { categories: historialHoras } });
                 }
@@ -338,7 +338,7 @@
                   let porcentajePasos = (data.pasos / 10000) * 100;
                   chartPasos.updateOptions({
                     series: [porcentajePasos > 100 ? 100 : porcentajePasos],
-                    plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.pasos > 1000 ? (data.pasos/1000).toFixed(1) + 'k' : data.pasos } } } }
+                    plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.pasos > 1000 ? (data.pasos/1000).toFixed(1) + "k" : data.pasos } } } }
                   });
                   historialPasos.push(data.pasos);
                   if(historialPasos.length > MAX_PUNTOS) { historialPasos.shift(); }
