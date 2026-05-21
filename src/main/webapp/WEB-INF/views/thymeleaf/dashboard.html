@@ -40,12 +40,12 @@
   </aside>
 
   <main class="flex-1 flex flex-col h-full overflow-hidden">
-    
+
     <header class="bg-white h-20 px-8 flex items-center justify-between border-b border-slate-200 shrink-0">
       <h1 class="text-2xl font-bold text-slate-800">
         Dashboard de Salud - <span id="nombre-mascota" th:text="${mascotaNombre}">Mascota</span>
       </h1>
-      
+
       <div class="flex gap-4">
         <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 cursor-pointer">
           <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
@@ -70,13 +70,13 @@
 
     <div class="flex-1 p-8 overflow-y-auto">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-        
+
         <div class="lg:col-span-2 flex flex-col gap-8">
-          
+
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <h3 class="text-slate-800 font-bold mb-6">Resumen</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              
+
               <div class="flex flex-col items-center">
                 <div id="chart-frecuencia" class="-my-4"></div>
                 <p class="text-sm font-semibold text-slate-700">Frecuencia Cardíaca</p>
@@ -104,16 +104,33 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <h3 class="text-slate-800 font-bold mb-4">Frecuencia Cardíaca - Hoy</h3>
-            <div id="chart-historial-frecuencia" class="w-full h-64"></div>
+          <div class="flex flex-col gap-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h3 class="text-slate-800 font-bold mb-4">Frecuencia Cardíaca - Hoy</h3>
+              <div id="chart-historial-frecuencia" class="w-full h-48"></div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h3 class="text-slate-800 font-bold mb-4">Temperatura - Hoy</h3>
+              <div id="chart-historial-temperatura" class="w-full h-48"></div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h3 class="text-slate-800 font-bold mb-4">Presión Arterial (Sistólica) - Hoy</h3>
+              <div id="chart-historial-presion" class="w-full h-48"></div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h3 class="text-slate-800 font-bold mb-4">Evolución de Pasos - Hoy</h3>
+              <div id="chart-historial-pasos" class="w-full h-48"></div>
+            </div>
           </div>
 
         </div>
 
         <div class="lg:col-span-1 flex flex-col h-full">
           <h3 class="text-slate-800 font-bold mb-4">Alertas Recientes</h3>
-          
+
           <div class="flex flex-col gap-4 overflow-y-auto scrollbar-hide pr-2" id="contenedor-alertas">
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-1">
               <div class="flex items-center gap-2">
@@ -130,7 +147,7 @@
               </div>
               <span class="text-xs text-slate-500 ml-4">Hace 2 horas</span>
             </div>
-            
+
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-1">
               <div class="flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full bg-amber-500"></div>
@@ -150,10 +167,16 @@
     const idMascota = [[${idMascota}]];
 
     // =========================
-    // ESTADO LOCAL DE DATOS
+    // ESTADO LOCAL DE DATOS (Arreglos para el Historial)
     // =========================
-    let historialFrecuencia = [];
     let historialHoras = [];
+    let historialFrecuencia = [];
+    let historialTemperatura = [];
+    let historialSistolica = [];
+    let historialDiastolica = [];
+    let historialPasos = [];
+
+    const MAX_PUNTOS = 15; // Límite de elementos en pantalla
 
     // =========================
     // CONFIGURACIÓN RADIALES
@@ -182,24 +205,13 @@
       };
     }
 
-    const chartFrecuencia = new ApexCharts(document.querySelector("#chart-frecuencia"), 
-      getRadialConfig('#3b82f6', 'ppm', function(val) { return Math.round(val * 1.8); }) // Ajuste visual inverso
-    );
-    
-    const chartTemperatura = new ApexCharts(document.querySelector("#chart-temperatura"), 
-      getRadialConfig('#10b981', '°C', function(val) { return (val / 100 * 50).toFixed(1); })
-    );
-    
-    const chartPresion = new ApexCharts(document.querySelector("#chart-presion"), 
-      getRadialConfig('#f59e0b', 'mmHg', function(val) { return val + "/80"; }) // Formato especial para presión
-    );
-    
-    const chartPasos = new ApexCharts(document.querySelector("#chart-pasos"), 
-      getRadialConfig('#8b5cf6', 'pasos', function(val) { 
-        let pasosReales = Math.round((val / 100) * 10000);
-        return pasosReales > 1000 ? (pasosReales/1000).toFixed(1) + 'k' : pasosReales; 
-      })
-    );
+    const chartFrecuencia = new ApexCharts(document.querySelector("#chart-frecuencia"), getRadialConfig('#3b82f6', 'bpm', (val) => Math.round(val * 1.8)));
+    const chartTemperatura = new ApexCharts(document.querySelector("#chart-temperatura"), getRadialConfig('#10b981', '°C', (val) => (val / 100 * 50).toFixed(1)));
+    const chartPresion = new ApexCharts(document.querySelector("#chart-presion"), getRadialConfig('#f59e0b', 'mmHg', (val) => val + "/80"));
+    const chartPasos = new ApexCharts(document.querySelector("#chart-pasos"), getRadialConfig('#8b5cf6', 'pasos', (val) => {
+      let pasosReales = Math.round((val / 100) * 10000);
+      return pasosReales > 1000 ? (pasosReales/1000).toFixed(1) + 'k' : pasosReales;
+    }));
 
     chartFrecuencia.render();
     chartTemperatura.render();
@@ -207,97 +219,134 @@
     chartPasos.render();
 
     // =========================
-    // CONFIGURACIÓN GRÁFICO LÍNEA
+    // FUNCIÓN GENERADORA DE CONFIGURACIÓN DE LÍNEAS
     // =========================
-    const opcionesLinea = {
-      series: [{ name: "Frecuencia", data: [] }],
-      chart: { type: 'area', height: 250, toolbar: { show: false } },
-      colors: ['#60a5fa'],
-      fill: {
-        type: 'gradient',
-        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] }
-      },
+    function getLineaConfig(color, nombreSerie) {
+      return {
+        series: [{ name: nombreSerie, data: [] }],
+        chart: { type: 'area', height: 200, toolbar: { show: false } },
+        colors: [color],
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02, stops: [0, 100] } },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        xaxis: { categories: [], labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+        yaxis: {
+          forceNiceScale: true, // Fuerza a que la escala sea estéticamente linda
+          labels: {
+            style: { colors: '#94a3b8' },
+            formatter: (val) => val.toFixed(1) // Muestra un decimal para notar variaciones chicas
+          }
+        },
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+      };
+    }
+
+    // Inicialización de Gráficos de Líneas
+    const chartLineaFrecuencia = new ApexCharts(document.querySelector("#chart-historial-frecuencia"), getLineaConfig('#60a5fa', 'Frecuencia'));
+    const chartLineaTemperatura = new ApexCharts(document.querySelector("#chart-historial-temperatura"), getLineaConfig('#34d399', 'Temperatura'));
+    const chartLineaPresion = new ApexCharts(document.querySelector("#chart-historial-presion"), {
+      series: [
+        { name: 'Sistólica', data: [] },
+        { name: 'Diastólica', data: [] }
+      ],
+      chart: { type: 'area', height: 200, toolbar: { show: false } },
+      colors: ['#fbbf24', '#f59e0b'],
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02, stops: [0, 100] } },
       dataLabels: { enabled: false },
       stroke: { curve: 'smooth', width: 3 },
       xaxis: { categories: [], labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
-      yaxis: { min: 40, max: 180, tickAmount: 4, labels: { style: { colors: '#94a3b8' } } },
+      yaxis: {
+        forceNiceScale: true, // <-- Activamos zoom automático para las dos curvas
+        labels: { style: { colors: '#94a3b8' } }
+      },
       grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
-    };
-    const chartLinea = new ApexCharts(document.querySelector("#chart-historial-frecuencia"), opcionesLinea);
-    chartLinea.render();
+    });
+    const chartLineaPasos = new ApexCharts(document.querySelector("#chart-historial-pasos"), getLineaConfig('#a78bfa', 'Pasos'));
+
+    chartLineaFrecuencia.render();
+    chartLineaTemperatura.render();
+    chartLineaPresion.render();
+    chartLineaPasos.render();
 
     // =========================
-    // FUNCIÓN DE CONEXIÓN
+    // FUNCIÓN DE CONEXIÓN Y ACTUALIZACIÓN
     // =========================
     function conectarYActualizar() {
       fetch('/spring/simulacion/estado/' + idMascota)
-        .then(response => response.json())
-        .then(data => {
-          
-          if(data.nombreMascota) {
-            document.getElementById('nombre-mascota').textContent = data.nombreMascota;
-          }
+              .then(response => response.json())
+              .then(data => {
 
-          // =========================
-            // ACTUALIZAR FRECUENTA CARDIACA
-            // =========================
-          if(data.frecuenciaCardiaca != null) {
-            let porcentajePpm = (data.frecuenciaCardiaca / 180) * 100;
-            chartFrecuencia.updateOptions({
-              series: [porcentajePpm],
-              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.frecuenciaCardiaca } } } }
-            });
+                if(data.nombreMascota) {
+                  document.getElementById('nombre-mascota').textContent = data.nombreMascota;
+                }
 
-            // Actualizar gráfico de línea
-            const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            historialFrecuencia.push(data.frecuenciaCardiaca);
-            historialHoras.push(hora);
-            
-            if(historialFrecuencia.length > 15) {
-              historialFrecuencia.shift();
-              historialHoras.shift();
-            }
-            
-            chartLinea.updateSeries([{ data: historialFrecuencia }]);
-            chartLinea.updateOptions({ xaxis: { categories: historialHoras } });
-          }
+                const horaActual = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                historialHoras.push(horaActual);
+                if(historialHoras.length > MAX_PUNTOS) { historialHoras.shift(); }
 
-          // =========================
-            // ACTUALIZAR TEMPERATURA
-            // =========================
-          if(data.temperatura != null) {
-            let porcentajeTemp = (data.temperatura / 45) * 100;
-            chartTemperatura.updateOptions({
-              series: [porcentajeTemp],
-              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.temperatura.toFixed(1) } } } }
-            });
-          }
+                // 1. Procesar Frecuencia Cardíaca
+                if(data.frecuenciaCardiaca != null) {
+                  let porcentajeBpm = (data.frecuenciaCardiaca / 180) * 100;
+                  chartFrecuencia.updateOptions({
+                    series: [porcentajeBpm],
+                    plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.frecuenciaCardiaca } } } }
+                  });
+                  historialFrecuencia.push(data.frecuenciaCardiaca);
+                  if(historialFrecuencia.length > MAX_PUNTOS) { historialFrecuencia.shift(); }
+                  chartLineaFrecuencia.updateSeries([{ data: historialFrecuencia }]);
+                  chartLineaFrecuencia.updateOptions({ xaxis: { categories: historialHoras } });
+                }
 
-          // =========================
-            // ACTUALIZAR PRESION
-            // =========================
-          if(data.presionSistolica != null && data.presionDiastolica != null) {
-            let porcentajePresion = (data.presionSistolica / 160) * 100; // Base sobre sistólica
-            chartPresion.updateOptions({
-              series: [porcentajePresion],
-              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.presionSistolica + "/" + data.presionDiastolica } } } }
-            });
-          }
+                // 2. Procesar Temperatura
+                if(data.temperatura != null) {
+                  let porcentajeTemp = (data.temperatura / 45) * 100;
+                  chartTemperatura.updateOptions({
+                    series: [porcentajeTemp],
+                    plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.temperatura.toFixed(1) } } } }
+                  });
+                  historialTemperatura.push(data.temperatura.toFixed(1));
+                  if(historialTemperatura.length > MAX_PUNTOS) { historialTemperatura.shift(); }
+                  chartLineaTemperatura.updateSeries([{ data: historialTemperatura }]);
+                  chartLineaTemperatura.updateOptions({ xaxis: { categories: historialHoras } });
+                }
 
-          // =========================
-            // ACTUALIZAR PASOS
-            // =========================
-          if(data.pasos != null) {
-            let porcentajePasos = (data.pasos / 10000) * 100;
-            chartPasos.updateOptions({
-              series: [porcentajePasos > 100 ? 100 : porcentajePasos],
-              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => {
-                return data.pasos > 1000 ? (data.pasos/1000).toFixed(1) + 'k' : data.pasos;
-              } } } } }
-            });
-          }
-        })
-        .catch(error => console.error("Error al conectar con el backend:", error));
+                // 3. Procesar Presión Arterial
+                if(data.presionSistolica != null && data.presionDiastolica != null) {
+                  let porcentajePresion = (data.presionSistolica / 160) * 100;
+                  chartPresion.updateOptions({
+                    series: [porcentajePresion],
+                    plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.presionSistolica + "/" + data.presionDiastolica } } } }
+                  });
+
+                  historialSistolica.push(data.presionSistolica);
+                  historialDiastolica.push(data.presionDiastolica);
+
+                  if(historialSistolica.length > MAX_PUNTOS) {
+                    historialSistolica.shift();
+                    historialDiastolica.shift();
+                  }
+
+                  chartLineaPresion.updateSeries([
+                    { name: 'Sistólica', data: historialSistolica },
+                    { name: 'Diastólica', data: historialDiastolica }
+                  ]);
+                  chartLineaPresion.updateOptions({ xaxis: { categories: historialHoras } });
+                }
+
+                // 4. Procesar Pasos Diarios
+                if(data.pasos != null) {
+                  let porcentajePasos = (data.pasos / 10000) * 100;
+                  chartPasos.updateOptions({
+                    series: [porcentajePasos > 100 ? 100 : porcentajePasos],
+                    plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.pasos > 1000 ? (data.pasos/1000).toFixed(1) + 'k' : data.pasos } } } }
+                  });
+                  historialPasos.push(data.pasos);
+                  if(historialPasos.length > MAX_PUNTOS) { historialPasos.shift(); }
+                  chartLineaPasos.updateSeries([{ data: historialPasos }]);
+                  chartLineaPasos.updateOptions({ xaxis: { categories: historialHoras } });
+                }
+              })
+              .catch(error => console.error("Error al conectar con el backend:", error));
     }
 
     conectarYActualizar();
