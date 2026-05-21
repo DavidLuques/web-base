@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Salud - PetTracker</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+  <aside class="w-20 bg-[#2d3748] flex flex-col items-center py-6 border-r border-slate-700 shadow-xl z-20">
+    <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-8">
+      <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
+    </div>
+    <nav class="flex flex-col gap-6 w-full">
+      <a th:href="@{/simulacion/dashboard/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400">
+        <i data-lucide="home" class="w-6 h-6 text-white"></i>
+      </a>
+      <a th:href="@{/simulacion/vista/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+        <i data-lucide="activity" class="w-6 h-6"></i>
+      </a>
+      <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+        <i data-lucide="map-pin" class="w-6 h-6"></i>
+      </a>
+      <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+        <i data-lucide="bell" class="w-6 h-6"></i>
+      </a>
+    </nav>
+    <div class="mt-auto">
+      <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+        <i data-lucide="settings" class="w-6 h-6"></i>
+      </a>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-full overflow-hidden">
+    
+    <header class="bg-white h-20 px-8 flex items-center justify-between border-b border-slate-200 shrink-0">
+      <h1 class="text-2xl font-bold text-slate-800">
+        Dashboard de Salud - <span id="nombre-mascota" th:text="${mascotaNombre}">Mascota</span>
+      </h1>
+      
+      <div class="flex gap-4">
+        <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 cursor-pointer">
+          <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
+            <i data-lucide="dog" class="w-4 h-4"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-slate-800 leading-tight">Max</span>
+            <span class="text-xs text-slate-500 leading-tight">3 años</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-full border border-slate-200 opacity-60 cursor-pointer hover:opacity-100 transition-opacity">
+          <div class="w-8 h-8 rounded-full bg-rose-200 flex items-center justify-center text-rose-700">
+            <i data-lucide="cat" class="w-4 h-4"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-slate-800 leading-tight">Luna</span>
+            <span class="text-xs text-slate-500 leading-tight">2 años</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 p-8 overflow-y-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        
+        <div class="lg:col-span-2 flex flex-col gap-8">
+          
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-slate-800 font-bold mb-6">Resumen</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              
+              <div class="flex flex-col items-center">
+                <div id="chart-frecuencia" class="-my-4"></div>
+                <p class="text-sm font-semibold text-slate-700">Frecuencia Cardíaca</p>
+                <a href="#" class="text-xs text-blue-500 hover:underline mt-1">Click para historial</a>
+              </div>
+
+              <div class="flex flex-col items-center">
+                <div id="chart-temperatura" class="-my-4"></div>
+                <p class="text-sm font-semibold text-slate-700">Temperatura</p>
+                <a href="#" class="text-xs text-blue-500 hover:underline mt-1">Click para historial</a>
+              </div>
+
+              <div class="flex flex-col items-center">
+                <div id="chart-presion" class="-my-4"></div>
+                <p class="text-sm font-semibold text-slate-700">Presión Arterial</p>
+                <a href="#" class="text-xs text-blue-500 hover:underline mt-1">Click para historial</a>
+              </div>
+
+              <div class="flex flex-col items-center">
+                <div id="chart-pasos" class="-my-4"></div>
+                <p class="text-sm font-semibold text-slate-700">Pasos Diarios</p>
+                <a href="#" class="text-xs text-blue-500 hover:underline mt-1">Click para historial</a>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-slate-800 font-bold mb-4">Frecuencia Cardíaca - Hoy</h3>
+            <div id="chart-historial-frecuencia" class="w-full h-64"></div>
+          </div>
+
+        </div>
+
+        <div class="lg:col-span-1 flex flex-col h-full">
+          <h3 class="text-slate-800 font-bold mb-4">Alertas Recientes</h3>
+          
+          <div class="flex flex-col gap-4 overflow-y-auto scrollbar-hide pr-2" id="contenedor-alertas">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                <span class="font-bold text-slate-800 text-sm">Actividad Baja</span>
+              </div>
+              <span class="text-xs text-slate-500 ml-4">Hace 30 min</span>
+            </div>
+
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-rose-500"></div>
+                <span class="font-bold text-slate-800 text-sm">Ritmo Cardíaco Alto</span>
+              </div>
+              <span class="text-xs text-slate-500 ml-4">Hace 2 horas</span>
+            </div>
+            
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                <span class="font-bold text-slate-800 text-sm">Actividad Baja</span>
+              </div>
+              <span class="text-xs text-slate-500 ml-4">Hace 3 horas</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script th:inline="javascript">
+    lucide.createIcons();
+    const idMascota = [[${idMascota}]];
+
+    // =========================
+    // ESTADO LOCAL DE DATOS
+    // =========================
+    let historialFrecuencia = [];
+    let historialHoras = [];
+
+    // =========================
+    // CONFIGURACIÓN RADIALES
+    // =========================
+    function getRadialConfig(color, label, formatFunction) {
+      return {
+        series: [0],
+        chart: { type: 'radialBar', height: 220, sparkline: { enabled: true } },
+        colors: [color],
+        plotOptions: {
+          radialBar: {
+            hollow: { size: '60%' },
+            track: { background: '#f1f5f9', strokeWidth: '100%' },
+            dataLabels: {
+              show: true,
+              name: { show: true, color: '#94a3b8', fontSize: '10px', offsetY: 20 },
+              value: {
+                show: true, color: '#1e293b', fontSize: '24px', fontWeight: 'bold', offsetY: -5,
+                formatter: formatFunction
+              }
+            }
+          }
+        },
+        stroke: { lineCap: 'round' },
+        labels: [label]
+      };
+    }
+
+    const chartFrecuencia = new ApexCharts(document.querySelector("#chart-frecuencia"), 
+      getRadialConfig('#3b82f6', 'bpm', function(val) { return Math.round(val * 1.8); }) // Ajuste visual inverso
+    );
+    
+    const chartTemperatura = new ApexCharts(document.querySelector("#chart-temperatura"), 
+      getRadialConfig('#10b981', '°C', function(val) { return (val / 100 * 50).toFixed(1); })
+    );
+    
+    const chartPresion = new ApexCharts(document.querySelector("#chart-presion"), 
+      getRadialConfig('#f59e0b', 'mmHg', function(val) { return val + "/80"; }) // Formato especial para presión
+    );
+    
+    const chartPasos = new ApexCharts(document.querySelector("#chart-pasos"), 
+      getRadialConfig('#8b5cf6', 'pasos', function(val) { 
+        let pasosReales = Math.round((val / 100) * 10000);
+        return pasosReales > 1000 ? (pasosReales/1000).toFixed(1) + 'k' : pasosReales; 
+      })
+    );
+
+    chartFrecuencia.render();
+    chartTemperatura.render();
+    chartPresion.render();
+    chartPasos.render();
+
+    // =========================
+    // CONFIGURACIÓN GRÁFICO LÍNEA
+    // =========================
+    const opcionesLinea = {
+      series: [{ name: "Frecuencia", data: [] }],
+      chart: { type: 'area', height: 250, toolbar: { show: false } },
+      colors: ['#60a5fa'],
+      fill: {
+        type: 'gradient',
+        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] }
+      },
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: 3 },
+      xaxis: { categories: [], labels: { style: { colors: '#94a3b8' } }, axisBorder: { show: false }, axisTicks: { show: false } },
+      yaxis: { min: 40, max: 180, tickAmount: 4, labels: { style: { colors: '#94a3b8' } } },
+      grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+    };
+    const chartLinea = new ApexCharts(document.querySelector("#chart-historial-frecuencia"), opcionesLinea);
+    chartLinea.render();
+
+    // =========================
+    // FUNCIÓN DE CONEXIÓN
+    // =========================
+    function conectarYActualizar() {
+      fetch('/spring/simulacion/estado/' + idMascota)
+        .then(response => response.json())
+        .then(data => {
+          
+          if(data.nombreMascota) {
+            document.getElementById('nombre-mascota').textContent = data.nombreMascota;
+          }
+
+          // =========================
+            // ACTUALIZAR FRECUENTA CARDIACA
+            // =========================
+          if(data.frecuenciaCardiaca != null) {
+            let porcentajeBpm = (data.frecuenciaCardiaca / 180) * 100;
+            chartFrecuencia.updateOptions({
+              series: [porcentajeBpm],
+              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.frecuenciaCardiaca } } } }
+            });
+
+            // Actualizar gráfico de línea
+            const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            historialFrecuencia.push(data.frecuenciaCardiaca);
+            historialHoras.push(hora);
+            
+            if(historialFrecuencia.length > 15) {
+              historialFrecuencia.shift();
+              historialHoras.shift();
+            }
+            
+            chartLinea.updateSeries([{ data: historialFrecuencia }]);
+            chartLinea.updateOptions({ xaxis: { categories: historialHoras } });
+          }
+
+          // =========================
+            // ACTUALIZAR TEMPERATURA
+            // =========================
+          if(data.temperatura != null) {
+            let porcentajeTemp = (data.temperatura / 45) * 100;
+            chartTemperatura.updateOptions({
+              series: [porcentajeTemp],
+              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.temperatura.toFixed(1) } } } }
+            });
+          }
+
+          // =========================
+            // ACTUALIZAR PRESION
+            // =========================
+          if(data.presionSistolica != null && data.presionDiastolica != null) {
+            let porcentajePresion = (data.presionSistolica / 160) * 100; // Base sobre sistólica
+            chartPresion.updateOptions({
+              series: [porcentajePresion],
+              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.presionSistolica + "/" + data.presionDiastolica } } } }
+            });
+          }
+
+          // =========================
+            // ACTUALIZAR PASOS
+            // =========================
+          if(data.pasos != null) {
+            let porcentajePasos = (data.pasos / 10000) * 100;
+            chartPasos.updateOptions({
+              series: [porcentajePasos > 100 ? 100 : porcentajePasos],
+              plotOptions: { radialBar: { dataLabels: { value: { formatter: () => {
+                return data.pasos > 1000 ? (data.pasos/1000).toFixed(1) + 'k' : data.pasos;
+              } } } } }
+            });
+          }
+        })
+        .catch(error => console.error("Error al conectar con el backend:", error));
+    }
+
+    conectarYActualizar();
+    setInterval(conectarYActualizar, 5000);
+
+  </script>
+</body>
+</html>
