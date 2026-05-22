@@ -44,14 +44,14 @@ public class SimulacionActividadService {
 
   @Autowired
   public SimulacionActividadService(
-          MascotaDao mascotaDao,
-          RangoVitalDao rangoVitalDao,
-          SimuladorCollarService simuladorCollarService,
-          MotorActividadService motorActividadService,
-          RepositorioActividad repositorioActividad,
-          ServicioAnalisis servicioAnalisis,
-          RepositorioAnalisis repositorioAnalisis,
-          RepositorioSueno repositorioSueno
+    MascotaDao mascotaDao,
+    RangoVitalDao rangoVitalDao,
+    SimuladorCollarService simuladorCollarService,
+    MotorActividadService motorActividadService,
+    RepositorioActividad repositorioActividad,
+    ServicioAnalisis servicioAnalisis,
+    RepositorioAnalisis repositorioAnalisis,
+    RepositorioSueno repositorioSueno
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
@@ -87,14 +87,14 @@ public class SimulacionActividadService {
     RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
 
     LecturaSensor lectura = simuladorCollarService.generarLectura(
-            mascota.getId(),
-            mascota.getEstadoActual(),
-            rango.getFrecuenciaMinima(),
-            rango.getFrecuenciaMaxima(),
-            rango.getSistolicaMinima(),
-            rango.getSistolicaMaxima(),
-            rango.getDiastolicaMinima(),
-            rango.getDiastolicaMaxima()
+      mascota.getId(),
+      mascota.getEstadoActual(),
+      rango.getFrecuenciaMinima(),
+      rango.getFrecuenciaMaxima(),
+      rango.getSistolicaMinima(),
+      rango.getSistolicaMaxima(),
+      rango.getDiastolicaMinima(),
+      rango.getDiastolicaMaxima()
     );
 
     EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
@@ -117,16 +117,16 @@ public class SimulacionActividadService {
     Integer minutosDormidos = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(mascotaId);
 
     return new ResultadoSimulacionDto(
-            mascota.getNombre(),
-            estado,
-            lectura.getFrecuenciaCardiaca(),
-            lectura.getPresionSistolica(),
-            lectura.getPresionDiastolica(),
-            lectura.getTemperatura(),
-            distanciaTotal,
-            pasosCalculados,
-            calorias,
-            minutosDormidos
+      mascota.getNombre(),
+      estado,
+      lectura.getFrecuenciaCardiaca(),
+      lectura.getPresionSistolica(),
+      lectura.getPresionDiastolica(),
+      lectura.getTemperatura(),
+      distanciaTotal,
+      pasosCalculados,
+      calorias,
+      minutosDormidos
     );
   }
 
@@ -143,10 +143,10 @@ public class SimulacionActividadService {
     for (Mascota mascota : mascotas) {
       RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
       simuladorCollarService.actualizarFrecuencia(
-              mascota.getId(),
-              mascota.getEstadoActual(),
-              rango.getFrecuenciaMinima(),
-              rango.getFrecuenciaMaxima()
+        mascota.getId(),
+        mascota.getEstadoActual(),
+        rango.getFrecuenciaMinima(),
+        rango.getFrecuenciaMaxima()
       );
     }
   }
@@ -166,42 +166,42 @@ public class SimulacionActividadService {
 
     if (ultimo == null) {
       return new ResultadoSimulacionDto(
-              mascota.getNombre(),
-              mascota.getEstadoActual(),
-              distanciaTotal,
-              pasosCalculados,
-              0.0,
-              minutosDormidos
+        mascota.getNombre(),
+        mascota.getEstadoActual(),
+        distanciaTotal,
+        pasosCalculados,
+        0.0,
+        minutosDormidos
       );
     }
 
     Double calorias = calcularCalorias(
-            distanciaTotal,
-            mascota.getEstadoActual(),
-            mascota.getPeso()
+      distanciaTotal,
+      mascota.getEstadoActual(),
+      mascota.getPeso()
     );
 
     return new ResultadoSimulacionDto(
-            mascota.getNombre(),
-            mascota.getEstadoActual(),
-            ultimo.getDatos().getFrecuenciaCardiaca(),
-            ultimo.getDatos().getPresionSistolica(),
-            ultimo.getDatos().getPresionDiastolica(),
-            ultimo.getDatos().getTemperatura(),
-            distanciaTotal,
-            pasosCalculados,
-            calorias,
-            minutosDormidos
+      mascota.getNombre(),
+      mascota.getEstadoActual(),
+      ultimo.getDatos().getFrecuenciaCardiaca(),
+      ultimo.getDatos().getPresionSistolica(),
+      ultimo.getDatos().getPresionDiastolica(),
+      ultimo.getDatos().getTemperatura(),
+      distanciaTotal,
+      pasosCalculados,
+      calorias,
+      minutosDormidos
     );
   }
 
   private Double calcularCalorias(Double distanciaEnKm, EstadoMascota estado, Double pesoKg) {
     if (
-            distanciaEnKm == null ||
-                    distanciaEnKm == 0.0 ||
-                    estado == null ||
-                    pesoKg == null ||
-                    pesoKg == 0.0
+      distanciaEnKm == null ||
+      distanciaEnKm == 0.0 ||
+      estado == null ||
+      pesoKg == null ||
+      pesoKg == 0.0
     ) {
       return 0.0;
     }

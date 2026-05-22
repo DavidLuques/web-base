@@ -28,13 +28,15 @@ public class AlertaService {
   }
 
   public void evaluarPeso(Mascota mascota) {
-    if (mascota == null || mascota.getRaza() == null || mascota.getPeso() == null) {
+    if (mascota == null || mascota.getTamano() == null || mascota.getPeso() == null) {
       return;
     }
 
-    BigDecimal peso = mascota.getPeso();
+    Double peso = mascota.getPeso();
+    Double pesoMinimo = obtenerPesoMinimo(mascota);
 
-    if (obtenerPesoMinimo(mascota) != null && peso.compareTo(obtenerPesoMinimo(mascota)) < 0) {
+    // Si el peso es menor, alertamos y cortamos la ejecución acá
+    if (pesoMinimo != null && peso < pesoMinimo) {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
@@ -43,12 +45,16 @@ public class AlertaService {
         " (" +
         peso +
         " kg) está por debajo del mínimo recomendado (" +
-        obtenerPesoMinimo(mascota) +
+        pesoMinimo +
         " kg)."
       );
-    } else if (
-      obtenerPesoMaximo(mascota) != null && peso.compareTo(obtenerPesoMaximo(mascota)) > 0
-    ) {
+      return;
+    }
+
+    // Solo calculamos el máximo si NO entró al if anterior
+    Double pesoMaximo = obtenerPesoMaximo(mascota);
+
+    if (pesoMaximo != null && peso > pesoMaximo) {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
@@ -57,30 +63,36 @@ public class AlertaService {
         " (" +
         peso +
         " kg) está por encima del máximo recomendado (" +
-        obtenerPesoMaximo(mascota) +
+        pesoMaximo +
         " kg)."
       );
     }
   }
 
-  private BigDecimal obtenerPesoMinimo(Mascota mascota) {
-    if ("Macho".equalsIgnoreCase(mascota.getGenero())) {
-      return mascota.getRaza().getPesoMinMacho();
+  private Double obtenerPesoMinimo(Mascota mascota) {
+    switch (mascota.getTamano()) {
+      case PEQUENO:
+        return 2.0;
+      case MEDIANO:
+        return 10.0;
+      case GRANDE:
+        return 25.0;
+      default:
+        return null;
     }
-    if ("Hembra".equalsIgnoreCase(mascota.getGenero())) {
-      return mascota.getRaza().getPesoMinHembra();
-    }
-    return null;
   }
 
-  private BigDecimal obtenerPesoMaximo(Mascota mascota) {
-    if ("Macho".equalsIgnoreCase(mascota.getGenero())) {
-      return mascota.getRaza().getPesoMaxMacho();
+  private Double obtenerPesoMaximo(Mascota mascota) {
+    switch (mascota.getTamano()) {
+      case PEQUENO:
+        return 10.0;
+      case MEDIANO:
+        return 25.0;
+      case GRANDE:
+        return 45.0;
+      default:
+        return null;
     }
-    if ("Hembra".equalsIgnoreCase(mascota.getGenero())) {
-      return mascota.getRaza().getPesoMaxHembra();
-    }
-    return null;
   }
 
   public void evaluarSignosVitales(Mascota mascota, Analisis actual, Analisis anterior) {

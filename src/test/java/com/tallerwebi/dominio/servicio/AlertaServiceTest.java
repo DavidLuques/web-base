@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
+import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.*;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,22 +27,17 @@ public class AlertaServiceTest {
     repositorioAlertaMock = mock(RepositorioAlerta.class);
     alertaService = new AlertaService(repositorioAlertaMock);
 
-    Raza razaPrueba = new Raza();
-    razaPrueba.setNombre("Raza de Prueba");
-    razaPrueba.setPesoMinMacho(new BigDecimal("10.0"));
-    razaPrueba.setPesoMaxMacho(new BigDecimal("20.0"));
-    razaPrueba.setPesoMinHembra(new BigDecimal("8.0"));
-    razaPrueba.setPesoMaxHembra(new BigDecimal("18.0"));
-
     mascotaMacho = new Mascota();
     mascotaMacho.setNombre("Firulais");
     mascotaMacho.setGenero("Macho");
-    mascotaMacho.setRaza(razaPrueba);
+    mascotaMacho.setRaza("Labrador"); // Ahora es un simple String
+    mascotaMacho.setTamano(TamanoMascota.MEDIANO); // Asignamos tamaño para la alerta
 
     mascotaHembra = new Mascota();
     mascotaHembra.setNombre("Luna");
     mascotaHembra.setGenero("Hembra");
-    mascotaHembra.setRaza(razaPrueba);
+    mascotaHembra.setRaza("Caniche");
+    mascotaHembra.setTamano(TamanoMascota.MEDIANO);
 
     analisisAnterior = new Analisis();
     analisisAnterior.setDatos(new DatosAnalisis());
@@ -61,7 +55,7 @@ public class AlertaServiceTest {
 
   @Test
   void debeGenerarAlertaPorBajoPesoMacho() {
-    mascotaMacho.setPeso(new BigDecimal("8.0"));
+    mascotaMacho.setPeso(8.0); // Inferior a 10.0 (Mínimo para Mediano)
 
     alertaService.evaluarPeso(mascotaMacho);
 
@@ -77,7 +71,7 @@ public class AlertaServiceTest {
 
   @Test
   void debeGenerarAlertaPorAltoPesoMacho() {
-    mascotaMacho.setPeso(new BigDecimal("22.0"));
+    mascotaMacho.setPeso(28.0); // Superior a 25.0 (Máximo para Mediano)
 
     alertaService.evaluarPeso(mascotaMacho);
 
@@ -86,14 +80,14 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
     assertEquals(
-      "Atención: El peso de Firulais (22.0 kg) está por encima del máximo recomendado (20.0 kg).",
+      "Atención: El peso de Firulais (28.0 kg) está por encima del máximo recomendado (25.0 kg).",
       captor.getValue().getMensaje()
     );
   }
 
   @Test
   void noDebeGenerarAlertaPorPesoNormal() {
-    mascotaMacho.setPeso(new BigDecimal("15.0"));
+    mascotaMacho.setPeso(15.0); // Entre 10.0 y 25.0
 
     alertaService.evaluarPeso(mascotaMacho);
 
@@ -132,37 +126,37 @@ public class AlertaServiceTest {
     );
   }
 
-  //  @Test
-  //  void debeGenerarAlertaPorTemperaturaCorporalAlta() {
-  //    analisisActual.getDatos().setTemperatura(40.0);
-  //
-  //    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-  //
-  //    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-  //    verify(repositorioAlertaMock).save(captor.capture());
-  //
-  //    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
-  //    assertEquals(
-  //            "Emergencia: Temperatura corporal alta detectada (40.0°C).",
-  //            captor.getValue().getMensaje()
-  //    );
-  //  }
-  //
-  //  @Test
-  //  void debeGenerarAlertaPorTemperaturaCorporalBaja() {
-  //    analisisActual.getDatos().setTemperatura(37.0);
-  //
-  //    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-  //
-  //    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-  //    verify(repositorioAlertaMock).save(captor.capture());
-  //
-  //    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-  //    assertEquals(
-  //            "Alerta: Temperatura corporal baja detectada (37.0°C).",
-  //            captor.getValue().getMensaje()
-  //    );
-  //  }
+  @Test
+  void debeGenerarAlertaPorTemperaturaCorporalAlta() {
+    analisisActual.getDatos().setTemperatura(40.0);
+
+    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+
+    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
+    assertEquals(
+      "Emergencia: Temperatura corporal alta detectada (40.0°C).",
+      captor.getValue().getMensaje()
+    );
+  }
+
+  @Test
+  void debeGenerarAlertaPorTemperaturaCorporalBaja() {
+    analisisActual.getDatos().setTemperatura(37.0);
+
+    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+    assertEquals(
+      "Alerta: Temperatura corporal baja detectada (37.0°C).",
+      captor.getValue().getMensaje()
+    );
+  }
 
   @Test
   void debeGenerarAlertaPorCambioDrasticoTemperatura() {

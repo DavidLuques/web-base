@@ -30,7 +30,7 @@ public class ControladorSimulacion {
   @GetMapping("/alerta/{idMascota}")
   @ResponseBody
   public ResultadoSimulacionDto simularAlerta(@PathVariable Long idMascota) {
-    return simulacionActividadService.simularAlertaDetalle(idMascota);
+    return simulacionActividadService.simularDetalle(idMascota);
   }
 
   @GetMapping("/vista/{idMascota}")
