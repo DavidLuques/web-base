@@ -1,11 +1,12 @@
-package com.tallerwebi.dominio.modelo;
+package com.tallerwebi.dominio.servicio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
 import com.tallerwebi.dominio.enums.TipoAlerta;
-import com.tallerwebi.dominio.servicio.AlertaService;
+import com.tallerwebi.dominio.modelo.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
