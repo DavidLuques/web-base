@@ -19,6 +19,7 @@ public class MotorActividadService {
   private static final int ORDEN_REPOSO = 1;
   private static final int ORDEN_CAMINANDO = 2;
   private static final int ORDEN_CORRIENDO = 3;
+  private static final double PROBABILIDAD_MEDIA = 0.5;
 
   private final RangoVitalDao rangoVitalDao;
   private final Map<Long, EstadoMascota> memoriaEstados = new HashMap<>();
@@ -67,9 +68,30 @@ public class MotorActividadService {
       return nuevoEstado;
     }
 
-    EstadoMascota estadoPermitido = avanzarUnPaso(anterior, nuevoEstado);
-    memoriaEstados.put(idMascota, estadoPermitido);
-    return estadoPermitido;
+    EstadoMascota estadoFinal;
+
+    if (nuevoEstado == anterior) {
+      int orden = ordenDe(anterior);
+
+      // Reemplazamos el 0 por la constante
+      if (orden == ORDEN_DURMIENDO) {
+        estadoFinal = estadoConOrden(1);
+      } else if (orden >= ORDEN_CORRIENDO) {
+        estadoFinal = estadoConOrden(orden - 1);
+      } else {
+        // Reemplazamos el 0.5 por la constante
+        if (Math.random() > PROBABILIDAD_MEDIA) {
+          estadoFinal = estadoConOrden(orden + 1);
+        } else {
+          estadoFinal = estadoConOrden(orden - 1);
+        }
+      }
+    } else {
+      estadoFinal = avanzarUnPaso(anterior, nuevoEstado);
+    }
+
+    memoriaEstados.put(idMascota, estadoFinal);
+    return estadoFinal;
   }
 
   private EstadoMascota avanzarUnPaso(EstadoMascota anterior, EstadoMascota objetivo) {

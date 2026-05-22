@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +41,98 @@ public class MotorActividadServiceTest {
     rango.setFrecuenciaMaxima(120);
 
     when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+  }
+
+  @Test
+  public void debeAvanzarGradualmenteEntreEstados() {
+    LecturaSensor dormido = new LecturaSensor();
+    dormido.setFrecuenciaCardiaca(80);
+    dormido.setAccelX(0.1);
+    dormido.setAccelY(0.1);
+    dormido.setAccelZ(0.1);
+    dormido.setGyroX(0.1);
+    dormido.setGyroY(0.1);
+    dormido.setGyroZ(0.1);
+
+    LecturaSensor corriendo = new LecturaSensor();
+    corriendo.setFrecuenciaCardiaca(130);
+    corriendo.setAccelX(10.0);
+    corriendo.setAccelY(10.0);
+    corriendo.setAccelZ(10.0);
+    corriendo.setGyroX(6.0);
+    corriendo.setGyroY(6.0);
+    corriendo.setGyroZ(6.0);
+
+    EstadoMascota estado1 = motorActividadService.analizar(mascota, dormido);
+
+    EstadoMascota estado2 = motorActividadService.analizar(mascota, corriendo);
+
+    EstadoMascota estado3 = motorActividadService.analizar(mascota, corriendo);
+
+    EstadoMascota estado4 = motorActividadService.analizar(mascota, corriendo);
+
+    assertThat(estado1, equalTo(EstadoMascota.DURMIENDO));
+    assertThat(estado2, equalTo(EstadoMascota.REPOSO));
+    assertThat(estado3, equalTo(EstadoMascota.CAMINANDO));
+    assertThat(estado4, equalTo(EstadoMascota.CORRIENDO));
+  }
+
+  @Test
+  public void debePoderLlegarADurmiendoDesdeCorriendoDeAPoco() {
+    LecturaSensor corriendo = new LecturaSensor();
+    corriendo.setFrecuenciaCardiaca(130);
+    corriendo.setAccelX(10.0);
+    corriendo.setAccelY(10.0);
+    corriendo.setAccelZ(10.0);
+    corriendo.setGyroX(6.0);
+    corriendo.setGyroY(6.0);
+    corriendo.setGyroZ(6.0);
+
+    LecturaSensor dormido = new LecturaSensor();
+    dormido.setFrecuenciaCardiaca(80);
+    dormido.setAccelX(0.1);
+    dormido.setAccelY(0.1);
+    dormido.setAccelZ(0.1);
+    dormido.setGyroX(0.1);
+    dormido.setGyroY(0.1);
+    dormido.setGyroZ(0.1);
+
+    EstadoMascota estado1 = motorActividadService.analizar(mascota, corriendo);
+    EstadoMascota estado2 = motorActividadService.analizar(mascota, dormido);
+    EstadoMascota estado3 = motorActividadService.analizar(mascota, dormido);
+    EstadoMascota estado4 = motorActividadService.analizar(mascota, dormido);
+
+    assertThat(estado1, equalTo(EstadoMascota.CORRIENDO));
+    assertThat(estado2, equalTo(EstadoMascota.CAMINANDO));
+    assertThat(estado3, equalTo(EstadoMascota.REPOSO));
+    assertThat(estado4, equalTo(EstadoMascota.DURMIENDO));
+  }
+
+  @Test
+  public void noDebePermitirSaltoBruscoDeCorriendoADormido() {
+    LecturaSensor corriendo = new LecturaSensor();
+    corriendo.setFrecuenciaCardiaca(130);
+    corriendo.setAccelX(10.0);
+    corriendo.setAccelY(10.0);
+    corriendo.setAccelZ(10.0);
+    corriendo.setGyroX(6.0);
+    corriendo.setGyroY(6.0);
+    corriendo.setGyroZ(6.0);
+
+    LecturaSensor dormido = new LecturaSensor();
+    dormido.setFrecuenciaCardiaca(80);
+    dormido.setAccelX(0.1);
+    dormido.setAccelY(0.1);
+    dormido.setAccelZ(0.1);
+    dormido.setGyroX(0.1);
+    dormido.setGyroY(0.1);
+    dormido.setGyroZ(0.1);
+
+    motorActividadService.analizar(mascota, corriendo);
+
+    EstadoMascota segundoEstado = motorActividadService.analizar(mascota, dormido);
+
+    assertThat(segundoEstado, equalTo(EstadoMascota.CAMINANDO));
   }
 
   @Test
