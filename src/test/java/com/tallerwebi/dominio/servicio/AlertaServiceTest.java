@@ -128,7 +128,7 @@ public class AlertaServiceTest {
 
   @Test
   void debeGenerarAlertaPorTemperaturaCorporalAlta() {
-    analisisActual.getDatos().setTemperatura(40.0);
+    analisisActual.getDatos().setTemperatura(39.8);
 
     alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
 
@@ -137,13 +137,14 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
     assertEquals(
-      "Emergencia: Temperatura corporal alta detectada (40.0°C).",
+      "Emergencia: Temperatura corporal alta detectada (39.8°C).",
       captor.getValue().getMensaje()
     );
   }
 
   @Test
   void debeGenerarAlertaPorTemperaturaCorporalBaja() {
+    analisisAnterior.getDatos().setTemperatura(37.5);
     analisisActual.getDatos().setTemperatura(37.0);
 
     alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
