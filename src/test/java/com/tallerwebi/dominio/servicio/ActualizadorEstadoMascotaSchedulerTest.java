@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 
 public class ActualizadorEstadoMascotaSchedulerTest {
 
-  private ActualizadorEstadoMascotaScheduler scheduler;
   private SimulacionActividadService simulacionActividadServiceMock;
+  private ActualizadorEstadoMascotaScheduler scheduler;
 
   @BeforeEach
   public void init() {
@@ -17,18 +17,20 @@ public class ActualizadorEstadoMascotaSchedulerTest {
   }
 
   @Test
-  public void cuandoActualizoEntoncesSeLlamaASimularDetalleParaTodas() {
+  public void cuandoSeEjecutaElSchedulerDeActualizarEstadoEntoncesDebeLlamarAlServicio() {
+    // Ejecución
     scheduler.actualizarEstadosDeMascotas();
 
+    // Verificación
     verify(simulacionActividadServiceMock, times(1)).simularDetalleParaTodas();
   }
 
   @Test
-  public void cuandoActualizoVariasVecesEntoncesSeLlamaVariasVeces() {
-    scheduler.actualizarEstadosDeMascotas();
-    scheduler.actualizarEstadosDeMascotas();
-    scheduler.actualizarEstadosDeMascotas();
+  public void cuandoSeEjecutaElSchedulerDeActualizarFrecuenciaEntoncesDebeLlamarAlServicio() {
+    // Ejecución
+    scheduler.actualizarFrecuenciaCardiaca();
 
-    verify(simulacionActividadServiceMock, times(3)).simularDetalleParaTodas();
+    // Verificación
+    verify(simulacionActividadServiceMock, times(1)).actualizarFrecuenciaParaTodas();
   }
 }

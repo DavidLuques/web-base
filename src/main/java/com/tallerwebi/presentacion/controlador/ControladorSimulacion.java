@@ -27,6 +27,12 @@ public class ControladorSimulacion {
     return simulacionActividadService.simularDetalle(idMascota);
   }
 
+  @GetMapping("/alerta/{idMascota}")
+  @ResponseBody
+  public ResultadoSimulacionDto simularAlerta(@PathVariable Long idMascota) {
+    return simulacionActividadService.simularDetalle(idMascota);
+  }
+
   @GetMapping("/vista/{idMascota}")
   public String vista(@PathVariable Long idMascota, Model model) {
     model.addAttribute("idMascota", idMascota);
