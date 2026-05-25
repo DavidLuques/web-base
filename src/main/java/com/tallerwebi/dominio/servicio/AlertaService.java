@@ -7,7 +7,11 @@ import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.Mascota;
 import java.math.BigDecimal;
+import java.util.List;
+import javax.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AlertaService {
 
   // CONSTANTES
@@ -214,5 +218,13 @@ public class AlertaService {
     alerta.setTipo(tipo);
     alerta.setMensaje(mensaje);
     repositorioAlerta.save(alerta);
+  }
+
+  @Transactional
+  public List<Alerta> obtenerAlertasPorMascota(Long idMascota) {
+    if (idMascota == null) {
+      return java.util.Collections.emptyList();
+    }
+    return repositorioAlerta.buscarPorMascota(idMascota);
   }
 }

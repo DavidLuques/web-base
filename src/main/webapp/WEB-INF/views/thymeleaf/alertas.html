@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Centro de Alertas - PetTracker</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+<aside class="w-20 bg-[#2d3748] flex flex-col items-center py-6 border-r border-slate-700 shadow-xl z-20">
+    <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-8">
+        <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
+    </div>
+    <nav class="flex flex-col gap-6 w-full">
+        <a th:href="@{/simulacion/dashboard/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="home" class="w-6 h-6"></i>
+        </a>
+        <a th:href="@{/simulacion/vista/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="activity" class="w-6 h-6"></i>
+        </a>
+        <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="map-pin" class="w-6 h-6"></i>
+        </a>
+        <a href="#" class="w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400">
+            <i data-lucide="bell" class="w-6 h-6 text-white"></i>
+        </a>
+    </nav>
+    <div class="mt-auto">
+        <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="settings" class="w-6 h-6"></i>
+        </a>
+    </div>
+</aside>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+
+    <header class="bg-white h-20 px-8 flex items-center justify-between border-b border-slate-200 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800">Historial de Alertas Críticas</h1>
+        </div>
+    </header>
+
+    <div class="flex-1 p-8 overflow-y-auto">
+        <div class="max-w-4xl mx-auto w-full">
+
+            <div class="flex justify-between items-center mb-6">
+                <p class="text-sm text-slate-500">Mostrando las alertas generadas por los signos vitales en tiempo real.</p>
+                <span id="contador-alertas" class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">0 Alertas</span>
+            </div>
+
+            <div id="lista-alertas-exclusiva" class="flex flex-col gap-4">
+                <div class="text-center py-12 text-slate-400">
+                    <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2" role="status" aria-label="loading"></div>
+                    <p class="text-sm">Buscando alertas en el servidor...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script th:inline="javascript">
+    lucide.createIcons();
+    // Captura el ID que viene desde el controlador de Spring
+    const idMascota = [[${idMascota}]];
+
+    function cargarAlertasPantalla() {
+        // Petición al endpoint de datos JSON
+        fetch("/spring/simulacion/alertas/datos/" + idMascota)
+            .then(response => {
+                // Si el servidor responde con error (404, 500, etc), lanzamos error para ir al catch
+                if (!response.ok) {
+                    throw new Error("Error en el servidor. Código HTTP: " + response.status);
+                }
+                return response.json();
+            })
+            .then(listaDeAlertas => {
+                const contenedor = document.getElementById("lista-alertas-exclusiva");
+                const contador = document.getElementById("contador-alertas");
+
+                // Verificación estricta de que llegó un Array con datos
+                if (!listaDeAlertas || !Array.isArray(listaDeAlertas) || listaDeAlertas.length === 0) {
+                    contador.textContent = "0 Alertas";
+                    contenedor.innerHTML = `
+                      <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
+                        <i data-lucide="check-circle-2" class="w-12 h-12 text-emerald-500 mx-auto mb-3"></i>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">¡Todo controlado!</h3>
+                        <p class="text-sm text-slate-500">No se registran anomalías ni alertas para esta mascota en este momento.</p>
+                      </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                // Actualizamos el contador real en base al tamaño de la lista
+                contador.textContent = `${listaDeAlertas.length} Alertas`;
+                let htmlContent = "";
+
+                // Iteramos la lista que viene directa del backend
+                listaDeAlertas.forEach(alerta => {
+                    const esEmergencia = alerta.tipo === 'EMERGENCIA';
+                    const bgClass = esEmergencia ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-200';
+                    const textClass = esEmergencia ? 'text-rose-800' : 'text-amber-800';
+                    const iconColor = esEmergencia ? 'text-rose-500' : 'text-amber-500';
+                    const iconName = esEmergencia ? 'octagon-alert' : 'triangle-alert';
+
+                    htmlContent += `
+                      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
+                        <div class="p-3 rounded-xl ${bgClass} ${iconColor} shrink-0">
+                          <i data-lucide="${iconName}" class="w-6 h-6"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-xs font-bold uppercase tracking-wider ${textClass} ${bgClass} px-2 py-0.5 rounded-md">
+                              ${alerta.tipo}
+                            </span>
+                            <span class="text-xs text-slate-400">En tiempo real</span>
+                          </div>
+                          <p class="text-slate-700 text-sm font-medium leading-relaxed">${alerta.mensaje}</p>
+                        </div>
+                      </div>
+                    `;
+                });
+
+                contenedor.innerHTML = htmlContent;
+                lucide.createIcons(); // Dibuja los iconos inyectados por string
+            })
+            .catch(error => {
+                console.error("Detalle del error:", error);
+                document.getElementById("lista-alertas-exclusiva").innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm shadow-sm">
+                      <strong>Error al cargar alertas:</strong> ${error.message}. <br>
+                      <span class="text-xs text-red-500">Revisá la consola del navegador (F12) o los logs de Spring.</span>
+                    </div>
+                `;
+            });
+    }
+
+    // Ejecución inicial y bucle cada 5 segundos
+    cargarAlertasPantalla();
+    setInterval(cargarAlertasPantalla, 5000);
+</script>
+</body>
+</html>

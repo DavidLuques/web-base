@@ -29,3 +29,20 @@ CREATE TABLE IF NOT EXISTS registro_sueno (
                                               mascota_id BIGINT NOT NULL,
                                               FOREIGN KEY (mascota_id) REFERENCES mascota(id)
 );
+
+-- Forzamos la tabla con tus nombres reales de columnas por si Hibernate se atrasa
+CREATE TABLE IF NOT EXISTS alerta (
+                                      pk_id_alerta BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                      fk_id_mascota BIGINT NOT NULL,
+                                      tipo VARCHAR(50) NOT NULL,
+    mensaje LONGTEXT NOT NULL,
+    fecha_y_hora DATETIME,
+    leido BOOLEAN NOT NULL
+    );
+
+
+
+INSERT INTO alerta (fk_id_mascota, tipo, mensaje, fecha_y_hora, leido) VALUES
+                                                                           (1, 'EMERGENCIA', 'Emergencia: Frecuencia cardiaca inusualmente alta detectada (170 lpm).', NOW() - INTERVAL 10 MINUTE, false),
+                                                                           (1, 'ALERTA', 'Alerta: Temperatura corporal baja detectada (37.0°C).', NOW() - INTERVAL 45 MINUTE, false),
+                                                                           (1, 'ALERTA', 'Atencion: El peso de la mascota esta por debajo del minimo recomendado.', NOW() - INTERVAL 2 HOUR, false);
