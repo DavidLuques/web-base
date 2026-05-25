@@ -25,7 +25,6 @@ public class AlertaImpl implements RepositorioAlerta {
   public List<Alerta> buscarPorMascota(Long idMascota) {
     return sessionFactory
       .getCurrentSession()
-      // Consulta HQL apuntando al atributo 'mascota.id' de Alerta
       .createQuery(
         "SELECT a FROM Alerta a JOIN FETCH a.mascota WHERE a.mascota.id = :idMascota",
         Alerta.class
