@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.modelo.Alerta;
+import java.util.List;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,5 +19,18 @@ public class AlertaImpl implements RepositorioAlerta {
   @Override
   public void save(Alerta alerta) {
     this.sessionFactory.getCurrentSession().save(alerta);
+  }
+
+  @Override
+  public List<Alerta> buscarPorMascota(Long idMascota) {
+    return sessionFactory
+      .getCurrentSession()
+      // Consulta HQL apuntando al atributo 'mascota.id' de Alerta
+      .createQuery(
+        "SELECT a FROM Alerta a JOIN FETCH a.mascota WHERE a.mascota.id = :idMascota",
+        Alerta.class
+      )
+      .setParameter("idMascota", idMascota)
+      .getResultList();
   }
 }

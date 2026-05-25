@@ -1,11 +1,12 @@
 package com.tallerwebi.dominio.modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import java.time.LocalDateTime;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Alerta")
+@Table(name = "alerta")
 public class Alerta {
 
   @Id
@@ -26,6 +27,7 @@ public class Alerta {
   private String mensaje;
 
   @Column(name = "fecha_y_hora")
+  @JsonIgnore
   private LocalDateTime fechaYHora;
 
   @Column(nullable = false)

@@ -6,8 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
+import com.tallerwebi.dominio.servicio.AlertaService;
 import com.tallerwebi.dominio.servicio.SimulacionActividadService;
-import com.tallerwebi.presentacion.controlador.ControladorSimulacion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,11 +15,15 @@ public class ControladorSimulacionTest {
 
   private ControladorSimulacion controladorSimulacion;
   private SimulacionActividadService simulacionActividadServiceMock;
+  private AlertaService alertaServiceMock;
 
   @BeforeEach
   public void init() {
     simulacionActividadServiceMock = mock(SimulacionActividadService.class);
-    controladorSimulacion = new ControladorSimulacion(simulacionActividadServiceMock);
+    alertaServiceMock = mock(AlertaService.class);
+
+    controladorSimulacion =
+      new ControladorSimulacion(simulacionActividadServiceMock, alertaServiceMock);
   }
 
   @Test
