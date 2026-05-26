@@ -106,8 +106,6 @@ public class DatosAnalisis {
     vitalesYVitales.setPresionDiastolica(presionDiastolica);
   }
 
-  // --- MÉTODOS COMPATIBLES CON EL CÓDIGO DE TUS COMPAÑEROS (Usan Double) ---
-
   public Double getTemperatura() {
     return vitalesYVitales.getTemperatura();
   }

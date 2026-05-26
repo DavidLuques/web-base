@@ -35,6 +35,7 @@ public class SimulacionActividadServiceTest {
   private ServicioAnalisis servicioAnalisisMock;
   private RepositorioAnalisis repositorioAnalisisMock;
   private RepositorioSueno repositorioSuenoMock;
+  private AlertaService alertaServiceMock;
 
   private static final int SISTOLICA_MINIMA = 115;
   private static final int SISTOLICA_MAXIMA = 140;
@@ -51,6 +52,7 @@ public class SimulacionActividadServiceTest {
     servicioAnalisisMock = mock(ServicioAnalisis.class);
     repositorioAnalisisMock = mock(RepositorioAnalisis.class);
     repositorioSuenoMock = mock(RepositorioSueno.class);
+    alertaServiceMock = mock(AlertaService.class);
 
     simulacionActividadService =
       new SimulacionActividadService(
@@ -61,7 +63,8 @@ public class SimulacionActividadServiceTest {
         repositorioActividadMock,
         servicioAnalisisMock,
         repositorioAnalisisMock,
-        repositorioSuenoMock
+        repositorioSuenoMock,
+        alertaServiceMock
       );
   }
 

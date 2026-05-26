@@ -82,7 +82,6 @@ public class Mascota {
     this.datos = datos;
   }
 
-  // Delegación para mantener compatibilidad con el código existente
   public Double getPeso() {
     return datos.getPeso();
   }

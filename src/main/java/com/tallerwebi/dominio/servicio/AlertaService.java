@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlertaService {
 
-  // CONSTANTES
   private static final int FRECUENCIA_MAXIMA = 160;
   private static final int FRECUENCIA_MINIMA = 60;
   private static final int SUENO_MINIMO = 6;
@@ -39,7 +38,7 @@ public class AlertaService {
     Double peso = mascota.getPeso();
     Double pesoMinimo = obtenerPesoMinimo(mascota);
 
-    // Si el peso es menor, alertamos y cortamos la ejecución acá
+    // Si el peso es menor alertamos y cortamos la ejecucion aca
     if (pesoMinimo != null && peso < pesoMinimo) {
       crearAlerta(
         mascota,
@@ -55,7 +54,7 @@ public class AlertaService {
       return;
     }
 
-    // Solo calculamos el máximo si NO entró al if anterior
+    // Solo calculamos el máximo si no entro al if anterior
     Double pesoMaximo = obtenerPesoMaximo(mascota);
 
     if (pesoMaximo != null && peso > pesoMaximo) {

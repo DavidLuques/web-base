@@ -34,6 +34,7 @@ public class SimulacionActividadService {
   private final ServicioAnalisis servicioAnalisis;
   private final RepositorioAnalisis repositorioAnalisis;
   private final RepositorioSueno repositorioSueno;
+  private final AlertaService alertaService;
 
   private static final double MET_DURMIENDO = 1.0;
   private static final double MET_REPOSO = 1.5;
@@ -41,6 +42,7 @@ public class SimulacionActividadService {
   private static final double MET_CORRIENDO = 6.0;
   private static final double VEL_CAMINANDO = 5.0;
   private static final double VEL_CORRIENDO = 15.0;
+  private static final int MINIMO_ANALISIS_ANTERIOR = 1;
 
   @Autowired
   public SimulacionActividadService(
@@ -51,7 +53,8 @@ public class SimulacionActividadService {
     RepositorioActividad repositorioActividad,
     ServicioAnalisis servicioAnalisis,
     RepositorioAnalisis repositorioAnalisis,
-    RepositorioSueno repositorioSueno
+    RepositorioSueno repositorioSueno,
+    AlertaService alertaService
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
@@ -61,6 +64,7 @@ public class SimulacionActividadService {
     this.servicioAnalisis = servicioAnalisis;
     this.repositorioAnalisis = repositorioAnalisis;
     this.repositorioSueno = repositorioSueno;
+    this.alertaService = alertaService;
   }
 
   private void registrarActividadSegunEstado(Mascota mascota, EstadoMascota estado) {
@@ -134,7 +138,22 @@ public class SimulacionActividadService {
     List<Mascota> mascotas = mascotaDao.buscarTodas();
     for (Mascota mascota : mascotas) {
       simularDetalle(mascota.getId());
+
       servicioAnalisis.simularGeolocalizacion(mascota.getId());
+
+      alertaService.evaluarPeso(mascota);
+
+      List<Analisis> historialAnalisis = repositorioAnalisis.buscarPorMascota(mascota.getId());
+
+      if (historialAnalisis != null && !historialAnalisis.isEmpty()) {
+        Analisis actual = historialAnalisis.get(0);
+
+        Analisis anterior = (historialAnalisis.size() > MINIMO_ANALISIS_ANTERIOR)
+          ? historialAnalisis.get(1)
+          : null;
+
+        alertaService.evaluarSignosVitales(mascota, actual, anterior);
+      }
     }
   }
 
