@@ -33,6 +33,25 @@ public class SpringWebConfig implements WebMvcConfigurer {
     registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
   }
 
+  @Override
+  public void addInterceptors(
+    org.springframework.web.servlet.config.annotation.InterceptorRegistry registry
+  ) {
+    registry
+      .addInterceptor(new com.tallerwebi.presentacion.interceptor.AuthInterceptor())
+      .addPathPatterns("/**")
+      .excludePathPatterns(
+        "/login",
+        "/validar-login",
+        "/registrarme",
+        "/nuevo-usuario",
+        "/css/**",
+        "/js/**",
+        "/webjars/**",
+        "/img/**"
+      );
+  }
+
   // https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html
   // Spring + Thymeleaf
   @Bean

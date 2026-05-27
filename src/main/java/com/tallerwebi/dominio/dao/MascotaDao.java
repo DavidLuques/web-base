@@ -9,4 +9,5 @@ public interface MascotaDao {
   void modificar(Mascota mascota);
 
   List<Mascota> buscarTodas();
+  List<Mascota> buscarPorUsuarioId(Long usuarioId);
 }

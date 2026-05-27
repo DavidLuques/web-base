@@ -62,20 +62,36 @@ public class VistaLoginE2E {
   }
 
   @Test
-  void deberiaNavegarAlHomeSiElUsuarioExiste() throws MalformedURLException {
+  void deberiaNavegarALaVista1SiElUsuarioExiste() throws MalformedURLException {
     dadoQueElUsuarioCargaSusDatosDeLoginCon("test@unlam.edu.ar", "test");
     cuandoElUsuarioTocaElBotonDeLogin();
-    entoncesDeberiaSerRedirigidoALaVistaDeHome();
+    entoncesDeberiaSerRedirigidoALaVista1();
   }
 
   @Test
-  void deberiaRegistrarUnUsuarioEIniciarSesionExistosamente() throws MalformedURLException {
+  void deberiaRegistrarUnUsuarioEIniciarSesionAutomaticamente() throws MalformedURLException {
     dadoQueElUsuarioNavegaALaVistaDeRegistro();
     dadoQueElUsuarioSeRegistraCon("juan@unlam.edu.ar", "123456");
+    // Al registrarse, ya deberia auto-loguearse y redirigir
+    entoncesDeberiaSerRedirigidoALaVista1();
+  }
+
+  @Test
+  void deberiaRedirigirALoginSiElUsuarioIntentaAccederARutaProtegida()
+    throws MalformedURLException {
+    context.pages().get(0).navigate("http://localhost:8080/spring/simulacion/vista/1");
     dadoQueElUsuarioEstaEnLaVistaDeLogin();
-    dadoQueElUsuarioCargaSusDatosDeLoginCon("juan@unlam.edu.ar", "123456");
+  }
+
+  @Test
+  void deberiaCerrarSesionYRedirigirALogin() throws MalformedURLException {
+    dadoQueElUsuarioCargaSusDatosDeLoginCon("test@unlam.edu.ar", "test");
     cuandoElUsuarioTocaElBotonDeLogin();
-    entoncesDeberiaSerRedirigidoALaVistaDeHome();
+    entoncesDeberiaSerRedirigidoALaVista1();
+
+    // Toca el boton de logout (usando el atributo title="Cerrar Sesión")
+    context.pages().get(0).click("a[title='Cerrar Sesión']");
+    dadoQueElUsuarioEstaEnLaVistaDeLogin();
   }
 
   private void entoncesDeberiaVerUNLAMEnElNavbar() {
@@ -92,9 +108,19 @@ public class VistaLoginE2E {
     vistaLogin.darClickEnIniciarSesion();
   }
 
-  private void entoncesDeberiaSerRedirigidoALaVistaDeHome() throws MalformedURLException {
+  private void entoncesDeberiaSerRedirigidoALaVista1() throws MalformedURLException {
+    // Wait for URL to change to the expected pattern
+    context
+      .pages()
+      .get(0)
+      .waitForURL(url ->
+        url.matches(".*\\/spring\\/simulacion\\/vista\\/\\d+(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
+      );
     URL url = vistaLogin.obtenerURLActual();
-    assertThat(url.getPath(), matchesPattern("^/spring/home(?:;jsessionid=[^/\\s]+)?$"));
+    assertThat(
+      url.getPath(),
+      matchesPattern("^/spring/simulacion/vista/\\d+(?:;jsessionid=[^/\\s]+)?$")
+    );
   }
 
   private void entoncesDeberiaVerUnMensajeDeError() {

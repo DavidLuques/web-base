@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -56,29 +57,39 @@ public class ControladorLoginTest {
   public void loginConUsuarioYPasswordCorrectosDeberiaLLevarAHome() {
     // preparacion
     Usuario usuarioEncontrado = new Usuario();
+    usuarioEncontrado.setId(1L);
     usuarioEncontrado.setRol("ADMIN");
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(servicioLoginMock.consultarUsuario(anyString(), anyString()))
       .thenReturn(usuarioEncontrado);
+    when(servicioLoginMock.buscarMascotasPorUsuario(1L))
+      .thenReturn(java.util.Collections.emptyList());
 
     // ejecucion
     ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
     // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/simulacion/vista/1"));
     verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontrado.getRol());
+    verify(sessionMock, times(1)).setAttribute("ID_USUARIO", 1L);
   }
 
   @Test
   public void registrameSiUsuarioNoExisteDeberiaCrearUsuarioYVolverAlLogin()
     throws UsuarioExistente {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    usuario.setId(2L);
+    usuario.setRol("ADMIN");
+
     // ejecucion
-    ModelAndView modelAndView = controladorLogin.registrarme(usuario);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuario, requestMock);
 
     // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/simulacion/vista/1"));
     verify(servicioLoginMock, times(1)).registrar(usuario);
+    verify(sessionMock, times(1)).setAttribute("ROL", "ADMIN");
+    verify(sessionMock, times(1)).setAttribute("ID_USUARIO", 2L);
   }
 
   @Test
@@ -88,7 +99,7 @@ public class ControladorLoginTest {
     doThrow(UsuarioExistente.class).when(servicioLoginMock).registrar(usuario);
 
     // ejecucion
-    ModelAndView modelAndView = controladorLogin.registrarme(usuario);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuario, requestMock);
 
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
@@ -104,7 +115,7 @@ public class ControladorLoginTest {
     doThrow(RuntimeException.class).when(servicioLoginMock).registrar(usuario);
 
     // ejecucion
-    ModelAndView modelAndView = controladorLogin.registrarme(usuario);
+    ModelAndView modelAndView = controladorLogin.registrarme(usuario, requestMock);
 
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("nuevo-usuario"));
@@ -141,6 +152,16 @@ public class ControladorLoginTest {
 
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("home"));
+  }
+
+  @Test
+  public void logoutDeberiaInvalidarSesionYRedirigirALogin() {
+    when(requestMock.getSession()).thenReturn(sessionMock);
+
+    ModelAndView modelAndView = controladorLogin.logout(requestMock);
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+    verify(sessionMock, times(1)).invalidate();
   }
 
   @Test

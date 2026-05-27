@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,11 +14,13 @@ public class ServicioLoginTest {
 
   private ServicioLogin servicioLogin;
   private RepositorioUsuario repositorioUsuarioMock;
+  private MascotaDao mascotaDaoMock;
 
   @BeforeEach
   public void init() {
     this.repositorioUsuarioMock = mock(RepositorioUsuario.class);
-    this.servicioLogin = new ServicioLoginImpl(this.repositorioUsuarioMock);
+    this.mascotaDaoMock = mock(MascotaDao.class);
+    this.servicioLogin = new ServicioLoginImpl(this.repositorioUsuarioMock, this.mascotaDaoMock);
   }
 
   @Test
