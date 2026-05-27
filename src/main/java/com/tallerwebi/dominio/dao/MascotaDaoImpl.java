@@ -30,4 +30,13 @@ public class MascotaDaoImpl implements MascotaDao {
   public List<Mascota> buscarTodas() {
     return sessionFactory.getCurrentSession().createQuery("FROM Mascota", Mascota.class).list();
   }
+
+  @Override
+  public List<Mascota> buscarPorUsuarioId(Long usuarioId) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("FROM Mascota m WHERE m.usuario.id = :usuarioId", Mascota.class)
+      .setParameter("usuarioId", usuarioId)
+      .list();
+  }
 }

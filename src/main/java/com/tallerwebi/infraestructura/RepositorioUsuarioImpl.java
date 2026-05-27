@@ -17,18 +17,6 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     this.sessionFactory = sessionFactory;
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public Usuario buscarUsuario(String email, String password) {
-    /* Se utiliza sessionFactory.getCurrentSession() directamente para que el recurso sea gestionado por Spring y PMD no exija cerrarlo manualmente */
-    return (Usuario) sessionFactory
-      .getCurrentSession()
-      .createCriteria(Usuario.class)
-      .add(Restrictions.eq("email", email))
-      .add(Restrictions.eq("password", password))
-      .uniqueResult();
-  }
-
   @Override
   public void guardar(Usuario usuario) {
     sessionFactory.getCurrentSession().save(usuario);

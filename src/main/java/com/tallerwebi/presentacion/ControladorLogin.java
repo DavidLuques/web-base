@@ -3,6 +3,8 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.modelo.Mascota;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,7 +42,11 @@ public class ControladorLogin {
     );
     if (usuarioBuscado != null) {
       request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
-      return new ModelAndView("redirect:/home");
+      request.getSession().setAttribute("ID_USUARIO", usuarioBuscado.getId());
+
+      List<Mascota> mascotas = servicioLogin.buscarMascotasPorUsuario(usuarioBuscado.getId());
+      Long idMascota = (mascotas != null && !mascotas.isEmpty()) ? mascotas.get(0).getId() : 1L;
+      return new ModelAndView("redirect:/simulacion/vista/" + idMascota);
     } else {
       /* Se instancia el ModelMap solo cuando es necesario (en el flujo de error) para evitar anomalías en el flujo de datos (DU-anomaly de PMD) */
       ModelMap model = new ModelMap();
@@ -50,18 +56,24 @@ public class ControladorLogin {
   }
 
   @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
-  public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
-    ModelMap model = new ModelMap();
+  public ModelAndView registrarme(
+    @ModelAttribute("usuario") Usuario usuario,
+    HttpServletRequest request
+  ) {
     try {
       servicioLogin.registrar(usuario);
+      request.getSession().setAttribute("ROL", usuario.getRol());
+      request.getSession().setAttribute("ID_USUARIO", usuario.getId());
+      return new ModelAndView("redirect:/simulacion/vista/1");
     } catch (UsuarioExistente e) {
+      ModelMap model = new ModelMap();
       model.put("error", "El usuario ya existe");
       return new ModelAndView("nuevo-usuario", model);
     } catch (Exception e) {
+      ModelMap model = new ModelMap();
       model.put("error", "Error al registrar el nuevo usuario");
       return new ModelAndView("nuevo-usuario", model);
     }
-    return new ModelAndView("redirect:/login");
   }
 
   @RequestMapping(path = "/nuevo-usuario", method = RequestMethod.GET)
@@ -69,6 +81,12 @@ public class ControladorLogin {
     ModelMap model = new ModelMap();
     model.put("usuario", new Usuario());
     return new ModelAndView("nuevo-usuario", model);
+  }
+
+  @RequestMapping(path = "/logout", method = RequestMethod.GET)
+  public ModelAndView logout(HttpServletRequest request) {
+    request.getSession().invalidate();
+    return new ModelAndView("redirect:/login");
   }
 
   @RequestMapping(path = "/home", method = RequestMethod.GET)

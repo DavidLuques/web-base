@@ -53,27 +53,6 @@ public class RepositorioUsuarioTest {
   @Test
   @Transactional
   @Rollback
-  public void deberiaEncontrarUnUsuarioExistenteCuandoBuscoPorEmailYPassword() {
-    String email = "test@test.com";
-    String password = "123";
-    Usuario usuario = this.dadoQueTengoUnUsuario(email, password, "USER");
-    this.dadoQueExisteElUsuario(usuario);
-
-    Usuario obtenido = this.cuandoBuscoUnUsuario(email, password);
-
-    this.entoncesElUsuarioObtenidoEsCorrecto(obtenido, usuario);
-  }
-
-  @Test
-  @Transactional
-  public void noDeberiaEncontrarUnUsuarioInexistenteCuandoBuscoPorEmailYPassword() {
-    Usuario obtenido = this.cuandoBuscoUnUsuario("test@test.com", "123");
-    this.entoncesElUsuarioObtenidoEsNull(obtenido);
-  }
-
-  @Test
-  @Transactional
-  @Rollback
   public void deberiaEncontrarUnUsuarioExistenteCuandoBuscoPorEmail() {
     String email = "test@test.com";
     Usuario usuario = this.dadoQueTengoUnUsuario(email, "123", "USER");
@@ -134,10 +113,6 @@ public class RepositorioUsuarioTest {
 
   private void cuandoGuardoUnUsuario(Usuario usuario) {
     repositorioUsuario.guardar(usuario);
-  }
-
-  private Usuario cuandoBuscoUnUsuario(String email, String password) {
-    return repositorioUsuario.buscarUsuario(email, password);
   }
 
   private Usuario cuandoObtengoUnUsuarioPorEmail(String email) {
