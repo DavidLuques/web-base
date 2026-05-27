@@ -14,143 +14,143 @@
 
 <body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
 
-  <aside class="w-20 bg-[#2d3748] flex flex-col items-center py-6 border-r border-slate-700 shadow-xl z-20">
-    <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-8">
-      <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
-    </div>
-    <nav class="flex flex-col gap-6 w-full">
-      <a th:href="@{/simulacion/dashboard/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
-        <i data-lucide="home" class="w-6 h-6"></i>
-      </a>
-      <a th:href="@{/simulacion/vista/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400">
-        <i data-lucide="activity" class="w-6 h-6 text-white"></i>
-      </a>
-      <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
-        <i data-lucide="map-pin" class="w-6 h-6"></i>
-      </a>
-      <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
-        <i data-lucide="bell" class="w-6 h-6"></i>
-      </a>
-    </nav>
-    <div class="mt-auto">
-      <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
-        <i data-lucide="settings" class="w-6 h-6"></i>
-      </a>
-    </div>
-  </aside>
-  <main class="flex-1 flex flex-col h-full overflow-y-auto">
+<aside class="w-20 bg-[#2d3748] flex flex-col items-center py-6 border-r border-slate-700 shadow-xl z-20">
+  <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-8">
+    <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
+  </div>
+  <nav class="flex flex-col gap-6 w-full">
+    <a th:href="@{/simulacion/dashboard/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+      <i data-lucide="home" class="w-6 h-6"></i>
+    </a>
+    <a th:href="@{/simulacion/vista/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400">
+      <i data-lucide="activity" class="w-6 h-6 text-white"></i>
+    </a>
+    <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+      <i data-lucide="map-pin" class="w-6 h-6"></i>
+    </a>
+    <a th:href="@{/simulacion/alertas/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+      <i data-lucide="bell" class="w-6 h-6"></i>
+    </a>
+  </nav>
+  <div class="mt-auto">
+    <a href="#" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+      <i data-lucide="settings" class="w-6 h-6"></i>
+    </a>
+  </div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-y-auto">
 
-    <header class="bg-white h-20 px-8 flex items-center justify-between border-b border-slate-200 shrink-0">
-      <h1 class="text-2xl font-bold text-slate-800">
-        Análisis de Actividad y Comportamiento - <span id="nombre-mascota" th:text="${mascotaNombre}">Mascota</span>
-      </h1>
-      
-      <div class="flex gap-4">
-        <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 cursor-pointer">
-          <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
-            <i data-lucide="dog" class="w-4 h-4"></i>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-sm font-bold text-slate-800 leading-tight">Max</span>
-            <span class="text-xs text-slate-500 leading-tight">3 años</span>
-          </div>
+  <header class="bg-white h-20 px-8 flex items-center justify-between border-b border-slate-200 shrink-0">
+    <h1 class="text-2xl font-bold text-slate-800">
+      Análisis de Actividad y Comportamiento - <span id="nombre-mascota" th:text="${mascotaNombre}">Mascota</span>
+    </h1>
+
+    <div class="flex gap-4">
+      <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 cursor-pointer">
+        <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
+          <i data-lucide="dog" class="w-4 h-4"></i>
         </div>
-        <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-full border border-slate-200 opacity-60 cursor-pointer hover:opacity-100 transition-opacity">
-          <div class="w-8 h-8 rounded-full bg-rose-200 flex items-center justify-center text-rose-700">
-            <i data-lucide="cat" class="w-4 h-4"></i>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-sm font-bold text-slate-800 leading-tight">Luna</span>
-            <span class="text-xs text-slate-500 leading-tight">2 años</span>
-          </div>
+        <div class="flex flex-col">
+          <span class="text-sm font-bold text-slate-800 leading-tight">Max</span>
+          <span class="text-xs text-slate-500 leading-tight">3 años</span>
         </div>
       </div>
-    </header>
-
-    <!-- ESTADO -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex justify-between items-center">
-      <div>
-        <p class="text-sm text-gray-400 font-medium mb-1">Estado Actual</p>
-        <h2 id="estado" class="text-3xl font-semibold text-gray-800">Cargando...</h2>
-      </div>
-      <div id="badge-actividad"
-        class="bg-blue-100 text-blue-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-        <span>Nivel liviano de actividad</span>
+      <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-full border border-slate-200 opacity-60 cursor-pointer hover:opacity-100 transition-opacity">
+        <div class="w-8 h-8 rounded-full bg-rose-200 flex items-center justify-center text-rose-700">
+          <i data-lucide="cat" class="w-4 h-4"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm font-bold text-slate-800 leading-tight">Luna</span>
+          <span class="text-xs text-slate-500 leading-tight">2 años</span>
+        </div>
       </div>
     </div>
+  </header>
 
-    <!-- RESUMEN -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h3 class="text-lg font-bold mb-6">Resumen</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+  <!-- ESTADO -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex justify-between items-center">
+    <div>
+      <p class="text-sm text-gray-400 font-medium mb-1">Estado Actual</p>
+      <h2 id="estado" class="text-3xl font-semibold text-gray-800">Cargando...</h2>
+    </div>
+    <div id="badge-actividad"
+         class="bg-blue-100 text-blue-600 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+      <span>Nivel liviano de actividad</span>
+    </div>
+  </div>
 
-        <div class="flex flex-col items-center">
-          <div id="chart-distancia"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Distancia Recorrida</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
-        </div>
+  <!-- RESUMEN -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <h3 class="text-lg font-bold mb-6">Resumen</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
 
-        <div class="flex flex-col items-center">
-          <div id="chart-calorias"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Calorías Quemadas</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
-        </div>
-
-        <div class="flex flex-col items-center">
-          <div id="chart-sueno"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Tiempo de Sueño</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
-        </div>
-
-        <div class="flex flex-col items-center">
-          <div id="chart-pasos"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Pasos Hoy</p>
-          <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
-        </div>
-
+      <div class="flex flex-col items-center">
+        <div id="chart-distancia"></div>
+        <p class="text-sm font-medium text-gray-700 mt-2">Distancia Recorrida</p>
+        <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
       </div>
+
+      <div class="flex flex-col items-center">
+        <div id="chart-calorias"></div>
+        <p class="text-sm font-medium text-gray-700 mt-2">Calorías Quemadas</p>
+        <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <div id="chart-sueno"></div>
+        <p class="text-sm font-medium text-gray-700 mt-2">Tiempo de Sueño</p>
+        <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <div id="chart-pasos"></div>
+        <p class="text-sm font-medium text-gray-700 mt-2">Pasos Hoy</p>
+        <a href="#" class="text-xs text-blue-500 hover:underline">Click para historial</a>
+      </div>
+
     </div>
+  </div>
 
-    <!-- HISTORIAL DISTANCIA -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-      <h3 class="text-lg font-bold mb-4 text-slate-800">Distancia Recorrida - Hoy</h3>
-      <div id="chart-historial-distancia"></div>
-    </div>
+  <!-- HISTORIAL DISTANCIA -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+    <h3 class="text-lg font-bold mb-4 text-slate-800">Distancia Recorrida - Hoy</h3>
+    <div id="chart-historial-distancia"></div>
+  </div>
 
-    <!-- HISTORIAL CALORIAS -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-      <h3 class="text-lg font-bold mb-4 text-slate-800">Calorías Quemadas - Hoy</h3>
-      <div id="chart-historial-calorias"></div>
-    </div>
+  <!-- HISTORIAL CALORIAS -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+    <h3 class="text-lg font-bold mb-4 text-slate-800">Calorías Quemadas - Hoy</h3>
+    <div id="chart-historial-calorias"></div>
+  </div>
 
-    <!-- HISTORIAL SUEÑO -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-      <h3 class="text-lg font-bold mb-4 text-slate-800">Tiempo de Sueño - Hoy</h3>
-      <div id="chart-historial-sueno"></div>
-    </div>
+  <!-- HISTORIAL SUEÑO -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+    <h3 class="text-lg font-bold mb-4 text-slate-800">Tiempo de Sueño - Hoy</h3>
+    <div id="chart-historial-sueno"></div>
+  </div>
 
-    <!-- HISTORIAL PASOS -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-      <h3 class="text-lg font-bold mb-4 text-slate-800">Pasos - Hoy</h3>
-      <div id="chart-historial-pasos"></div>
-    </div>
+  <!-- HISTORIAL PASOS -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+    <h3 class="text-lg font-bold mb-4 text-slate-800">Pasos - Hoy</h3>
+    <div id="chart-historial-pasos"></div>
+  </div>
 
-    <!-- NIVELES DE ACTIVIDAD -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-      <h3 class="text-lg font-bold mb-4 text-slate-800">Niveles de Actividad</h3>
-      <div id="chart-niveles-actividad"></div>
-    </div>
+  <!-- NIVELES DE ACTIVIDAD -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+    <h3 class="text-lg font-bold mb-4 text-slate-800">Niveles de Actividad</h3>
+    <div id="chart-niveles-actividad"></div>
+  </div>
 
-  </main>
+</main>
 
-  <!-- Variable de Thymeleaf expuesta al JS externo -->
-  <script th:inline="javascript">
-    const idMascota = [[${idMascota}]];
-    lucide.createIcons();
-  </script>
+<!-- Variable de Thymeleaf expuesta al JS externo -->
+<script th:inline="javascript">
+  const idMascota = [[${idMascota}]];
+  lucide.createIcons();
+</script>
 
-  <script th:src="@{/js/simulacion.js}"></script>
+<script th:src="@{/js/simulacion.js}"></script>
 
 </body>
 

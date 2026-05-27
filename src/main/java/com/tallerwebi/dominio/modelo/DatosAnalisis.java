@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.modelo;
 
+import java.math.BigDecimal;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 
@@ -105,11 +106,43 @@ public class DatosAnalisis {
     vitalesYVitales.setPresionDiastolica(presionDiastolica);
   }
 
+  // --- MÉTODOS COMPATIBLES CON EL CÓDIGO DE TUS COMPAÑEROS (Usan Double) ---
+
   public Double getTemperatura() {
     return vitalesYVitales.getTemperatura();
   }
 
   public void setTemperatura(Double temperatura) {
     vitalesYVitales.setTemperatura(temperatura);
+  }
+
+  public Double getOxigenacion() {
+    return vitalesYVitales.getOxigenacion();
+  }
+
+  public void setOxigenacion(Double oxigenacion) {
+    vitalesYVitales.setOxigenacion(oxigenacion);
+  }
+
+  public Integer getHorasSueno() {
+    return vitalesYVitales.getHorasSueno();
+  }
+
+  public void setHorasSueno(Integer horasSueno) {
+    vitalesYVitales.setHorasSueno(horasSueno);
+  }
+
+  public BigDecimal getTemperaturaBigDecimal() {
+    if (vitalesYVitales.getTemperatura() == null) {
+      return null;
+    }
+    return BigDecimal.valueOf(vitalesYVitales.getTemperatura());
+  }
+
+  public BigDecimal getOxigenacionBigDecimal() {
+    if (vitalesYVitales.getOxigenacion() == null) {
+      return null;
+    }
+    return BigDecimal.valueOf(vitalesYVitales.getOxigenacion());
   }
 }

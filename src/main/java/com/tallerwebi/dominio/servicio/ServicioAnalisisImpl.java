@@ -62,7 +62,7 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
       );
 
       Analisis ultimoAnalisis = repositorioAnalisis.obtenerUltimoAnalisis(perro.getId());
-      Double distancia = (ultimoAnalisis != null)
+      double distancia = (ultimoAnalisis != null)
         ? calcularDistancia(
           ultimoAnalisis.getLatitud(),
           ultimoAnalisis.getLongitud(),
@@ -111,6 +111,7 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
     return analisis;
   }
 
+  @Override
   public Double calcularDistancia(Double lat1, Double lon1, Double lat2, Double lon2) {
     final int RADIO_TIERRA = 6371;
     double disLat = Math.toRadians(lat1 - lat2);

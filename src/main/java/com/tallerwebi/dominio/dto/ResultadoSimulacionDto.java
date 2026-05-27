@@ -34,6 +34,22 @@ public class ResultadoSimulacionDto {
   public ResultadoSimulacionDto(
     String nombreMascota,
     EstadoMascota estado,
+    Double distanciaRecorrida,
+    Integer pasos,
+    Double calorias,
+    Integer minutosDormidos
+  ) {
+    this.nombreMascota = nombreMascota;
+    this.estado = estado;
+    this.distanciaRecorrida = distanciaRecorrida;
+    this.pasos = pasos;
+    this.calorias = calorias;
+    this.minutosDormidos = minutosDormidos;
+  }
+
+  public ResultadoSimulacionDto(
+    String nombreMascota,
+    EstadoMascota estado,
     Integer frecuenciaCardiaca,
     Integer presionSistolica,
     Integer presionDiastolica,

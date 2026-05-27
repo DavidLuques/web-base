@@ -1,3 +1,4 @@
+/* global ApexCharts, idMascota */
 /* ── simulacion.js ── */
 
 /* idMascota es inyectado desde el HTML con th:inline="javascript" antes de cargar este script */
@@ -7,19 +8,57 @@ let historialCalorias   = [0];
 let historialSueno      = [0];
 let historialPasos      = [0];
 let historialHoras = [new Date().toLocaleTimeString([], {
-  hour: '2-digit',
-  minute: '2-digit'
+  hour: "2-digit",
+  minute: "2-digit"
 })];
 
-/* ── Niveles de actividad cada 5 minutos ── */
-/* Cada entrada es { hora: "HH:MM", intenso: N, moderado: N, liviano: N } */
 let nivelesHoras = {};
 
+/* ─────────────────────────────────────────
+   Persistencia en sessionStorage
+───────────────────────────────────────── */
+const STORAGE_KEY = `simulacion_${idMascota}`;
+
+function cargarEstado() {
+  try {
+    const guardado = sessionStorage.getItem(STORAGE_KEY);
+    if (!guardado) return;
+    const s = JSON.parse(guardado);
+    historialDistancias = s.historialDistancias ?? [0];
+    historialCalorias   = s.historialCalorias   ?? [0];
+    historialSueno      = s.historialSueno      ?? [0];
+    historialPasos      = s.historialPasos      ?? [0];
+    historialHoras      = s.historialHoras      ?? [new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })];
+    nivelesHoras        = s.nivelesHoras        ?? {};
+  } catch (e) {
+    console.warn("No se pudo cargar el estado guardado:", e);
+  }
+}
+
+function guardarEstado() {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+      historialDistancias,
+      historialCalorias,
+      historialSueno,
+      historialPasos,
+      historialHoras,
+      nivelesHoras
+    }));
+  } catch (e) {
+    console.warn("No se pudo guardar el estado:", e);
+  }
+}
+
+/* ── Cargar antes de inicializar los charts ── */
+cargarEstado();
+
+/* ── Niveles de actividad cada 5 minutos ── */
 function getHoraRedondeada() {
   const ahora = new Date();
-  const hh = ahora.getHours().toString().padStart(2, '0');
-  const mm = (Math.floor(ahora.getMinutes() / 5) * 5).toString().padStart(2, '0');
-  return hh + ':' + mm;
+  const hh = ahora.getHours().toString().padStart(2, "0");
+  const mm = (Math.floor(ahora.getMinutes() / 5) * 5).toString().padStart(2, "0");
+  return hh + ":" + mm;
 }
 
 function registrarNivel(estado) {
@@ -27,9 +66,9 @@ function registrarNivel(estado) {
   if (!nivelesHoras[hora]) {
     nivelesHoras[hora] = { intenso: 0, moderado: 0, liviano: 0 };
   }
-  if (estado === 'CORRIENDO') {
+  if (estado === "CORRIENDO") {
     nivelesHoras[hora].intenso++;
-  } else if (estado === 'CAMINANDO') {
+  } else if (estado === "CAMINANDO") {
     nivelesHoras[hora].moderado++;
   } else {
     nivelesHoras[hora].liviano++;
@@ -60,35 +99,35 @@ function getConfiguracionGrafico(colorPrincipal, etiqueta, valorMostrar, porcent
   return {
     series: [porcentajeLlenado],
     chart: {
-      type: 'radialBar',
+      type: "radialBar",
       height: 200,
       sparkline: { enabled: true }
     },
     colors: [colorPrincipal],
     plotOptions: {
       radialBar: {
-        hollow: { size: '65%' },
-        track:  { background: '#f1f5f9' },
+        hollow: { size: "65%" },
+        track:  { background: "#f1f5f9" },
         dataLabels: {
           show: true,
           name: {
             show: true,
-            color: '#94a3b8',
-            fontSize: '12px',
+            color: "#94a3b8",
+            fontSize: "12px",
             offsetY: 20
           },
           value: {
             show: true,
-            color: '#1e293b',
-            fontSize: '22px',
-            fontWeight: '600',
+            color: "#1e293b",
+            fontSize: "22px",
+            fontWeight: "600",
             offsetY: -10,
             formatter: function () { return valorMostrar; }
           }
         }
       }
     },
-    stroke: { lineCap: 'round' },
+    stroke: { lineCap: "round" },
     labels: [etiqueta]
   };
 }
@@ -98,26 +137,26 @@ function getOpcionesHistorial(nombreSerie, datos, horas, color, formatterFn) {
     series: [{ name: nombreSerie, data: datos }],
     chart: {
       height: 300,
-      type: 'line',
+      type: "line",
       toolbar: { show: false },
       zoom:    { enabled: false }
     },
-    stroke: { curve: 'smooth', width: 3 },
+    stroke: { curve: "smooth", width: 3 },
     colors: [color],
     xaxis: {
       categories: horas,
-      labels:     { style: { colors: '#94a3b8' } },
+      labels:     { style: { colors: "#94a3b8" } },
       axisBorder: { show: false },
       axisTicks:  { show: false }
     },
     yaxis: {
       min: 0,
       tickAmount: 4,
-      labels: { formatter: formatterFn, style: { colors: '#94a3b8' } }
+      labels: { formatter: formatterFn, style: { colors: "#94a3b8" } }
     },
     tooltip: { y: { formatter: formatterFn } },
     grid: {
-      borderColor: '#f1f5f9',
+      borderColor: "#f1f5f9",
       strokeDashArray: 4,
       yaxis: { lines: { show: true } }
     }
@@ -129,19 +168,19 @@ function getOpcionesHistorial(nombreSerie, datos, horas, color, formatterFn) {
 ───────────────────────────────────────── */
 let chartDistancia = new ApexCharts(
   document.querySelector("#chart-distancia"),
-  getConfiguracionGrafico('#3b82f6', 'km', '0', 0)
+  getConfiguracionGrafico("#3b82f6", "km", "0", 0)
 );
 let chartCalorias = new ApexCharts(
   document.querySelector("#chart-calorias"),
-  getConfiguracionGrafico('#10b981', 'kcal', '0', 0)
+  getConfiguracionGrafico("#10b981", "kcal", "0", 0)
 );
 let chartSueno = new ApexCharts(
   document.querySelector("#chart-sueno"),
-  getConfiguracionGrafico('#f59e0b', 'horas', '0', 0)
+  getConfiguracionGrafico("#f59e0b", "horas", "0", 0)
 );
 let chartPasos = new ApexCharts(
   document.querySelector("#chart-pasos"),
-  getConfiguracionGrafico('#ec4899', 'pasos', '0', 0)
+  getConfiguracionGrafico("#ec4899", "pasos", "0", 0)
 );
 
 chartDistancia.render();
@@ -151,24 +190,25 @@ chartPasos.render();
 
 /* ─────────────────────────────────────────
    Historial line charts
+   — se inicializan con los datos ya cargados del sessionStorage
 ───────────────────────────────────────── */
 let chartHistorialDistancia = new ApexCharts(
   document.querySelector("#chart-historial-distancia"),
-  getOpcionesHistorial("Distancia (km)", historialDistancias, historialHoras, '#3b82f6',
+  getOpcionesHistorial("Distancia (km)", historialDistancias, historialHoras, "#3b82f6",
     v => v.toFixed(2) + " km")
 );
 chartHistorialDistancia.render();
 
 let chartHistorialCalorias = new ApexCharts(
   document.querySelector("#chart-historial-calorias"),
-  getOpcionesHistorial("Calorías (kcal)", historialCalorias, historialHoras, '#10b981',
+  getOpcionesHistorial("Calorías (kcal)", historialCalorias, historialHoras, "#10b981",
     v => v.toFixed(1) + " kcal")
 );
 chartHistorialCalorias.render();
 
 let chartHistorialSueno = new ApexCharts(
   document.querySelector("#chart-historial-sueno"),
-  getOpcionesHistorial("Sueño (min)", historialSueno, historialHoras, '#f59e0b', v => {
+  getOpcionesHistorial("Sueño (min)", historialSueno, historialHoras, "#f59e0b", v => {
     if (v >= 60) {
       let h = Math.floor(v / 60);
       let m = Math.round(v % 60);
@@ -181,48 +221,50 @@ chartHistorialSueno.render();
 
 let chartHistorialPasos = new ApexCharts(
   document.querySelector("#chart-historial-pasos"),
-  getOpcionesHistorial("Pasos", historialPasos, historialHoras, '#ec4899',
-    v => Math.round(v).toLocaleString('es-AR') + " pasos")
+  getOpcionesHistorial("Pasos", historialPasos, historialHoras, "#ec4899",
+    v => Math.round(v).toLocaleString("es-AR") + " pasos")
 );
 chartHistorialPasos.render();
 
 /* ─────────────────────────────────────────
    Chart niveles de actividad (barras apiladas)
 ───────────────────────────────────────── */
+const nivelesIniciales = getNivelesSeriesYCategorias();
+
 let chartNiveles = new ApexCharts(
   document.querySelector("#chart-niveles-actividad"),
   {
     series: [
-      { name: 'Intenso',   data: [] },
-      { name: 'Moderado',  data: [] },
-      { name: 'Liviano',   data: [] }
+      { name: "Intenso",  data: nivelesIniciales.intenso  },
+      { name: "Moderado", data: nivelesIniciales.moderado },
+      { name: "Liviano",  data: nivelesIniciales.liviano  }
     ],
     chart: {
-      type: 'bar',
+      type: "bar",
       height: 300,
       stacked: true,
       toolbar: { show: false },
       zoom:    { enabled: false }
     },
-    colors: ['#ef4444', '#d97706', '#3b82f6'],
+    colors: ["#ef4444", "#d97706", "#3b82f6"],
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: '55%',
+        columnWidth: "55%",
         borderRadius: 4,
-        borderRadiusApplication: 'end',
-        borderRadiusWhenStacked: 'last'
+        borderRadiusApplication: "end",
+        borderRadiusWhenStacked: "last"
       }
     },
     dataLabels: { enabled: false },
     legend: {
-      position: 'top',
-      horizontalAlign: 'right',
-      labels: { colors: '#64748b' }
+      position: "top",
+      horizontalAlign: "right",
+      labels: { colors: "#64748b" }
     },
     xaxis: {
-      categories: [],
-      labels: { style: { colors: '#94a3b8' } },
+      categories: nivelesIniciales.categorias,
+      labels: { style: { colors: "#94a3b8" } },
       axisBorder: { show: false },
       axisTicks:  { show: false }
     },
@@ -231,14 +273,14 @@ let chartNiveles = new ApexCharts(
       tickAmount: 4,
       labels: {
         formatter: v => Math.round(v),
-        style: { colors: '#94a3b8' }
+        style: { colors: "#94a3b8" }
       }
     },
     tooltip: {
-      y: { formatter: v => Math.round(v) + ' min' }
+      y: { formatter: v => Math.round(v) + "min" }
     },
     grid: {
-      borderColor: '#f1f5f9',
+      borderColor: "#f1f5f9",
       strokeDashArray: 4,
       yaxis: { lines: { show: true } }
     },
@@ -252,31 +294,31 @@ chartNiveles.render();
 ───────────────────────────────────────── */
 const CONFIG_BADGE = {
   CORRIENDO: {
-    clase: 'bg-red-100 text-red-600',
-    dot:   'bg-red-500',
-    texto: 'Nivel alto de actividad'
+    clase: "bg-red-100 text-red-600",
+    dot:   "bg-red-500",
+    texto: "Nivel alto de actividad"
   },
   CAMINANDO: {
-    clase: 'bg-yellow-100 text-yellow-700',
-    dot:   'bg-yellow-600',
-    texto: 'Nivel moderado de actividad'
+    clase: "bg-yellow-100 text-yellow-700",
+    dot:   "bg-yellow-600",
+    texto: "Nivel moderado de actividad"
   },
   DURMIENDO: {
-    clase: 'bg-blue-100 text-blue-600',
-    dot:   'bg-blue-500',
-    texto: 'Nivel liviano de actividad'
+    clase: "bg-blue-100 text-blue-600",
+    dot:   "bg-blue-500",
+    texto: "Nivel liviano de actividad"
   },
   _DEFAULT: {
-    clase: 'bg-blue-100 text-blue-600',
-    dot:   'bg-blue-500',
-    texto: 'Nivel liviano de actividad'
+    clase: "bg-blue-100 text-blue-600",
+    dot:   "bg-blue-500",
+    texto: "Nivel liviano de actividad"
   }
 };
 
 function actualizarBadge(estado) {
-  const cfg = CONFIG_BADGE[estado] || CONFIG_BADGE['_DEFAULT'];
-  const badge = document.getElementById('badge-actividad');
-  badge.className = cfg.clase + ' px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2';
+  const cfg = CONFIG_BADGE[estado] || CONFIG_BADGE["_DEFAULT"];
+  const badge = document.getElementById("badge-actividad");
+  badge.className = cfg.clase + " px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2";
   badge.innerHTML = `<div class="w-2 h-2 rounded-full ${cfg.dot}"></div> ${cfg.texto}`;
 }
 
@@ -284,20 +326,19 @@ function actualizarBadge(estado) {
    Polling principal
 ───────────────────────────────────────── */
 function actualizarEstado() {
-  fetch('/spring/simulacion/estado/' + idMascota)
+  fetch("/spring/simulacion/estado/" + idMascota)
     .then(response => response.json())
     .then(data => {
 
-      document.getElementById('estado').textContent = formatearEstado(data.estado);
+      document.getElementById("estado").textContent = formatearEstado(data.estado);
       actualizarBadge(data.estado);
       registrarNivel(data.estado);
-      
-      // Nombre mascota
-      if(data.nombreMascota) {
-            document.getElementById('nombre-mascota').textContent = data.nombreMascota;
-          }
 
-      const horaActual = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (data.nombreMascota) {
+        document.getElementById("nombre-mascota").textContent = data.nombreMascota;
+      }
+
+      const horaActual = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
       /* Distancia */
       if (data.distanciaRecorrida != null) {
@@ -325,8 +366,8 @@ function actualizarEstado() {
       if (data.minutosDormidos != null) {
         let pct = Math.min((data.minutosDormidos / 480) * 100, 100);
         let etiqueta = data.minutosDormidos >= 60
-          ? (Math.floor(data.minutosDormidos / 60) + 'h' + (data.minutosDormidos % 60 > 0 ? ' ' + (data.minutosDormidos % 60) + 'm' : ''))
-          : (data.minutosDormidos + 'm');
+          ? (Math.floor(data.minutosDormidos / 60) + "h" + (data.minutosDormidos % 60 > 0 ? " " + (data.minutosDormidos % 60) + "m" : ""))
+          : (data.minutosDormidos + "m");
         chartSueno.updateOptions({
           series: [pct],
           plotOptions: { radialBar: { dataLabels: { value: { formatter: () => etiqueta } } } }
@@ -340,7 +381,7 @@ function actualizarEstado() {
         let pct = Math.min((data.pasos / 10000) * 100, 100);
         chartPasos.updateOptions({
           series: [pct],
-          plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.pasos.toLocaleString('es-AR') } } } }
+          plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.pasos.toLocaleString("es-AR") } } } }
         });
         historialPasos.push(data.pasos);
         if (historialPasos.length > 20) historialPasos.shift();
@@ -360,14 +401,17 @@ function actualizarEstado() {
       const { categorias, intenso, moderado, liviano } = getNivelesSeriesYCategorias();
       chartNiveles.updateOptions({
         series: [
-          { name: 'Intenso',  data: intenso  },
-          { name: 'Moderado', data: moderado },
-          { name: 'Liviano',  data: liviano  }
+          { name: "Intenso",  data: intenso  },
+          { name: "Moderado", data: moderado },
+          { name: "Liviano",  data: liviano  }
         ],
         xaxis: { categories: categorias }
       });
+
+      /* Guardar estado actualizado */
+      guardarEstado();
     });
 }
 
 actualizarEstado();
-setInterval(actualizarEstado, 60000);
+setInterval(actualizarEstado, 30000);

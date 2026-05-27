@@ -73,4 +73,26 @@ public class RepositorioSuenoTest {
 
     assertEquals(0, resultado);
   }
+
+  @Test
+  public void queMinutosDormidosSeIncrementanCadaVezQueSeGuardaUnRegistro() {
+    String hql =
+      "SELECT SUM(r.minutosDormido) FROM RegistroSueno r WHERE r.mascota.id = :mascotaId";
+
+    when(sessionMock.createQuery(hql)).thenReturn(queryMock);
+    when(queryMock.setParameter("mascotaId", 1L)).thenReturn(queryMock);
+    when(queryMock.uniqueResult()).thenReturn(null);
+
+    Integer primerResultado = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L);
+    assertEquals(0, primerResultado);
+
+    RegistroSueno registro = new RegistroSueno();
+    repositorioSueno.guardar(registro);
+    verify(sessionMock, atLeastOnce()).save(registro);
+
+    when(queryMock.uniqueResult()).thenReturn(2L);
+
+    Integer segundoResultado = repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L);
+    assertEquals(2, segundoResultado);
+  }
 }

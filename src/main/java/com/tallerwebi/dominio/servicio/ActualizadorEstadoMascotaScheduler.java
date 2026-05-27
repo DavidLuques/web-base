@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActualizadorEstadoMascotaScheduler {
 
-  private static final long UN_MINUTO_EN_MS = 1 * 60 * 1000;
+  private static final long TRES_MINUTOS_EN_MS = 10000;
+  private static final long DOS_MINUTOS_EN_MS = 2 * 60 * 1000;
   private static final long DIEZ_SEGUNDOS_EN_MS = 10 * 1000;
 
   private final SimulacionActividadService simulacionActividadService;
@@ -17,7 +18,7 @@ public class ActualizadorEstadoMascotaScheduler {
     this.simulacionActividadService = simulacionActividadService;
   }
 
-  @Scheduled(fixedRate = UN_MINUTO_EN_MS)
+  @Scheduled(fixedRate = DOS_MINUTOS_EN_MS)
   public void actualizarEstadosDeMascotas() {
     simulacionActividadService.simularDetalleParaTodas();
   }
