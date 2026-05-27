@@ -24,7 +24,7 @@ public class Usuario {
 
   // refactorizo por que eran muchos atributos
   @Embedded
-  private Direccion ubicacion;
+  private Direccion ubicacion = new Direccion();
 
   public Usuario() {}
 
