@@ -120,6 +120,13 @@
             <version>${playwright.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Dependencia para BCrypt (hashing de contraseñas) -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
         <!-- compile only, deployed container will provide this -->
         <!--
         <dependency>

@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.modelo.Mascota;
 import java.util.List;
 import javax.transaction.Transactional;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +24,16 @@ public class ServicioLoginImpl implements ServicioLogin {
 
   @Override
   public Usuario consultarUsuario(String email, String password) {
-    return repositorioUsuario.buscarUsuario(email, password);
+    Usuario usuario = repositorioUsuario.buscar(email);
+    if (usuario != null && BCrypt.checkpw(password, usuario.getPassword())) {
+      return usuario;
+    }
+    return null;
   }
 
   @Override
   public void registrar(Usuario usuario) throws UsuarioExistente {
-    Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(
-      usuario.getEmail(),
-      usuario.getPassword()
-    );
+    Usuario usuarioEncontrado = repositorioUsuario.buscar(usuario.getEmail());
     if (usuarioEncontrado != null) {
       throw new UsuarioExistente();
     }
@@ -39,6 +41,9 @@ public class ServicioLoginImpl implements ServicioLogin {
     usuario.setActivo(true);
     usuario.setRol("USER");
     usuario.setFechaCreacion(java.time.LocalDateTime.now().toString());
+
+    String hashedPassword = BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt());
+    usuario.setPassword(hashedPassword);
 
     repositorioUsuario.guardar(usuario);
   }
