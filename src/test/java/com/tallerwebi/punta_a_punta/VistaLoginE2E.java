@@ -51,7 +51,7 @@ public class VistaLoginE2E {
   @Test
   void deberiaDecirUNLAMEnElNavbar() throws MalformedURLException {
     dadoQueElUsuarioEstaEnLaVistaDeLogin();
-    entoncesDeberiaVerUNLAMEnElNavbar();
+    entoncesDeberiaVerElNombreDelProyectoEnElNavbar();
   }
 
   @Test
@@ -94,9 +94,9 @@ public class VistaLoginE2E {
     dadoQueElUsuarioEstaEnLaVistaDeLogin();
   }
 
-  private void entoncesDeberiaVerUNLAMEnElNavbar() {
+  private void entoncesDeberiaVerElNombreDelProyectoEnElNavbar() {
     String texto = vistaLogin.obtenerTextoDeLaBarraDeNavegacion();
-    assertThat("UNLAM", equalToIgnoringCase(texto));
+    assertThat("PetTracker", equalToIgnoringCase(texto));
   }
 
   private void dadoQueElUsuarioEstaEnLaVistaDeLogin() throws MalformedURLException {
@@ -109,23 +109,22 @@ public class VistaLoginE2E {
   }
 
   private void entoncesDeberiaSerRedirigidoALaVista1() throws MalformedURLException {
-    // Wait for URL to change to the expected pattern
     context
       .pages()
       .get(0)
       .waitForURL(url ->
-        url.matches(".*\\/spring\\/simulacion\\/vista\\/\\d+(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
+        url.matches(".*\\/spring\\/simulacion\\/dashboard\\/\\d+(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
       );
     URL url = vistaLogin.obtenerURLActual();
     assertThat(
       url.getPath(),
-      matchesPattern("^/spring/simulacion/vista/\\d+(?:;jsessionid=[^/\\s]+)?$")
+      matchesPattern("^/spring/simulacion/dashboard/\\d+(?:;jsessionid=[^/\\s]+)?$")
     );
   }
 
   private void entoncesDeberiaVerUnMensajeDeError() {
     String texto = vistaLogin.obtenerMensajeDeError();
-    assertThat("Error Usuario o clave incorrecta", equalToIgnoringCase(texto));
+    assertThat("Usuario o clave incorrecta", equalToIgnoringCase(texto));
   }
 
   private void dadoQueElUsuarioCargaSusDatosDeLoginCon(String email, String clave) {

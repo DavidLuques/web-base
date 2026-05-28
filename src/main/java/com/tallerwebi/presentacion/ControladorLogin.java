@@ -64,7 +64,7 @@ public class ControladorLogin {
       servicioLogin.registrar(usuario);
       request.getSession().setAttribute("ROL", usuario.getRol());
       request.getSession().setAttribute("ID_USUARIO", usuario.getId());
-      return new ModelAndView("redirect:/simulacion/vista/1");
+      return new ModelAndView("redirect:/simulacion/dashboard/1");
     } catch (UsuarioExistente e) {
       ModelMap model = new ModelMap();
       model.put("error", "El usuario ya existe");
