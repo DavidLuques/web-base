@@ -13,13 +13,13 @@ public class UsuarioTest {
     usuario.setId(1L);
     usuario.setEmail("test@correo.com");
     usuario.setPassword("123456");
-    usuario.setRol("ADMIN");
+    usuario.setRol("USER");
     usuario.setActivo(true);
 
     assertEquals(1L, usuario.getId());
     assertEquals("test@correo.com", usuario.getEmail());
     assertEquals("123456", usuario.getPassword());
-    assertEquals("ADMIN", usuario.getRol());
+    assertEquals("USER", usuario.getRol());
     assertTrue(usuario.getActivo());
   }
 }

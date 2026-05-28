@@ -80,7 +80,7 @@ public class RepositorioUsuarioTest {
 
     usuario.setPassword("4567");
     usuario.setActivo(true);
-    usuario.setRol("ADMIN");
+    usuario.setRol("USER");
 
     this.cuandoModificoUnUsuario(usuario);
 

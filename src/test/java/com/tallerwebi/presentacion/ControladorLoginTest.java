@@ -50,7 +50,7 @@ public class ControladorLoginTest {
       modelAndView.getModel().get("error").toString(),
       equalToIgnoringCase("Usuario o clave incorrecta")
     );
-    verify(sessionMock, times(0)).setAttribute("ROL", "ADMIN");
+    verify(sessionMock, times(0)).setAttribute("ROL", "USER");
   }
 
   @Test
@@ -58,7 +58,7 @@ public class ControladorLoginTest {
     // preparacion
     Usuario usuarioEncontrado = new Usuario();
     usuarioEncontrado.setId(1L);
-    usuarioEncontrado.setRol("ADMIN");
+    usuarioEncontrado.setRol("USER");
 
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(servicioLoginMock.consultarUsuario(anyString(), anyString()))
@@ -80,7 +80,7 @@ public class ControladorLoginTest {
     throws UsuarioExistente {
     when(requestMock.getSession()).thenReturn(sessionMock);
     usuario.setId(2L);
-    usuario.setRol("ADMIN");
+    usuario.setRol("USER");
 
     // ejecucion
     ModelAndView modelAndView = controladorLogin.registrarme(usuario, requestMock);
@@ -88,7 +88,7 @@ public class ControladorLoginTest {
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/simulacion/vista/1"));
     verify(servicioLoginMock, times(1)).registrar(usuario);
-    verify(sessionMock, times(1)).setAttribute("ROL", "ADMIN");
+    verify(sessionMock, times(1)).setAttribute("ROL", "USER");
     verify(sessionMock, times(1)).setAttribute("ID_USUARIO", 2L);
   }
 
