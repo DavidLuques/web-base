@@ -246,4 +246,111 @@ public class AlertaServiceTest {
     alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, null);
     verify(repositorioAlertaMock, never()).save(any(Alerta.class));
   }
+
+  @Test
+  void debeGenerarAlertaPorFrecuenciaCardiacaAltaEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(170);
+    lectura.setTemperatura(38.5);
+    lectura.setPresionSistolica(120);
+
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
+    assertEquals(
+      "Emergencia: Frecuencia cardiaca inusualmente alta detectada (170 lpm).",
+      captor.getValue().getMensaje()
+    );
+  }
+
+  @Test
+  void debeGenerarAlertaPorFrecuenciaCardiacaBajaEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(50);
+    lectura.setTemperatura(38.5);
+    lectura.setPresionSistolica(120);
+
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+    assertEquals(
+      "Alerta: Frecuencia cardiaca inusualmente baja detectada (50 lpm).",
+      captor.getValue().getMensaje()
+    );
+  }
+
+  @Test
+  void debeGenerarAlertaPorTemperaturaAltaEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(100);
+    lectura.setTemperatura(40.0);
+    lectura.setPresionSistolica(120);
+
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
+    assertEquals(
+      "Emergencia: Temperatura corporal alta detectada (40.0°C).",
+      captor.getValue().getMensaje()
+    );
+  }
+
+  @Test
+  void debeGenerarAlertaPorTemperaturaBajaEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(100);
+    lectura.setTemperatura(37.0);
+    lectura.setPresionSistolica(120);
+
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+    assertEquals(
+      "Alerta: Temperatura corporal baja detectada (37.0\u00b0C).",
+      captor.getValue().getMensaje()
+    );
+  }
+
+  @Test
+  void debeGenerarAlertaPorPresionAltaEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(100);
+    lectura.setTemperatura(38.5);
+    lectura.setPresionSistolica(170);
+
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+    assertEquals(
+      "Alerta: Fluctuacion significativa en la presion arterial detectada.",
+      captor.getValue().getMensaje()
+    );
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiLecturaEsNull() {
+    alertaService.evaluarLectura(mascotaMacho, null);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiSignosNormalesEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(100);
+    lectura.setTemperatura(38.5);
+    lectura.setPresionSistolica(120);
+
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
 }
