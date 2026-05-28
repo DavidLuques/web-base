@@ -2,7 +2,6 @@ package com.tallerwebi.punta_a_punta.vistas;
 
 import com.microsoft.playwright.Page;
 
-
 public class VistaDashboard {
 
   private Page page;
@@ -29,12 +28,12 @@ public class VistaDashboard {
   }
 
   public void darClickEnIconoActividad() {
-        page.locator("a[href*='/simulacion/vista/']").click();
-    }
+    page.locator("a[href*='/simulacion/vista/']").click();
+  }
 
-    public boolean graficosEstanVisibles() {
-        // waitFor asegura que le demos tiempo a la librería gráfica de ejecutarse
-        page.waitForSelector(".apexcharts-canvas");
-        return page.locator(".apexcharts-canvas").count() > 0;
-    }
+  public boolean graficosEstanVisibles() {
+    // waitFor asegura que le demos tiempo a la librería gráfica de ejecutarse
+    page.waitForSelector(".apexcharts-canvas");
+    return page.locator(".apexcharts-canvas").count() > 0;
+  }
 }

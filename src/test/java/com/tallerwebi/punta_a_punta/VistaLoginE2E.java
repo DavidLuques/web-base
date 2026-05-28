@@ -25,7 +25,11 @@ public class VistaLoginE2E {
   @BeforeAll
   static void abrirNavegador() {
     playwright = Playwright.create();
-    browser = playwright.chromium().launch();
+    browser =
+      playwright
+        .chromium()
+        .launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(1000));
+    //browser = playwright.chromium().launch();
     //browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(500));
   }
 
@@ -138,8 +142,15 @@ public class VistaLoginE2E {
 
   private void dadoQueElUsuarioSeRegistraCon(String email, String clave) {
     VistaNuevoUsuario vistaNuevoUsuario = new VistaNuevoUsuario(context.pages().get(0));
+    vistaNuevoUsuario.escribirNombre("Juan Pérez");
     vistaNuevoUsuario.escribirEMAIL(email);
+    vistaNuevoUsuario.escribirTelefono("1122334455");
     vistaNuevoUsuario.escribirClave(clave);
+    vistaNuevoUsuario.escribirCalle("Av. Principal 123");
+    vistaNuevoUsuario.escribirCiudad("Morón");
+    vistaNuevoUsuario.escribirProvincia("Buenos Aires");
+    vistaNuevoUsuario.escribirPais("Argentina");
+    vistaNuevoUsuario.escribirCodigoPostal("1708");
     vistaNuevoUsuario.darClickEnRegistrarme();
   }
 }
