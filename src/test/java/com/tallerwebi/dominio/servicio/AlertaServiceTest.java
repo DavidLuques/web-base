@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
+import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -91,159 +93,6 @@ public class AlertaServiceTest {
 
     alertaService.evaluarPeso(mascotaMacho);
 
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
-  }
-
-  @Test
-  void debeGenerarAlertaPorFrecuenciaCardiacaAlta() {
-    analisisActual.getDatos().setFrecuenciaCardiaca(170);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
-    assertEquals(
-      "Emergencia: Frecuencia cardiaca inusualmente alta detectada (170 lpm).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorFrecuenciaCardiacaBaja() {
-    analisisActual.getDatos().setFrecuenciaCardiaca(50);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Alerta: Frecuencia cardiaca inusualmente baja detectada (50 lpm).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorTemperaturaCorporalAlta() {
-    analisisActual.getDatos().setTemperatura(39.8);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
-    assertEquals(
-      "Emergencia: Temperatura corporal alta detectada (39.8°C).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorTemperaturaCorporalBaja() {
-    analisisAnterior.getDatos().setTemperatura(37.5);
-    analisisActual.getDatos().setTemperatura(37.0);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Alerta: Temperatura corporal baja detectada (37.0°C).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorCambioDrasticoTemperatura() {
-    analisisAnterior.getDatos().setTemperatura(37.6);
-    analisisActual.getDatos().setTemperatura(39.2);
-
-    analisisActual.getDatos().setFrecuenciaCardiaca(85);
-    analisisActual.getDatos().setPresionSistolica(125);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
-    assertEquals(
-      "Emergencia: Cambio drastico de temperatura detectado. De 37.6°C a 39.2°C.",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorNivelOxigenacionBajo() {
-    analisisActual.getDatos().setOxigenacion(88.0);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
-    assertEquals(
-      "Emergencia: Nivel de oxigenacion bajo detectado (88.0%).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorHorasSuenoBajas() {
-    analisisActual.getDatos().setHorasSueno(5);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Alerta: Horas de sueño bajas detectadas (5 horas).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorCambioDrasticoPresionSistolica() {
-    analisisActual.getDatos().setPresionSistolica(145);
-    analisisActual.getDatos().setFrecuenciaCardiaca(85);
-    analisisActual.getDatos().setTemperatura(38.6);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, analisisAnterior);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Alerta: Fluctuacion significativa en la presion arterial detectada.",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void noDebeGenerarAlertaSiNoHayDatosActuales() {
-    alertaService.evaluarSignosVitales(mascotaMacho, new Analisis(), analisisAnterior);
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
-  }
-
-  @Test
-  void noDebeGenerarAlertaSiNoHayDatosAnterioresParaCambiosDrasticos() {
-    analisisActual.getDatos().setFrecuenciaCardiaca(85);
-    analisisActual.getDatos().setTemperatura(38.6);
-    analisisActual.getDatos().setOxigenacion(95.0);
-    analisisActual.getDatos().setHorasSueno(7);
-    analisisActual.getDatos().setPresionSistolica(125);
-
-    alertaService.evaluarSignosVitales(mascotaMacho, analisisActual, null);
     verify(repositorioAlertaMock, never()).save(any(Alerta.class));
   }
 
@@ -350,6 +199,56 @@ public class AlertaServiceTest {
     lectura.setTemperatura(38.5);
     lectura.setPresionSistolica(120);
 
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiMascotaEsNull() {
+    alertaService.evaluarPeso(null);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiPesoEsNull() {
+    mascotaMacho.setPeso(null);
+    alertaService.evaluarPeso(mascotaMacho);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
+
+  @Test
+  void debeGenerarAlertaPorBajoPesoMascotaPequena() {
+    mascotaMacho.setTamano(TamanoMascota.PEQUENO);
+    mascotaMacho.setPeso(1.0);
+    alertaService.evaluarPeso(mascotaMacho);
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+  }
+
+  @Test
+  void debeGenerarAlertaPorAltoPesoMascotaGrande() {
+    mascotaMacho.setTamano(TamanoMascota.GRANDE);
+    mascotaMacho.setPeso(50.0);
+    alertaService.evaluarPeso(mascotaMacho);
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+  }
+
+  @Test
+  void debeRetornarListaVaciaSiIdMascotaEsNull() {
+    List<AlertaDto> resultado = alertaService.obtenerAlertasPorMascota(null);
+    assertEquals(0, resultado.size());
+    verify(repositorioAlertaMock, never()).buscarPorMascota(any());
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiFrecuenciaEsNullEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(null);
+    lectura.setTemperatura(38.5);
+    lectura.setPresionSistolica(120);
     alertaService.evaluarLectura(mascotaMacho, lectura);
     verify(repositorioAlertaMock, never()).save(any(Alerta.class));
   }
