@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajustes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+<div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'configuraciones')"></div>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+  <div class="flex-1 p-8 overflow-y-auto">
+    <div class="max-w-4xl mx-auto mt-8">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-200">
+          <i data-lucide="settings" class="w-6 h-6 text-indigo-500"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Ajustes</h1>
+          <p class="text-slate-500">Administra tus preferencias y datos personales</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 overflow-hidden border border-slate-100">
+        <ul class="divide-y divide-slate-100">
+          <li>
+            <a th:href="@{/perfil(idMascota=${idMascota})}" class="flex items-center justify-between p-6 hover:bg-slate-50 transition-colors group">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-800">Editar perfil</h3>
+                  <p class="text-sm text-slate-500">Modifica tus datos personales y dirección</p>
+                </div>
+              </div>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

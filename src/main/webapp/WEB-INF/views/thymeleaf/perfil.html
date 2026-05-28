@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Perfil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+<div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'configuraciones')"></div>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+  <div class="flex-1 p-8 overflow-y-auto">
+    <div class="max-w-2xl mx-auto mt-8">
+      
+      <!-- Breadcrumb and Title -->
+      <div class="mb-8 flex items-center gap-4">
+        <a th:href="@{/configuraciones(idMascota=${idMascota})}" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 shadow-sm border border-slate-200 transition-all">
+          <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Editar Perfil</h1>
+          <p class="text-slate-500">Actualiza tu información personal</p>
+        </div>
+      </div>
+
+      <!-- Success Alert -->
+      <div th:if="${param.exito}" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3 animate-[slideIn_0.3s_ease-out]">
+        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+          <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+        </div>
+        <p class="font-medium">¡Perfil actualizado correctamente!</p>
+      </div>
+
+      <!-- Error Alert -->
+      <div th:if="${error}" class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 px-6 py-4 rounded-2xl flex items-center gap-3">
+        <div class="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center shrink-0">
+          <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
+        </div>
+        <p class="font-medium" th:text="${error}">Error al actualizar</p>
+      </div>
+
+      <!-- Form Card -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
+        <form th:action="@{/perfil/actualizar(idMascota=${idMascota})}" th:object="${datosPerfil}" method="POST" class="space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <i data-lucide="user" class="w-4 h-4 text-slate-400"></i> Nombre Completo
+              </label>
+              <input type="text" th:field="*{nombre}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Juan Pérez" required>
+            </div>
+            
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <i data-lucide="mail" class="w-4 h-4 text-slate-400"></i> Email
+              </label>
+              <input type="email" th:field="*{email}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="juan@ejemplo.com" required>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <i data-lucide="phone" class="w-4 h-4 text-slate-400"></i> Teléfono
+              </label>
+              <input type="number" th:field="*{telefono}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="1122334455">
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <i data-lucide="lock" class="w-4 h-4 text-slate-400"></i> Nueva Contraseña
+              </label>
+              <input type="password" th:field="*{password}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Dejar en blanco para no cambiar">
+            </div>
+          </div>
+
+          <hr class="border-slate-100 my-8">
+
+          <h3 class="text-lg font-semibold text-slate-800 mb-4">Dirección</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2 md:col-span-2">
+              <label class="text-sm font-semibold text-slate-700">Calle y Altura</label>
+              <input type="text" th:field="*{calle}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Av. Siempreviva 742">
+            </div>
+            
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700">Ciudad</label>
+              <input type="text" th:field="*{ciudad}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Springfield">
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700">Provincia</label>
+              <input type="text" th:field="*{provincia}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Buenos Aires">
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700">País</label>
+              <input type="text" th:field="*{pais}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Argentina">
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700">Código Postal</label>
+              <input type="text" th:field="*{codigoPostal}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="1704">
+            </div>
+          </div>
+
+          <div class="pt-6 flex justify-end">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+              <i data-lucide="save" class="w-5 h-5"></i>
+              Guardar Cambios
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
