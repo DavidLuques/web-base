@@ -30,7 +30,7 @@ public class AlertaServiceTest {
     mascotaMacho = new Mascota();
     mascotaMacho.setNombre("Firulais");
     mascotaMacho.setGenero("Macho");
-    mascotaMacho.setRaza("Labrador"); // Ahora es un simple String
+    mascotaMacho.setRaza("Labrador");
     mascotaMacho.setTamano(TamanoMascota.MEDIANO); // Asignamos tamaño para la alerta
 
     mascotaHembra = new Mascota();
@@ -55,7 +55,7 @@ public class AlertaServiceTest {
 
   @Test
   void debeGenerarAlertaPorBajoPesoMacho() {
-    mascotaMacho.setPeso(8.0); // Inferior a 10.0 (Mínimo para Mediano)
+    mascotaMacho.setPeso(8.0); // Inferior a 11.0 (Mínimo para Mediano)
 
     alertaService.evaluarPeso(mascotaMacho);
 
@@ -64,7 +64,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
     assertEquals(
-      "Atención: El peso de Firulais (8.0 kg) está por debajo del mínimo recomendado (10.0 kg).",
+      "Atención: El peso de Firulais (8.0 kg) está por debajo del mínimo recomendado (11.0 kg).",
       captor.getValue().getMensaje()
     );
   }
@@ -87,7 +87,7 @@ public class AlertaServiceTest {
 
   @Test
   void noDebeGenerarAlertaPorPesoNormal() {
-    mascotaMacho.setPeso(15.0); // Entre 10.0 y 25.0
+    mascotaMacho.setPeso(15.0); // Entre 11.0 y 25.0
 
     alertaService.evaluarPeso(mascotaMacho);
 
