@@ -4,8 +4,6 @@ import com.tallerwebi.dominio.RepositorioAlerta;
 import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
-import com.tallerwebi.dominio.modelo.Analisis;
-import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import java.math.BigDecimal;
@@ -19,13 +17,13 @@ public class AlertaService {
 
   private static final int FRECUENCIA_MAXIMA = 160;
   private static final int FRECUENCIA_MINIMA = 60;
-//  private static final int SUENO_MINIMO = 6;
-//  private static final int DIFERENCIA_PRESION_MAXIMA = 20;
+  //  private static final int SUENO_MINIMO = 6;
+  //  private static final int DIFERENCIA_PRESION_MAXIMA = 20;
   private static final int PRESION_SISTOLICA_CRITICA = 125;
   private static final BigDecimal TEMP_MAXIMA = new BigDecimal("39.5");
   private static final BigDecimal TEMP_MINIMA = new BigDecimal("37.5");
-//  private static final BigDecimal OXIGENACION_MINIMA = new BigDecimal("90");
-//  private static final BigDecimal DIFERENCIA_TEMP_MAXIMA = new BigDecimal("1.5");
+  //  private static final BigDecimal OXIGENACION_MINIMA = new BigDecimal("90");
+  //  private static final BigDecimal DIFERENCIA_TEMP_MAXIMA = new BigDecimal("1.5");
   private static final String SUFIJO_LPM = " lpm).";
   private static final String SUFIJO_GRADOS = "°C).";
 
