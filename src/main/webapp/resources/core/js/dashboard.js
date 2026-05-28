@@ -1,3 +1,4 @@
+/* global ApexCharts, idMascota */
 let historialHoras        = [];
 let historialFrecuencia   = [];
 let historialTemperatura  = [];
