@@ -46,7 +46,7 @@ public class ControladorLogin {
 
       List<Mascota> mascotas = servicioLogin.buscarMascotasPorUsuario(usuarioBuscado.getId());
       Long idMascota = (mascotas != null && !mascotas.isEmpty()) ? mascotas.get(0).getId() : 1L;
-      return new ModelAndView("redirect:/simulacion/vista/" + idMascota);
+      return new ModelAndView("redirect:/simulacion/dashboard/" + idMascota);
     } else {
       /* Se instancia el ModelMap solo cuando es necesario (en el flujo de error) para evitar anomalías en el flujo de datos (DU-anomaly de PMD) */
       ModelMap model = new ModelMap();
