@@ -62,6 +62,8 @@ public class ControladorSimulacion {
   @GetMapping("/dashboard/{idMascota}")
   public String vistaDashboardFigma(@PathVariable Long idMascota, Model model) {
     model.addAttribute("idMascota", idMascota);
+    ResultadoSimulacionDto estado = simulacionActividadService.obtenerEstadoActual(idMascota);
+    model.addAttribute("mascotaNombre", estado != null ? estado.getNombreMascota() : "Mascota");
     return "dashboard";
   }
 }

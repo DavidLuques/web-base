@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="sidebar(idMascota, paginaActiva)" class="w-20 bg-[#2d3748] flex flex-col items-center py-6 border-r border-slate-700 shadow-xl z-20">
+  <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-8">
+    <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
+  </div>
+  <nav class="flex flex-col gap-6 w-full">
+    <a th:href="@{/simulacion/dashboard/{id}(id=${idMascota})}"
+       th:class="${paginaActiva == 'dashboard'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+      <i th:class="${paginaActiva == 'dashboard'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="home"></i>
+    </a>
+    <a th:href="@{/simulacion/vista/{id}(id=${idMascota})}"
+       th:class="${paginaActiva == 'vista'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+      <i th:class="${paginaActiva == 'vista'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="activity"></i>
+    </a>
+    <a th:href="@{/simulacion/alertas/{id}(id=${idMascota})}"
+       th:class="${paginaActiva == 'alertas'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+      <i th:class="${paginaActiva == 'alertas'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="bell"></i>
+    </a>
+  </nav>
+  <div class="mt-auto w-full flex flex-col">
+    <a th:href="@{/logout}" class="w-full flex justify-center py-3 text-rose-400 hover:text-rose-500 transition-colors" title="Cerrar Sesión">
+      <i data-lucide="log-out" class="w-6 h-6"></i>
+    </a>
+  </div>
+</aside>
+</body>
+</html>

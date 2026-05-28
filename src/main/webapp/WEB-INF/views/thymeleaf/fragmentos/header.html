@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="header(mascotaNombre, idMascota)" class="bg-white h-20 px-8 flex items-center justify-between border-b border-slate-200 shrink-0">
+  <h1 class="text-2xl font-bold text-slate-800">
+    Análisis de Actividad y Comportamiento - <span id="nombre-mascota" th:text="${mascotaNombre}">Mascota</span>
+  </h1>
+  <div class="flex gap-4">
+    <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 cursor-pointer">
+      <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
+        <i data-lucide="dog" class="w-4 h-4"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-bold text-slate-800 leading-tight">Firulais</span>
+        <span class="text-xs text-slate-500 leading-tight">3 años</span>
+      </div>
+    </div>
+  </div>
+</header>
+</body>
+</html>
