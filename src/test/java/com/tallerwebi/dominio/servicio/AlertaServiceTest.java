@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
+import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -197,6 +200,57 @@ public class AlertaServiceTest {
     lectura.setTemperatura(38.5);
     lectura.setPresionSistolica(120);
 
+    alertaService.evaluarLectura(mascotaMacho, lectura);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiMascotaEsNull() {
+    alertaService.evaluarPeso(null);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiPesoEsNull() {
+    mascotaMacho.setPeso(null);
+    alertaService.evaluarPeso(mascotaMacho);
+    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  }
+
+  @Test
+  void debeGenerarAlertaPorBajoPesoMascotaPequena() {
+    mascotaMacho.setTamano(TamanoMascota.PEQUENO);
+    mascotaMacho.setPeso(1.0);
+    alertaService.evaluarPeso(mascotaMacho);
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+  }
+
+  @Test
+  void debeGenerarAlertaPorAltoPesoMascotaGrande() {
+    mascotaMacho.setTamano(TamanoMascota.GRANDE);
+    mascotaMacho.setPeso(50.0);
+    alertaService.evaluarPeso(mascotaMacho);
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+  }
+
+  @Test
+  void debeRetornarListaVaciaSiIdMascotaEsNull() {
+    List<AlertaDto> resultado =
+            alertaService.obtenerAlertasPorMascota(null);
+    assertEquals(0, resultado.size());
+    verify(repositorioAlertaMock, never()).buscarPorMascota(any());
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiFrecuenciaEsNullEnLectura() {
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(null);
+    lectura.setTemperatura(38.5);
+    lectura.setPresionSistolica(120);
     alertaService.evaluarLectura(mascotaMacho, lectura);
     verify(repositorioAlertaMock, never()).save(any(Alerta.class));
   }
