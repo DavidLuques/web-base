@@ -69,7 +69,7 @@ public class VistaDashboardE2E {
         entoncesDeberiaVerLosGraficosRenderizados();
     }
 
-    // --- MÉTODOS BDD NUEVOS ---
+
 
     private void cuandoTocaElIconoDeActividad() {
         vistaDashboard.darClickEnIconoActividad();
