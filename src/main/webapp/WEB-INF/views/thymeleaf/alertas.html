@@ -78,7 +78,6 @@
         // Petición al endpoint de datos JSON
         fetch("/spring/simulacion/alertas/datos/" + idMascota)
             .then(response => {
-                // Si el servidor responde con error (404, 500, etc), lanzamos error para ir al catch
                 if (!response.ok) {
                     throw new Error("Error en el servidor. Código HTTP: " + response.status);
                 }
@@ -88,21 +87,20 @@
                 const contenedor = document.getElementById("lista-alertas-exclusiva");
                 const contador = document.getElementById("contador-alertas");
 
-                // Verificación estricta de que llegó un Array con datos
                 if (!listaDeAlertas || !Array.isArray(listaDeAlertas) || listaDeAlertas.length === 0) {
                     contador.textContent = "0 Alertas";
                     contenedor.innerHTML = `
                       <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
                         <i data-lucide="check-circle-2" class="w-12 h-12 text-emerald-500 mx-auto mb-3"></i>
                         <h3 class="text-lg font-bold text-slate-800 mb-1">¡Todo controlado!</h3>
-                        <p class="text-sm text-slate-500">No se registran anomalías ni alertas para esta mascota en este momento.</p>
+                        <p class="text-sm text-slate-500">No se registran anomalias ni alertas para esta mascota en este momento.</p>
                       </div>
                     `;
                     lucide.createIcons();
                     return;
                 }
 
-                // Actualizamos el contador real en base al tamaño de la lista
+                // Actualiza el contador real en base al tamaño de la lista
                 contador.textContent = `${listaDeAlertas.length} Alertas`;
                 let htmlContent = "";
 
@@ -124,7 +122,6 @@
                             <span class="text-xs font-bold uppercase tracking-wider ${textClass} ${bgClass} px-2 py-0.5 rounded-md">
                               ${alerta.tipo}
                             </span>
-                            <span class="text-xs text-slate-400">En tiempo real</span>
                           </div>
                           <p class="text-slate-700 text-sm font-medium leading-relaxed">${alerta.mensaje}</p>
                         </div>
@@ -133,14 +130,13 @@
                 });
 
                 contenedor.innerHTML = htmlContent;
-                lucide.createIcons(); // Dibuja los iconos inyectados por string
+                lucide.createIcons();
             })
             .catch(error => {
                 console.error("Detalle del error:", error);
                 document.getElementById("lista-alertas-exclusiva").innerHTML = `
                     <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm shadow-sm">
                       <strong>Error al cargar alertas:</strong> ${error.message}. <br>
-                      <span class="text-xs text-red-500">Revisá la consola del navegador (F12) o los logs de Spring.</span>
                     </div>
                 `;
             });

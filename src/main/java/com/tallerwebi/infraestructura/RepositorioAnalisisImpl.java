@@ -2,6 +2,7 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.modelo.Analisis;
+import java.util.List;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -29,5 +30,15 @@ public class RepositorioAnalisisImpl implements RepositorioAnalisis {
       .setParameter("id", id)
       .setMaxResults(1)
       .uniqueResult();
+  }
+
+  @Override
+  public List<Analisis> buscarPorMascota(Long idMascota) {
+    return sessionFactory
+      .getCurrentSession()
+      // Traigo los análisis ordenados por ID descendente para tener los más recientes primero
+      .createQuery("FROM Analisis WHERE mascota.id = :idMascota ORDER BY id DESC", Analisis.class)
+      .setParameter("idMascota", idMascota)
+      .getResultList();
   }
 }

@@ -71,21 +71,12 @@
         </div>
 
         <div class="lg:col-span-1 flex flex-col h-full">
-          <h3 class="text-slate-800 font-bold mb-4">Alertas Recientes</h3>
-          <div class="flex flex-col gap-4 overflow-y-auto pr-2" id="contenedor-alertas">
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-1">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-                <span class="font-bold text-slate-800 text-sm">Actividad Baja</span>
-              </div>
-              <span class="text-xs text-slate-500 ml-4">Hace 30 min</span>
-            </div>
-            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 flex flex-col gap-1">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-rose-500"></div>
-                <span class="font-bold text-slate-800 text-sm">Ritmo Cardíaco Alto</span>
-              </div>
-              <span class="text-xs text-slate-500 ml-4">Hace 2 horas</span>
+          <h3 class="text-slate-800 font-bold mb-4">Alertas Recientes (Últimas 3)</h3>
+
+          <div class="flex flex-col gap-4 overflow-y-auto scrollbar-hide pr-2" id="contenedor-alertas">
+            <div class="text-center py-6 text-slate-400">
+              <div class="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2"></div>
+              <p class="text-xs">Cargando alertas...</p>
             </div>
           </div>
         </div>
@@ -101,5 +92,39 @@
 
   <script th:src="@{/js/dashboard.js}"></script>
 
+  function cargarAlertasRecientes() {
+    fetch("/spring/simulacion/alertas/datos/" + idMascota)
+            .then(response => response.json())
+            .then(alertas => {
+              const contenedor = document.getElementById("contenedor-alertas");
+              if (!alertas || alertas.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                        <p class="text-xs text-emerald-600 font-medium">Sin alertas recientes</p>
+                    </div>`;
+                return;
+              }
+              const ultimas = alertas.slice(-3).reverse();
+              contenedor.innerHTML = ultimas.map(alerta => {
+                const esEmergencia = alerta.tipo === 'EMERGENCIA';
+                const bgClass   = esEmergencia ? 'bg-rose-50 border-rose-200'   : 'bg-amber-50 border-amber-200';
+                const dotColor  = esEmergencia ? 'bg-rose-500'                  : 'bg-amber-500';
+                return `
+                    <div class="${bgClass} border rounded-xl p-4 flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full ${dotColor} shrink-0"></div>
+                            <span class="font-bold text-slate-800 text-sm">${alerta.tipo}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 ml-4 leading-relaxed">${alerta.mensaje}</p>
+                    </div>`;
+              }).join('');
+            })
+            .catch(err => console.error("Error al cargar alertas en dashboard:", err));
+  }
+
+  conectarYActualizar();
+  cargarAlertasRecientes();
+  setInterval(conectarYActualizar, 5000);
+</script>
 </body>
 </html>
