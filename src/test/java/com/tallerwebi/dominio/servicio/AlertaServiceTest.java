@@ -64,7 +64,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
     assertEquals(
-      "Atención: El peso de Firulais (8.0 kg) está por debajo del mínimo recomendado (11.0 kg).",
+      "Atencion: El peso de Firulais (8.0 kg) esta por debajo del minimo recomendado (11.0 kg).",
       captor.getValue().getMensaje()
     );
   }
@@ -80,7 +80,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
     assertEquals(
-      "Atención: El peso de Firulais (28.0 kg) está por encima del máximo recomendado (25.0 kg).",
+      "Atencion: El peso de Firulais (28.0 kg) esta por encima del maximo recomendado (25.0 kg).",
       captor.getValue().getMensaje()
     );
   }
@@ -105,7 +105,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
     assertEquals(
-      "Emergencia: Frecuencia cardíaca inusualmente alta detectada (170 lpm).",
+      "Emergencia: Frecuencia cardiaca inusualmente alta detectada (170 lpm).",
       captor.getValue().getMensaje()
     );
   }
@@ -121,7 +121,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
     assertEquals(
-      "Alerta: Frecuencia cardíaca inusualmente baja detectada (50 lpm).",
+      "Alerta: Frecuencia cardiaca inusualmente baja detectada (50 lpm).",
       captor.getValue().getMensaje()
     );
   }
@@ -174,7 +174,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
     assertEquals(
-      "Emergencia: Cambio drástico de temperatura detectado. De 37.6°C a 39.2°C.",
+      "Emergencia: Cambio drastico de temperatura detectado. De 37.6°C a 39.2°C.",
       captor.getValue().getMensaje()
     );
   }
@@ -190,7 +190,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
     assertEquals(
-      "Emergencia: Nivel de oxigenación bajo detectado (88.0%).",
+      "Emergencia: Nivel de oxigenacion bajo detectado (88.0%).",
       captor.getValue().getMensaje()
     );
   }
@@ -224,7 +224,7 @@ public class AlertaServiceTest {
 
     assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
     assertEquals(
-      "Alerta: Fluctuación significativa en la presión arterial detectada.",
+      "Alerta: Fluctuacion significativa en la presion arterial detectada.",
       captor.getValue().getMensaje()
     );
   }

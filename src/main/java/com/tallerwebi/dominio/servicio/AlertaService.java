@@ -27,7 +27,7 @@ public class AlertaService {
   private static final BigDecimal OXIGENACION_MINIMA = new BigDecimal("90");
   private static final BigDecimal DIFERENCIA_TEMP_MAXIMA = new BigDecimal("1.5");
   private static final String SUFIJO_LPM = " lpm).";
-  private static final String SUFIJO_GRADOS = "\u00b0C).";
+  private static final String SUFIJO_GRADOS = "°C).";
 
   private final RepositorioAlerta repositorioAlerta;
 
@@ -45,11 +45,11 @@ public class AlertaService {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Atenci\u00f3n: El peso de " +
+        "Atencion: El peso de " +
         mascota.getNombre() +
         " (" +
         peso +
-        " kg) est\u00e1 por debajo del m\u00ednimo recomendado (" +
+        " kg) esta por debajo del minimo recomendado (" +
         pesoMinimo +
         " kg)."
       );
@@ -60,11 +60,11 @@ public class AlertaService {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Atenci\u00f3n: El peso de " +
+        "Atencion: El peso de " +
         mascota.getNombre() +
         " (" +
         peso +
-        " kg) est\u00e1 por encima del m\u00edximo recomendado (" +
+        " kg) esta por encima del maximo recomendado (" +
         pesoMaximo +
         " kg)."
       );
@@ -123,13 +123,13 @@ public class AlertaService {
       crearAlerta(
         mascota,
         TipoAlerta.EMERGENCIA,
-        "Emergencia: Frecuencia card\u00edaca inusualmente alta detectada (" + fc + SUFIJO_LPM
+        "Emergencia: Frecuencia cardiaca inusualmente alta detectada (" + fc + SUFIJO_LPM
       );
     } else if (fc < FRECUENCIA_MINIMA) {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Alerta: Frecuencia card\u00edaca inusualmente baja detectada (" + fc + SUFIJO_LPM
+        "Alerta: Frecuencia cardiaca inusualmente baja detectada (" + fc + SUFIJO_LPM
       );
     }
   }
@@ -158,7 +158,7 @@ public class AlertaService {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Alerta: Fluctuaci\u00f3n significativa en la presi\u00f3n arterial detectada."
+        "Alerta: Fluctuacion significativa en la presion arterial detectada."
       );
     }
   }
@@ -170,13 +170,13 @@ public class AlertaService {
       crearAlerta(
         mascota,
         TipoAlerta.EMERGENCIA,
-        "Emergencia: Frecuencia card\u00edaca inusualmente alta detectada (" + fc + SUFIJO_LPM
+        "Emergencia: Frecuencia cardiaca inusualmente alta detectada (" + fc + SUFIJO_LPM
       );
     } else if (fc < FRECUENCIA_MINIMA) {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Alerta: Frecuencia card\u00edaca inusualmente baja detectada (" + fc + SUFIJO_LPM
+        "Alerta: Frecuencia cardiaca inusualmente baja detectada (" + fc + SUFIJO_LPM
       );
     }
   }
@@ -205,7 +205,7 @@ public class AlertaService {
       crearAlerta(
         mascota,
         TipoAlerta.EMERGENCIA,
-        "Emergencia: Nivel de oxigenaci\u00f3n bajo detectado (" + oxigeno + "%)."
+        "Emergencia: Nivel de oxigenacion bajo detectado (" + oxigeno + "%)."
       );
     }
   }
@@ -235,7 +235,7 @@ public class AlertaService {
           mascota,
           TipoAlerta.EMERGENCIA,
           String.format(
-            "Emergencia: Cambio dr\u00e1stico de temperatura detectado. De %s°C a %s°C.",
+            "Emergencia: Cambio drastico de temperatura detectado. De %s°C a %s°C.",
             tempAnterior,
             tempActual
           )
@@ -250,7 +250,7 @@ public class AlertaService {
         crearAlerta(
           mascota,
           TipoAlerta.ALERTA,
-          "Alerta: Fluctuaci\u00f3n significativa en la presi\u00f3n arterial detectada."
+          "Alerta: Fluctuacion significativa en la presion arterial detectada."
         );
       }
     }
