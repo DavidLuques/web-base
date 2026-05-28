@@ -10,7 +10,6 @@ import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.*;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -239,8 +238,7 @@ public class AlertaServiceTest {
 
   @Test
   void debeRetornarListaVaciaSiIdMascotaEsNull() {
-    List<AlertaDto> resultado =
-            alertaService.obtenerAlertasPorMascota(null);
+    List<AlertaDto> resultado = alertaService.obtenerAlertasPorMascota(null);
     assertEquals(0, resultado.size());
     verify(repositorioAlertaMock, never()).buscarPorMascota(any());
   }

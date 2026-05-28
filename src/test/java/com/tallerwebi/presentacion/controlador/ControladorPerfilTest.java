@@ -32,6 +32,30 @@ public class ControladorPerfilTest {
   }
 
   @Test
+  public void queLosCamposDeDatosPerfilSeCargueCorrectamente() {
+    DatosPerfil datos = new DatosPerfil();
+    datos.setNombre("Juan");
+    datos.setEmail("juan@mail.com");
+    datos.setPassword("1234");
+    datos.setTelefono(1112345678L);
+    datos.setCalle("Av Corrientes 123");
+    datos.setCiudad("Buenos Aires");
+    datos.setProvincia("CABA");
+    datos.setPais("Argentina");
+    datos.setCodigoPostal("1043");
+
+    assertEquals("Juan", datos.getNombre());
+    assertEquals("juan@mail.com", datos.getEmail());
+    assertEquals("1234", datos.getPassword());
+    assertEquals(1112345678L, datos.getTelefono());
+    assertEquals("Av Corrientes 123", datos.getCalle());
+    assertEquals("Buenos Aires", datos.getCiudad());
+    assertEquals("CABA", datos.getProvincia());
+    assertEquals("Argentina", datos.getPais());
+    assertEquals("1043", datos.getCodigoPostal());
+  }
+
+  @Test
   public void queSiElUsuarioNoEstaLogueadoAlVerConfiguracionesRedirijaALogin() {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
 
