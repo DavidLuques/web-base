@@ -10,7 +10,7 @@
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-800">
   
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+  <div class="w-full max-w-xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden my-8">
     <!-- Encabezado con Ícono -->
     <div class="bg-[#2d3748] py-8 flex flex-col items-center">
         <div class="w-16 h-16 bg-indigo-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
@@ -22,7 +22,7 @@
 
     <!-- Formulario -->
     <div class="p-8">
-      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}" class="flex flex-col gap-5">
+      <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}" class="flex flex-col gap-6">
         
         <!-- Error -->
         <div th:if="${error != null}" class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg flex items-start gap-3">
@@ -30,33 +30,119 @@
             <p class="text-sm text-rose-700 font-medium" th:text="${error}"></p>
         </div>
 
-        <!-- Input Email -->
-        <div class="flex flex-col gap-1.5">
-            <label for="email" class="text-sm font-semibold text-slate-700 ml-1">Correo Electrónico</label>
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i data-lucide="mail" class="w-5 h-5 text-slate-400"></i>
+        <!-- SECCIÓN: Datos de la Cuenta -->
+        <div class="flex flex-col gap-4">
+            <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
+                <i data-lucide="user" class="w-5 h-5 text-indigo-500"></i>
+                Datos de la Cuenta
+            </h3>
+            
+            <div class="flex flex-col gap-4">
+                <!-- Input Nombre -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="nombre" class="text-sm font-semibold text-slate-700 ml-1">Nombre Completo</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="user-circle" class="w-5 h-5 text-slate-400"></i>
+                        </div>
+                        <input th:field="*{nombre}" id="nombre" type="text" required placeholder="Juan Pérez" 
+                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                    </div>
                 </div>
-                <input th:field="*{email}" id="email" type="email" required placeholder="tu@email.com" 
-                       class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Input Email -->
+                    <div class="flex flex-col gap-1.5">
+                        <label for="email" class="text-sm font-semibold text-slate-700 ml-1">Correo Electrónico</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="mail" class="w-5 h-5 text-slate-400"></i>
+                            </div>
+                            <input th:field="*{email}" id="email" type="email" required placeholder="tu@email.com" 
+                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                        </div>
+                    </div>
+
+                    <!-- Input Teléfono -->
+                    <div class="flex flex-col gap-1.5">
+                        <label for="telefono" class="text-sm font-semibold text-slate-700 ml-1">Teléfono</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="phone" class="w-5 h-5 text-slate-400"></i>
+                            </div>
+                            <input th:field="*{telefono}" id="telefono" type="tel" required placeholder="Ej: 1122334455" 
+                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Password -->
+            <div class="flex flex-col gap-1.5">
+                <label for="password" class="text-sm font-semibold text-slate-700 ml-1">Contraseña</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="lock" class="w-5 h-5 text-slate-400"></i>
+                    </div>
+                    <input th:field="*{password}" type="password" id="password" required placeholder="Crea una contraseña segura" 
+                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                </div>
             </div>
         </div>
 
-        <!-- Input Password -->
-        <div class="flex flex-col gap-1.5">
-            <label for="password" class="text-sm font-semibold text-slate-700 ml-1">Contraseña</label>
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i data-lucide="lock" class="w-5 h-5 text-slate-400"></i>
+        <!-- SECCIÓN: Dirección -->
+        <div class="flex flex-col gap-4 mt-2">
+            <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-5 h-5 text-indigo-500"></i>
+                Dirección
+            </h3>
+            
+            <!-- Calle -->
+            <div class="flex flex-col gap-1.5">
+                <label for="calle" class="text-sm font-semibold text-slate-700 ml-1">Calle y Número</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="home" class="w-5 h-5 text-slate-400"></i>
+                    </div>
+                    <input th:field="*{ubicacion.calle}" id="calle" type="text" required placeholder="Av. Principal 123" 
+                        class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
                 </div>
-                <input th:field="*{password}" type="password" id="password" required placeholder="Crea una contraseña segura" 
-                       class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Ciudad -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="ciudad" class="text-sm font-semibold text-slate-700 ml-1">Ciudad</label>
+                    <input th:field="*{ubicacion.ciudad}" id="ciudad" type="text" required placeholder="Ej: Morón" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                </div>
+                
+                <!-- Provincia -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="provincia" class="text-sm font-semibold text-slate-700 ml-1">Provincia</label>
+                    <input th:field="*{ubicacion.provincia}" id="provincia" type="text" required placeholder="Ej: Buenos Aires" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                </div>
+
+                <!-- País -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="pais" class="text-sm font-semibold text-slate-700 ml-1">País</label>
+                    <input th:field="*{ubicacion.pais}" id="pais" type="text" required placeholder="Ej: Argentina" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                </div>
+
+                <!-- Código Postal -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="codigoPostal" class="text-sm font-semibold text-slate-700 ml-1">Código Postal</label>
+                    <input th:field="*{ubicacion.codigoPostal}" id="codigoPostal" type="text" required placeholder="Ej: 1708" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-700 placeholder-slate-400 bg-slate-50 focus:bg-white shadow-sm" />
+                </div>
             </div>
         </div>
 
         <!-- Botón Submit -->
         <button id="btn-registrarme" type="submit" 
-                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md hover:shadow-lg mt-2 flex justify-center items-center gap-2 transform active:scale-[0.98]">
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md hover:shadow-lg mt-4 flex justify-center items-center gap-2 transform active:scale-[0.98]">
             Registrarme
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
