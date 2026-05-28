@@ -105,6 +105,10 @@ public class SimulacionActividadService {
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
 
+    // Evalua alertas con la lectura real, antes de que se descarte
+    alertaService.evaluarLectura(mascota, lectura);
+    alertaService.evaluarPeso(mascota);
+
     if (estado == EstadoMascota.DURMIENDO) {
       RegistroSueno registro = new RegistroSueno();
       registro.setMinutosDormido(MINUTOS_POR_TICK);
@@ -138,22 +142,7 @@ public class SimulacionActividadService {
     List<Mascota> mascotas = mascotaDao.buscarTodas();
     for (Mascota mascota : mascotas) {
       simularDetalle(mascota.getId());
-
       servicioAnalisis.simularGeolocalizacion(mascota.getId());
-
-      alertaService.evaluarPeso(mascota);
-
-      List<Analisis> historialAnalisis = repositorioAnalisis.buscarPorMascota(mascota.getId());
-
-      if (historialAnalisis != null && !historialAnalisis.isEmpty()) {
-        Analisis actual = historialAnalisis.get(0);
-
-        Analisis anterior = (historialAnalisis.size() > MINIMO_ANALISIS_ANTERIOR)
-          ? historialAnalisis.get(1)
-          : null;
-
-        alertaService.evaluarSignosVitales(mascota, actual, anterior);
-      }
     }
   }
 

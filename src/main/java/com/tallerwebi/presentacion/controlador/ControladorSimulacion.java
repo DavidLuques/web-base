@@ -1,7 +1,7 @@
 package com.tallerwebi.presentacion.controlador;
 
+import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
-import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.servicio.AlertaService;
 import com.tallerwebi.dominio.servicio.SimulacionActividadService;
 import java.util.List;
@@ -43,7 +43,7 @@ public class ControladorSimulacion {
 
   @GetMapping("/alertas/datos/{idMascota}")
   @ResponseBody
-  public List<Alerta> obtenerAlertasDeMascota(@PathVariable Long idMascota) {
+  public List<AlertaDto> obtenerAlertasDeMascota(@PathVariable Long idMascota) {
     return alertaService.obtenerAlertasPorMascota(idMascota);
   }
 
