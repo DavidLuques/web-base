@@ -36,14 +36,6 @@ public class SimulacionActividadService {
   private final RepositorioSueno repositorioSueno;
   private final AlertaService alertaService;
 
-  private static final double MET_DURMIENDO = 1.0;
-  private static final double MET_REPOSO = 1.5;
-  private static final double MET_CAMINANDO = 3.0;
-  private static final double MET_CORRIENDO = 6.0;
-  private static final double VEL_CAMINANDO = 5.0;
-  private static final double VEL_CORRIENDO = 15.0;
-  private static final int MINIMO_ANALISIS_ANTERIOR = 1;
-
   @Autowired
   public SimulacionActividadService(
     MascotaDao mascotaDao,
@@ -68,15 +60,9 @@ public class SimulacionActividadService {
   }
 
   private void registrarActividadSegunEstado(Mascota mascota, EstadoMascota estado) {
-    double velocidadKmH;
-    if (estado == EstadoMascota.CAMINANDO) {
-      velocidadKmH = VEL_CAMINANDO;
-    } else if (estado == EstadoMascota.CORRIENDO) {
-      velocidadKmH = VEL_CORRIENDO;
-    } else {
-      return;
-    }
+    if (!estado.getComportamiento().registraActividad()) return;
 
+    double velocidadKmH = estado.getComportamiento().getVelocidadKmH();
     double distanciaEnKm = velocidadKmH * (MINUTOS_POR_TICK / 60.0);
 
     Actividad actividad = new Actividad();
@@ -104,8 +90,6 @@ public class SimulacionActividadService {
     EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
-
-    // Evalua alertas con la lectura real, antes de que se descarte
     alertaService.evaluarLectura(mascota, lectura);
     alertaService.evaluarPeso(mascota);
 
@@ -214,29 +198,10 @@ public class SimulacionActividadService {
       return 0.0;
     }
 
-    double met;
-    double velocidadKmH;
-
-    switch (estado) {
-      case DURMIENDO:
-        met = MET_DURMIENDO;
-        velocidadKmH = 1.0;
-        break;
-      case REPOSO:
-        met = MET_REPOSO;
-        velocidadKmH = 1.0;
-        break;
-      case CAMINANDO:
-        met = MET_CAMINANDO;
-        velocidadKmH = VEL_CAMINANDO;
-        break;
-      default:
-        met = MET_CORRIENDO;
-        velocidadKmH = VEL_CORRIENDO;
-        break;
-    }
-
+    double met = estado.getComportamiento().getMET();
+    double velocidadKmH = estado.getComportamiento().getVelocidadKmH();
     double duracionHoras = distanciaEnKm / velocidadKmH;
+
     return Math.round(met * pesoKg * duracionHoras * 10.0) / 10.0;
   }
 

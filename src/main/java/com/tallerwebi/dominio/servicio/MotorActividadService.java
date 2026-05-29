@@ -15,10 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MotorActividadService {
 
-  private static final int ORDEN_DURMIENDO = 0;
-  private static final int ORDEN_REPOSO = 1;
-  private static final int ORDEN_CAMINANDO = 2;
-  private static final int ORDEN_CORRIENDO = 3;
   private static final double PROBABILIDAD_MEDIA = 0.5;
 
   private final RangoVitalDao rangoVitalDao;
@@ -40,13 +36,10 @@ public class MotorActividadService {
     );
     double rotacion = calcularMagnitud(lectura.getGyroX(), lectura.getGyroY(), lectura.getGyroZ());
 
-    int min = rango.getFrecuenciaMinima();
-    int max = rango.getFrecuenciaMaxima();
-    int rangoFreq = max - min;
-
-    int limiteDormido = min + (rangoFreq / 4);
-    int limiteReposo = min + (rangoFreq / 2);
-    int limiteCaminando = min + ((rangoFreq * 3) / 4);
+    int rangoFreq = rango.getFrecuenciaMaxima() - rango.getFrecuenciaMinima();
+    int limiteDormido = rango.getFrecuenciaMinima() + (rangoFreq / 4);
+    int limiteReposo = rango.getFrecuenciaMinima() + (rangoFreq / 2);
+    int limiteCaminando = rango.getFrecuenciaMinima() + ((rangoFreq * 3) / 4);
 
     EstadoMascota nuevoEstado = evaluarEstado(
       frecuencia,
@@ -60,6 +53,32 @@ public class MotorActividadService {
     return aplicarTransicionRealista(mascota.getId(), nuevoEstado);
   }
 
+  private EstadoMascota evaluarEstado(
+    int frecuencia,
+    double movimiento,
+    double rotacion,
+    int limiteDormido,
+    int limiteReposo,
+    int limiteCaminando
+  ) {
+    if (
+      EstadoMascota.DURMIENDO
+        .getComportamiento()
+        .coincideConLectura(frecuencia, movimiento, rotacion, limiteDormido)
+    ) return EstadoMascota.DURMIENDO;
+    if (
+      EstadoMascota.REPOSO
+        .getComportamiento()
+        .coincideConLectura(frecuencia, movimiento, rotacion, limiteReposo)
+    ) return EstadoMascota.REPOSO;
+    if (
+      EstadoMascota.CAMINANDO
+        .getComportamiento()
+        .coincideConLectura(frecuencia, movimiento, rotacion, limiteCaminando)
+    ) return EstadoMascota.CAMINANDO;
+    return EstadoMascota.CORRIENDO;
+  }
+
   private EstadoMascota aplicarTransicionRealista(Long idMascota, EstadoMascota nuevoEstado) {
     EstadoMascota anterior = memoriaEstados.get(idMascota);
 
@@ -71,20 +90,16 @@ public class MotorActividadService {
     EstadoMascota estadoFinal;
 
     if (nuevoEstado == anterior) {
-      int orden = ordenDe(anterior);
-
-      // Reemplazamos el 0 por la constante
-      if (orden == ORDEN_DURMIENDO) {
-        estadoFinal = estadoConOrden(1);
-      } else if (orden >= ORDEN_CORRIENDO) {
-        estadoFinal = estadoConOrden(orden - 1);
+      int orden = anterior.getComportamiento().getOrden();
+      if (orden == 0) {
+        estadoFinal = EstadoMascota.porOrden(1);
+      } else if (orden >= EstadoMascota.CORRIENDO.getComportamiento().getOrden()) {
+        estadoFinal = EstadoMascota.porOrden(orden - 1);
       } else {
-        // Reemplazamos el 0.5 por la constante
-        if (Math.random() > PROBABILIDAD_MEDIA) {
-          estadoFinal = estadoConOrden(orden + 1);
-        } else {
-          estadoFinal = estadoConOrden(orden - 1);
-        }
+        estadoFinal =
+          Math.random() > PROBABILIDAD_MEDIA
+            ? EstadoMascota.porOrden(orden + 1)
+            : EstadoMascota.porOrden(orden - 1);
       }
     } else {
       estadoFinal = avanzarUnPaso(anterior, nuevoEstado);
@@ -95,78 +110,18 @@ public class MotorActividadService {
   }
 
   private EstadoMascota avanzarUnPaso(EstadoMascota anterior, EstadoMascota objetivo) {
-    int ordenAnterior = ordenDe(anterior);
-    int ordenObjetivo = ordenDe(objetivo);
+    int ordenAnterior = anterior.getComportamiento().getOrden();
+    int ordenObjetivo = objetivo.getComportamiento().getOrden();
 
-    if (ordenObjetivo > ordenAnterior) {
-      return estadoConOrden(ordenAnterior + 1);
-    } else if (ordenObjetivo < ordenAnterior) {
-      return estadoConOrden(ordenAnterior - 1);
-    } else {
-      return anterior;
-    }
+    if (ordenObjetivo > ordenAnterior) return EstadoMascota.porOrden(ordenAnterior + 1);
+    if (ordenObjetivo < ordenAnterior) return EstadoMascota.porOrden(ordenAnterior - 1);
+    return anterior;
   }
 
-  private int ordenDe(EstadoMascota estado) {
-    switch (estado) {
-      case DURMIENDO:
-        return ORDEN_DURMIENDO;
-      case REPOSO:
-        return ORDEN_REPOSO;
-      case CAMINANDO:
-        return ORDEN_CAMINANDO;
-      default:
-        return ORDEN_CORRIENDO;
-    }
-  }
-
-  private EstadoMascota estadoConOrden(int orden) {
-    switch (orden) {
-      case ORDEN_DURMIENDO:
-        return EstadoMascota.DURMIENDO;
-      case ORDEN_REPOSO:
-        return EstadoMascota.REPOSO;
-      case ORDEN_CAMINANDO:
-        return EstadoMascota.CAMINANDO;
-      default:
-        return EstadoMascota.CORRIENDO;
-    }
-  }
-
-  private EstadoMascota evaluarEstado(
-    int frecuencia,
-    double movimiento,
-    double rotacion,
-    int limiteDormido,
-    int limiteReposo,
-    int limiteCaminando
-  ) {
-    if (esDurmiendo(frecuencia, movimiento, rotacion, limiteDormido)) {
-      return EstadoMascota.DURMIENDO;
-    }
-    if (esEnReposo(frecuencia, movimiento, rotacion, limiteReposo)) {
-      return EstadoMascota.REPOSO;
-    }
-    if (esCaminando(frecuencia, movimiento, rotacion, limiteCaminando)) {
-      return EstadoMascota.CAMINANDO;
-    }
-    return EstadoMascota.CORRIENDO;
-  }
-
-  private boolean esDurmiendo(int frecuencia, double movimiento, double rotacion, int limite) {
-    return frecuencia <= limite && movimiento < 2 && rotacion < 1;
-  }
-
-  private boolean esEnReposo(int frecuencia, double movimiento, double rotacion, int limite) {
-    return frecuencia <= limite && movimiento < 5 && rotacion < 2.5;
-  }
-
-  private boolean esCaminando(int frecuencia, double movimiento, double rotacion, int limite) {
-    return frecuencia <= limite && movimiento < 9 && rotacion < 4;
-  }
-
-  private double calcularMagnitud(Double coordX, Double coordY, Double coordZ) {
-    return Math.sqrt(coordX * coordX + coordY * coordY + coordZ * coordZ);
+  private double calcularMagnitud(Double coordenadaX, Double coordenadaY, Double coordenadaZ) {
+    return Math.sqrt(
+      coordenadaX * coordenadaX + coordenadaY * coordenadaY + coordenadaZ * coordenadaZ
+    );
   }
 
   public void limpiarMemoria() {

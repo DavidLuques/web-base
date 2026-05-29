@@ -13,36 +13,9 @@ public class SimuladorCollarService {
   private static final double LIMITE_DORMIDO = 0.25;
   private static final double LIMITE_REPOSO = 0.50;
   private static final double LIMITE_CAMINANDO = 0.75;
-
-  private static final double FACTOR_FRECUENCIA_DORMIDO = 0.15;
-  private static final double FACTOR_FRECUENCIA_REPOSO = 0.45;
-  private static final double FACTOR_FRECUENCIA_CAMINANDO = 0.70;
-  private static final double FACTOR_FRECUENCIA_CORRIENDO = 0.90;
   private static final double MAX_VARIACION_FRECUENCIA = 3.0;
-
-  private static final double MAX_MOVIMIENTO_DORMIDO = 0.8;
-  private static final double MAX_MOVIMIENTO_REPOSO = 3.0;
-  private static final double MAX_MOVIMIENTO_CAMINANDO = 7.0;
-  private static final double BASE_MOVIMIENTO_CORRIENDO = 8.0;
-  private static final double RANGO_MOVIMIENTO_CORRIENDO = 4.0;
-
-  private static final double MAX_GYRO_DORMIDO = 0.4;
-  private static final double MAX_GYRO_REPOSO = 1.5;
-  private static final double MAX_GYRO_CAMINANDO = 3.5;
-  private static final double BASE_GYRO_CORRIENDO = 4.0;
-  private static final double RANGO_GYRO_CORRIENDO = 2.0;
-
-  private static final double TEMP_BASE_DORMIDO = 38.0;
-  private static final double TEMP_BASE_REPOSO = 38.2;
-  private static final double TEMP_BASE_CAMINANDO = 38.5;
-  private static final double TEMP_BASE_CORRIENDO = 39.0;
-  private static final double TEMP_MAX_VARIACION = 0.15;
-
-  private static final double FACTOR_PRESION_DORMIDO = 0.15;
-  private static final double FACTOR_PRESION_REPOSO = 0.40;
-  private static final double FACTOR_PRESION_CAMINANDO = 0.65;
-  private static final double FACTOR_PRESION_CORRIENDO = 0.90;
   private static final double MAX_VARIACION_PRESION = 2.0;
+  private static final double TEMP_MAX_VARIACION = 0.15;
 
   private Double latitudActual = -34.7222;
   private Double longitudActual = -58.5250;
@@ -51,24 +24,22 @@ public class SimuladorCollarService {
   private Double diastolicaActual = null;
 
   private final Map<Long, Double> frecuenciaPorMascota = new HashMap<>();
-
   private final Random random = new Random();
 
   public LecturaSensor generarLectura(Integer frecuenciaMinima, Integer frecuenciaMaxima) {
-    EstadoMascota estadoSimulado = sortearEstado();
-
+    EstadoMascota estado = sortearEstado();
     LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(
-      generarFrecuenciaSegun(estadoSimulado, frecuenciaMinima, frecuenciaMaxima)
-    );
-    lectura.setAccelX(generarMovimientoSegun(estadoSimulado));
-    lectura.setAccelY(generarMovimientoSegun(estadoSimulado));
-    lectura.setAccelZ(generarMovimientoSegun(estadoSimulado));
-    lectura.setGyroX(generarGyroSegun(estadoSimulado));
-    lectura.setGyroY(generarGyroSegun(estadoSimulado));
-    lectura.setGyroZ(generarGyroSegun(estadoSimulado));
 
-    actualizarGpsSegun(estadoSimulado);
+    lectura.setFrecuenciaCardiaca(
+      generarFrecuenciaSegun(estado, frecuenciaMinima, frecuenciaMaxima)
+    );
+    lectura.setAccelX(estado.getComportamiento().generarMovimiento(random));
+    lectura.setAccelY(estado.getComportamiento().generarMovimiento(random));
+    lectura.setAccelZ(estado.getComportamiento().generarMovimiento(random));
+    lectura.setGyroX(estado.getComportamiento().generarGyro(random));
+    lectura.setGyroY(estado.getComportamiento().generarGyro(random));
+    lectura.setGyroZ(estado.getComportamiento().generarGyro(random));
+    actualizarGpsSegun(estado);
     lectura.setLatitud(latitudActual);
     lectura.setLongitud(longitudActual);
 
@@ -85,28 +56,26 @@ public class SimuladorCollarService {
     Integer diastolicaMinima,
     Integer diastolicaMaxima
   ) {
-    EstadoMascota estadoSimulado = sortearEstado();
+    EstadoMascota estado = sortearEstado();
 
     if (sistolicaActual == null) {
-      sistolicaActual =
-        (double) generarPresionSegun(estadoSimulado, sistolicaMinima, sistolicaMaxima);
-      diastolicaActual =
-        (double) generarPresionSegun(estadoSimulado, diastolicaMinima, diastolicaMaxima);
+      sistolicaActual = (double) generarPresionSegun(estado, sistolicaMinima, sistolicaMaxima);
+      diastolicaActual = (double) generarPresionSegun(estado, diastolicaMinima, diastolicaMaxima);
     }
 
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(
-      obtenerFrecuenciaIncremental(idMascota, estadoSimulado, frecuenciaMinima, frecuenciaMaxima)
+      obtenerFrecuenciaIncremental(idMascota, estado, frecuenciaMinima, frecuenciaMaxima)
     );
-    lectura.setAccelX(generarMovimientoSegun(estadoSimulado));
-    lectura.setAccelY(generarMovimientoSegun(estadoSimulado));
-    lectura.setAccelZ(generarMovimientoSegun(estadoSimulado));
-    lectura.setGyroX(generarGyroSegun(estadoSimulado));
-    lectura.setGyroY(generarGyroSegun(estadoSimulado));
-    lectura.setGyroZ(generarGyroSegun(estadoSimulado));
+    lectura.setAccelX(estado.getComportamiento().generarMovimiento(random));
+    lectura.setAccelY(estado.getComportamiento().generarMovimiento(random));
+    lectura.setAccelZ(estado.getComportamiento().generarMovimiento(random));
+    lectura.setGyroX(estado.getComportamiento().generarGyro(random));
+    lectura.setGyroY(estado.getComportamiento().generarGyro(random));
+    lectura.setGyroZ(estado.getComportamiento().generarGyro(random));
 
     actualizarPresionSegun(
-      estadoSimulado,
+      estado,
       sistolicaMinima,
       sistolicaMaxima,
       diastolicaMinima,
@@ -115,10 +84,10 @@ public class SimuladorCollarService {
     lectura.setPresionSistolica(sistolicaActual.intValue());
     lectura.setPresionDiastolica(diastolicaActual.intValue());
 
-    actualizarTemperaturaSegun(estadoSimulado);
+    actualizarTemperaturaSegun(estado);
     lectura.setTemperatura(Math.round(temperaturaActual * 10.0) / 10.0);
 
-    actualizarGpsSegun(estadoSimulado);
+    actualizarGpsSegun(estado);
     lectura.setLatitud(latitudActual);
     lectura.setLongitud(longitudActual);
 
@@ -135,38 +104,90 @@ public class SimuladorCollarService {
     if (sistolicaActual == null) sistolicaActual = 120.0;
     if (diastolicaActual == null) diastolicaActual = 80.0;
 
+    EstadoMascota corriendo = EstadoMascota.CORRIENDO;
     LecturaSensor lectura = new LecturaSensor();
 
-    int frecuenciaCritica = frecuenciaMaxima + 40; // Taquicardia severa
+    int frecuenciaCritica = frecuenciaMaxima + 40;
     frecuenciaPorMascota.put(idMascota, (double) frecuenciaCritica);
     lectura.setFrecuenciaCardiaca(frecuenciaCritica);
 
-    lectura.setAccelX(generarMovimientoSegun(EstadoMascota.CORRIENDO) * 2);
-    lectura.setAccelY(generarMovimientoSegun(EstadoMascota.CORRIENDO) * 2);
-    lectura.setAccelZ(generarMovimientoSegun(EstadoMascota.CORRIENDO) * 2);
-    lectura.setGyroX(generarGyroSegun(EstadoMascota.CORRIENDO) * 2);
-    lectura.setGyroY(generarGyroSegun(EstadoMascota.CORRIENDO) * 2);
-    lectura.setGyroZ(generarGyroSegun(EstadoMascota.CORRIENDO) * 2);
+    lectura.setAccelX(corriendo.getComportamiento().generarMovimiento(random) * 2);
+    lectura.setAccelY(corriendo.getComportamiento().generarMovimiento(random) * 2);
+    lectura.setAccelZ(corriendo.getComportamiento().generarMovimiento(random) * 2);
+    lectura.setGyroX(corriendo.getComportamiento().generarGyro(random) * 2);
+    lectura.setGyroY(corriendo.getComportamiento().generarGyro(random) * 2);
+    lectura.setGyroZ(corriendo.getComportamiento().generarGyro(random) * 2);
 
-    sistolicaActual = sistolicaMaxima + 30.0; // Hipertensión
+    sistolicaActual = sistolicaMaxima + 30.0;
     diastolicaActual = diastolicaMaxima + 20.0;
     lectura.setPresionSistolica(sistolicaActual.intValue());
     lectura.setPresionDiastolica(diastolicaActual.intValue());
 
-    temperaturaActual = 41.5; // Fiebre muy alta / Golpe de calor
+    temperaturaActual = 41.5;
     lectura.setTemperatura(temperaturaActual);
 
-    actualizarGpsSegun(EstadoMascota.CORRIENDO);
+    actualizarGpsSegun(corriendo);
     lectura.setLatitud(latitudActual);
     lectura.setLongitud(longitudActual);
 
     return lectura;
   }
 
-  public int actualizarFrecuencia(Long idMascota, EstadoMascota estadoActual, int min, int max) {
-    int nueva = obtenerFrecuenciaIncremental(idMascota, estadoActual, min, max);
+  public int actualizarFrecuencia(Long idMascota, EstadoMascota estado, int min, int max) {
+    int nueva = obtenerFrecuenciaIncremental(idMascota, estado, min, max);
     frecuenciaPorMascota.put(idMascota, (double) nueva);
     return nueva;
+  }
+
+  // ── privados ──────────────────────────────────────────────
+
+  private EstadoMascota sortearEstado() {
+    double probabilidadEstado = random.nextDouble();
+    if (probabilidadEstado < LIMITE_DORMIDO) return EstadoMascota.DURMIENDO;
+    if (probabilidadEstado < LIMITE_REPOSO) return EstadoMascota.REPOSO;
+    if (probabilidadEstado < LIMITE_CAMINANDO) return EstadoMascota.CAMINANDO;
+    return EstadoMascota.CORRIENDO;
+  }
+
+  private int generarFrecuenciaSegun(EstadoMascota estado, int min, int max) {
+    return min + (int) ((max - min) * estado.getComportamiento().getFactorFrecuencia());
+  }
+
+  private int generarPresionSegun(EstadoMascota estado, int min, int max) {
+    return min + (int) ((max - min) * estado.getComportamiento().getFactorPresion());
+  }
+
+  private void actualizarTemperaturaSegun(EstadoMascota estado) {
+    double objetivo = estado.getComportamiento().getTemperaturaBase();
+    double variacion = (random.nextDouble() - 0.5) * TEMP_MAX_VARIACION;
+    temperaturaActual += (objetivo - temperaturaActual) * 0.1 + variacion;
+    temperaturaActual = Math.max(37.5, Math.min(39.9, temperaturaActual));
+  }
+
+  private void actualizarGpsSegun(EstadoMascota estado) {
+    double[] coords = { latitudActual, longitudActual };
+    estado.getComportamiento().actualizarGps(coords, random);
+    latitudActual = coords[0];
+    longitudActual = coords[1];
+  }
+
+  private void actualizarPresionSegun(
+    EstadoMascota estado,
+    int sistolicaMin,
+    int sistolicaMax,
+    int diastolicaMin,
+    int diastolicaMax
+  ) {
+    double objSis = generarPresionSegun(estado, sistolicaMin, sistolicaMax);
+    double objDias = generarPresionSegun(estado, diastolicaMin, diastolicaMax);
+
+    sistolicaActual +=
+    (objSis - sistolicaActual) * 0.1 + (random.nextDouble() - 0.5) * MAX_VARIACION_PRESION;
+    diastolicaActual +=
+    (objDias - diastolicaActual) * 0.1 + (random.nextDouble() - 0.5) * MAX_VARIACION_PRESION;
+
+    sistolicaActual = Math.max(sistolicaMin, Math.min(sistolicaMax, sistolicaActual));
+    diastolicaActual = Math.max(diastolicaMin, Math.min(diastolicaMax, diastolicaActual));
   }
 
   private int obtenerFrecuenciaIncremental(Long idMascota, EstadoMascota estado, int min, int max) {
@@ -180,121 +201,9 @@ public class SimuladorCollarService {
     double actual = frecuenciaPorMascota.get(idMascota);
     double variacion = (random.nextDouble() - 0.5) * MAX_VARIACION_FRECUENCIA;
     double nueva = actual + (objetivo - actual) * 0.1 + variacion;
-
     nueva = Math.max(min, Math.min(max, nueva));
+
     frecuenciaPorMascota.put(idMascota, nueva);
     return (int) nueva;
-  }
-
-  private EstadoMascota sortearEstado() {
-    double probabilidad = random.nextDouble();
-    if (probabilidad < LIMITE_DORMIDO) return EstadoMascota.DURMIENDO; else if (
-      probabilidad < LIMITE_REPOSO
-    ) return EstadoMascota.REPOSO; else if (
-      probabilidad < LIMITE_CAMINANDO
-    ) return EstadoMascota.CAMINANDO; else return EstadoMascota.CORRIENDO;
-  }
-
-  private int generarFrecuenciaSegun(EstadoMascota estado, int min, int max) {
-    int rango = max - min;
-    switch (estado) {
-      case DURMIENDO:
-        return min + (int) (rango * FACTOR_FRECUENCIA_DORMIDO);
-      case REPOSO:
-        return min + (int) (rango * FACTOR_FRECUENCIA_REPOSO);
-      case CAMINANDO:
-        return min + (int) (rango * FACTOR_FRECUENCIA_CAMINANDO);
-      default:
-        return min + (int) (rango * FACTOR_FRECUENCIA_CORRIENDO);
-    }
-  }
-
-  private int generarPresionSegun(EstadoMascota estado, int min, int max) {
-    int rango = max - min;
-    switch (estado) {
-      case DURMIENDO:
-        return min + (int) (rango * FACTOR_PRESION_DORMIDO);
-      case REPOSO:
-        return min + (int) (rango * FACTOR_PRESION_REPOSO);
-      case CAMINANDO:
-        return min + (int) (rango * FACTOR_PRESION_CAMINANDO);
-      default:
-        return min + (int) (rango * FACTOR_PRESION_CORRIENDO);
-    }
-  }
-
-  private void actualizarPresionSegun(
-    EstadoMascota estado,
-    int sistolicaMin,
-    int sistolicaMax,
-    int diastolicaMin,
-    int diastolicaMax
-  ) {
-    double objetivoSistolica = generarPresionSegun(estado, sistolicaMin, sistolicaMax);
-    double objetivoDiastolica = generarPresionSegun(estado, diastolicaMin, diastolicaMax);
-
-    double variacionSistolica = (random.nextDouble() - 0.5) * MAX_VARIACION_PRESION;
-    double variacionDiastolica = (random.nextDouble() - 0.5) * MAX_VARIACION_PRESION;
-
-    sistolicaActual += (objetivoSistolica - sistolicaActual) * 0.1 + variacionSistolica;
-    diastolicaActual += (objetivoDiastolica - diastolicaActual) * 0.1 + variacionDiastolica;
-
-    sistolicaActual = Math.max(sistolicaMin, Math.min(sistolicaMax, sistolicaActual));
-    diastolicaActual = Math.max(diastolicaMin, Math.min(diastolicaMax, diastolicaActual));
-  }
-
-  private void actualizarTemperaturaSegun(EstadoMascota estado) {
-    double objetivo;
-    switch (estado) {
-      case DURMIENDO:
-        objetivo = TEMP_BASE_DORMIDO;
-        break;
-      case REPOSO:
-        objetivo = TEMP_BASE_REPOSO;
-        break;
-      case CAMINANDO:
-        objetivo = TEMP_BASE_CAMINANDO;
-        break;
-      default:
-        objetivo = TEMP_BASE_CORRIENDO;
-        break;
-    }
-    double variacion = (random.nextDouble() - 0.5) * TEMP_MAX_VARIACION;
-    temperaturaActual += (objetivo - temperaturaActual) * 0.1 + variacion;
-    temperaturaActual = Math.max(37.5, Math.min(39.9, temperaturaActual));
-  }
-
-  private Double generarMovimientoSegun(EstadoMascota estado) {
-    switch (estado) {
-      case DURMIENDO:
-        return random.nextDouble() * MAX_MOVIMIENTO_DORMIDO;
-      case REPOSO:
-        return random.nextDouble() * MAX_MOVIMIENTO_REPOSO;
-      case CAMINANDO:
-        return random.nextDouble() * MAX_MOVIMIENTO_CAMINANDO;
-      default:
-        return BASE_MOVIMIENTO_CORRIENDO + random.nextDouble() * RANGO_MOVIMIENTO_CORRIENDO;
-    }
-  }
-
-  private Double generarGyroSegun(EstadoMascota estado) {
-    switch (estado) {
-      case DURMIENDO:
-        return random.nextDouble() * MAX_GYRO_DORMIDO;
-      case REPOSO:
-        return random.nextDouble() * MAX_GYRO_REPOSO;
-      case CAMINANDO:
-        return random.nextDouble() * MAX_GYRO_CAMINANDO;
-      default:
-        return BASE_GYRO_CORRIENDO + random.nextDouble() * RANGO_GYRO_CORRIENDO;
-    }
-  }
-
-  private void actualizarGpsSegun(EstadoMascota estado) {
-    if (estado == EstadoMascota.CAMINANDO || estado == EstadoMascota.CORRIENDO) {
-      double factor = (estado == EstadoMascota.CORRIENDO) ? 0.002 : 0.001;
-      latitudActual += (random.nextDouble() - 0.5) * factor;
-      longitudActual += (random.nextDouble() - 0.5) * factor;
-    }
   }
 }

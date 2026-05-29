@@ -29,8 +29,6 @@ public class VistaLoginE2E {
       playwright
         .chromium()
         .launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(1000));
-    //browser = playwright.chromium().launch();
-    //browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(500));
   }
 
   @AfterAll

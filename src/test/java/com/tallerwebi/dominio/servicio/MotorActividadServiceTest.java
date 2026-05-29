@@ -168,6 +168,14 @@ public class MotorActividadServiceTest {
   }
 
   @Test
+  void deberiaDeterminarQueEsDurmiendoConFrecuenciaBajaYPocoMovimiento() {
+    boolean resultado = EstadoMascota.DURMIENDO
+      .getComportamiento()
+      .coincideConLectura(60, 0.5, 0.3, 80);
+    assertThat(resultado, equalTo(true));
+  }
+
+  @Test
   public void dadaUnaMascotaMedianaYUnaLecturaConActividadModeradaCuandoAnalizoDevuelveCaminando() {
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(108);

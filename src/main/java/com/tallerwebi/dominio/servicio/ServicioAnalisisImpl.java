@@ -2,7 +2,6 @@ package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
-import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Actividad;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
@@ -71,14 +70,9 @@ public class ServicioAnalisisImpl implements ServicioAnalisis {
         )
         : 0.0;
 
-      Analisis nuevoAnalisis = armarEntidad(lecturaCruda, perro);
-      repositorioAnalisis.guardar(nuevoAnalisis);
+      repositorioAnalisis.guardar(armarEntidad(lecturaCruda, perro));
 
-      boolean estaActivo =
-        perro.getEstadoActual() == EstadoMascota.CAMINANDO ||
-        perro.getEstadoActual() == EstadoMascota.CORRIENDO;
-
-      if (distancia > 0 && estaActivo) {
+      if (distancia > 0 && perro.getEstadoActual().getComportamiento().registraActividad()) {
         Actividad actividad = new Actividad();
         actividad.setDistanciaRecorrida(distancia);
         actividad.setFechaYHora(LocalDateTime.now());
