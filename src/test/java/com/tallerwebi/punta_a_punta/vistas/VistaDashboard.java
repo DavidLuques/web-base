@@ -11,7 +11,7 @@ public class VistaDashboard {
   }
 
   public void navegar(Long idMascota) {
-    page.navigate("http://localhost:8080/spring/simulacion/dashboard/" + idMascota);
+    page.navigate("http://localhost:8080/spring/analisis/dashboard/" + idMascota);
   }
 
   public String obtenerNombreDeMascota() {
@@ -28,7 +28,7 @@ public class VistaDashboard {
   }
 
   public void darClickEnIconoActividad() {
-    page.locator("a[href*='/simulacion/vista/']").click();
+    page.locator("a[href*='/analisis/vista/']").click();
   }
 
   public boolean graficosEstanVisibles() {

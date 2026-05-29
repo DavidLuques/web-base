@@ -78,12 +78,12 @@ public class VistaDashboardE2E {
       .pages()
       .get(0)
       .waitForURL(url ->
-        url.matches(".*\\/spring\\/simulacion\\/vista\\/\\d+(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
+        url.matches(".*\\/spring\\/analisis\\/vista\\/\\d+(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
       );
     String urlActual = context.pages().get(0).url();
     assertThat(
       urlActual,
-      matchesPattern(".*\\/spring\\/simulacion\\/vista\\/\\d+(?:;jsessionid=[^/\\s]+)?$")
+      matchesPattern(".*\\/spring\\/analisis\\/vista\\/\\d+(?:;jsessionid=[^/\\s]+)?$")
     );
   }
 

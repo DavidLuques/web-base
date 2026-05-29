@@ -70,7 +70,7 @@ public class ControladorLoginTest {
     ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
     // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/simulacion/dashboard/1"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/analisis/dashboard/1"));
     verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontrado.getRol());
     verify(sessionMock, times(1)).setAttribute("ID_USUARIO", 1L);
   }
@@ -86,7 +86,7 @@ public class ControladorLoginTest {
     ModelAndView modelAndView = controladorLogin.registrarme(usuario, requestMock);
 
     // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/simulacion/dashboard/1"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/analisis/dashboard/1"));
     verify(servicioLoginMock, times(1)).registrar(usuario);
     verify(sessionMock, times(1)).setAttribute("ROL", "USER");
     verify(sessionMock, times(1)).setAttribute("ID_USUARIO", 2L);

@@ -46,7 +46,7 @@ public class ControladorLogin {
 
       List<Mascota> mascotas = servicioLogin.buscarMascotasPorUsuario(usuarioBuscado.getId());
       Long idMascota = (mascotas != null && !mascotas.isEmpty()) ? mascotas.get(0).getId() : 1L;
-      return new ModelAndView("redirect:/simulacion/dashboard/" + idMascota);
+      return new ModelAndView("redirect:/analisis/dashboard/" + idMascota);
     } else {
       /* Se instancia el ModelMap solo cuando es necesario (en el flujo de error) para evitar anomalías en el flujo de datos (DU-anomaly de PMD) */
       ModelMap model = new ModelMap();
@@ -64,7 +64,7 @@ public class ControladorLogin {
       servicioLogin.registrar(usuario);
       request.getSession().setAttribute("ROL", usuario.getRol());
       request.getSession().setAttribute("ID_USUARIO", usuario.getId());
-      return new ModelAndView("redirect:/simulacion/dashboard/1");
+      return new ModelAndView("redirect:/analisis/dashboard/1");
     } catch (UsuarioExistente e) {
       ModelMap model = new ModelMap();
       model.put("error", "El usuario ya existe");

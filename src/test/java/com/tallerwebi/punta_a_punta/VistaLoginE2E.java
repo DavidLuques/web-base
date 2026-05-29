@@ -83,7 +83,7 @@ public class VistaLoginE2E {
   @Test
   void deberiaRedirigirALoginSiElUsuarioIntentaAccederARutaProtegida()
     throws MalformedURLException {
-    context.pages().get(0).navigate("http://localhost:8080/spring/simulacion/vista/1");
+    context.pages().get(0).navigate("http://localhost:8080/spring/analisis/vista/1");
     dadoQueElUsuarioEstaEnLaVistaDeLogin();
   }
 
@@ -117,12 +117,12 @@ public class VistaLoginE2E {
       .pages()
       .get(0)
       .waitForURL(url ->
-        url.matches(".*\\/spring\\/simulacion\\/dashboard\\/\\d+(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
+        url.matches(".*\\/spring\\/analisis\\/dashboard\\/\\d+(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
       );
     URL url = vistaLogin.obtenerURLActual();
     assertThat(
       url.getPath(),
-      matchesPattern("^/spring/simulacion/dashboard/\\d+(?:;jsessionid=[^/\\s]+)?$")
+      matchesPattern("^/spring/analisis/dashboard/\\d+(?:;jsessionid=[^/\\s]+)?$")
     );
   }
 

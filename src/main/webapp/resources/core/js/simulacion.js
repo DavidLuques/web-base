@@ -17,7 +17,7 @@ let nivelesHoras = {};
 /* ─────────────────────────────────────────
    Persistencia en sessionStorage
 ───────────────────────────────────────── */
-const STORAGE_KEY = `simulacion_${idMascota}`;
+const STORAGE_KEY = `analisis_${idMascota}`;
 
 function cargarEstado() {
   try {
@@ -326,7 +326,7 @@ function actualizarBadge(estado) {
    Polling principal
 ───────────────────────────────────────── */
 function actualizarEstado() {
-  fetch("/spring/simulacion/estado/" + idMascota)
+  fetch("/spring/analisis/estado/" + idMascota)
     .then(response => response.json())
     .then(data => {
 

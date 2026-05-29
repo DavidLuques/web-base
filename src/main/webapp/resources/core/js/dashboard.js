@@ -102,7 +102,7 @@ chartLineaPresion.render();
 chartLineaPasos.render();
 
 function conectarYActualizar() {
-  fetch("/spring/simulacion/estado/" + idMascota)
+  fetch("/spring/analisis/estado/" + idMascota)
     .then(function(response) { return response.json(); })
     .then(function(data) {
       if (data.nombreMascota) document.getElementById("nombre-mascota").textContent = data.nombreMascota;

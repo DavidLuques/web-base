@@ -6,15 +6,15 @@
     <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
   </div>
   <nav class="flex flex-col gap-6 w-full">
-    <a th:href="@{/simulacion/dashboard/{id}(id=${idMascota})}"
+    <a th:href="@{/analisis/dashboard/{id}(id=${idMascota})}"
        th:class="${paginaActiva == 'dashboard'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
       <i th:class="${paginaActiva == 'dashboard'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="home"></i>
     </a>
-    <a th:href="@{/simulacion/vista/{id}(id=${idMascota})}"
+    <a th:href="@{/analisis/vista/{id}(id=${idMascota})}"
        th:class="${paginaActiva == 'vista'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
       <i th:class="${paginaActiva == 'vista'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="activity"></i>
     </a>
-    <a th:href="@{/simulacion/alertas/{id}(id=${idMascota})}"
+    <a th:href="@{/analisis/alertas/{id}(id=${idMascota})}"
        th:class="${paginaActiva == 'alertas'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
       <i th:class="${paginaActiva == 'alertas'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="bell"></i>
     </a>

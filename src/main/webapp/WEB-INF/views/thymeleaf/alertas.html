@@ -16,10 +16,10 @@
         <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
     </div>
     <nav class="flex flex-col gap-6 w-full">
-        <a th:href="@{/simulacion/dashboard/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+        <a th:href="@{/analisis/dashboard/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
             <i data-lucide="home" class="w-6 h-6"></i>
         </a>
-        <a th:href="@{/simulacion/vista/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
+        <a th:href="@{/analisis/vista/{id}(id=${idMascota})}" class="w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors">
             <i data-lucide="activity" class="w-6 h-6"></i>
         </a>
         <a href="#" class="w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400">
@@ -84,7 +84,7 @@
 
     function cargarAlertasPantalla() {
         // Petición al endpoint de datos JSON
-        fetch("/spring/simulacion/alertas/datos/" + idMascota)
+        fetch("/spring/analisis/alertas/datos/" + idMascota)
             .then(response => {
                 if (!response.ok) {
                     throw new Error("Error en el servidor. Código HTTP: " + response.status);
