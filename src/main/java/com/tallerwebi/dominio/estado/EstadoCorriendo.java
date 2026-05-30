@@ -15,6 +15,11 @@ public class EstadoCorriendo implements ComportamientoEstado {
   }
 
   @Override
+  public boolean registraSueno() {
+    return false;
+  }
+
+  @Override
   public void actualizarGps(double[] coordenada, Random random) {
     coordenada[0] += (random.nextDouble() - 0.5) * 0.002;
     coordenada[1] += (random.nextDouble() - 0.5) * 0.002;

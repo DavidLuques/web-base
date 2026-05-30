@@ -14,4 +14,5 @@ public interface ComportamientoEstado {
   double getMET();
   double getVelocidadKmH();
   int getOrden();
+  boolean registraSueno();
 }

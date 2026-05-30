@@ -64,4 +64,9 @@ public class EstadoCaminando implements ComportamientoEstado {
   public boolean registraActividad() {
     return true;
   }
+
+  @Override
+  public boolean registraSueno() {
+    return false;
+  }
 }

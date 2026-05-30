@@ -15,6 +15,11 @@ public class EstadoReposo implements ComportamientoEstado {
   }
 
   @Override
+  public boolean registraSueno() {
+    return false;
+  }
+
+  @Override
   public void actualizarGps(double[] coordenada, Random random) {
     /* no se mueve */
   }
