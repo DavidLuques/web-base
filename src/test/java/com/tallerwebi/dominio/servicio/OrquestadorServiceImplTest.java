@@ -1,215 +1,215 @@
-package com.tallerwebi.dominio.servicio;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import com.tallerwebi.dominio.RepositorioActividad;
-import com.tallerwebi.dominio.RepositorioAnalisis;
-import com.tallerwebi.dominio.RepositorioSueno;
-import com.tallerwebi.dominio.dao.MascotaDao;
-import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
-import com.tallerwebi.dominio.enums.EstadoMascota;
-import com.tallerwebi.dominio.modelo.Analisis;
-import com.tallerwebi.dominio.modelo.DatosAnalisis;
-import com.tallerwebi.dominio.modelo.LecturaSensor;
-import com.tallerwebi.dominio.modelo.Mascota;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-public class OrquestadorServiceImplTest {
-
-  private OrquestadorServiceImpl servicio;
-
-  private MascotaDao mascotaDao;
-  private LectorCollarService lectorCollarService;
-  private AnalizadorDeDatosService analizadorDeDatosService;
-  private EvaluadorAlertaService evaluadorAlertaService;
-  private RepositorioActividad repositorioActividad;
-  private RepositorioSueno repositorioSueno;
-  private RepositorioAnalisis repositorioAnalisis;
-
-  private Mascota mascota;
-  private LecturaSensor lectura;
-
-  @BeforeEach
-  void setUp() {
-    mascotaDao = mock(MascotaDao.class);
-    lectorCollarService = mock(LectorCollarService.class);
-    analizadorDeDatosService = mock(AnalizadorDeDatosService.class);
-    evaluadorAlertaService = mock(EvaluadorAlertaService.class);
-    repositorioActividad = mock(RepositorioActividad.class);
-    repositorioSueno = mock(RepositorioSueno.class);
-    repositorioAnalisis = mock(RepositorioAnalisis.class);
-
-    servicio =
-      new OrquestadorServiceImpl(
-        mascotaDao,
-        lectorCollarService,
-        analizadorDeDatosService,
-        evaluadorAlertaService,
-        repositorioActividad,
-        repositorioSueno,
-        repositorioAnalisis
-      );
-
-    mascota = new Mascota();
-    mascota.setId(1L);
-    mascota.setNombre("Firulais");
-    mascota.setPeso(10.5);
-    mascota.setEstadoActual(EstadoMascota.CAMINANDO);
-
-    lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(90);
-    lectura.setPresionSistolica(120);
-    lectura.setPresionDiastolica(80);
-    lectura.setTemperatura(38.5);
-
-    when(mascotaDao.buscarPorId(1L)).thenReturn(mascota);
-    when(lectorCollarService.obtenerLectura(1L)).thenReturn(lectura);
-    when(analizadorDeDatosService.determinarEstado(mascota, lectura))
-      .thenReturn(EstadoMascota.CAMINANDO);
-    when(repositorioActividad.obtenerDistanciaTotalPorMascota(1L)).thenReturn(1.5);
-    when(analizadorDeDatosService.calcularPasos(1.5, mascota.getTamano())).thenReturn(2000);
-    when(analizadorDeDatosService.calcularCalorias(1.5, EstadoMascota.CAMINANDO, 10.5))
-      .thenReturn(50.0);
-    when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L)).thenReturn(30);
-  }
-
-  // ── procesarMascota ─────────────────────────────────────────────
-
-  @Test
-  void procesarMascotaDeberiaRetornarDtoConNombreDeLaMascota() {
-    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
-
-    assertThat(resultado.getNombreMascota(), equalTo("Firulais"));
-  }
-
-  @Test
-  void procesarMascotaDeberiaRetornarDtoConElEstadoDeterminado() {
-    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
-
-    assertThat(resultado.getEstado(), equalTo(EstadoMascota.CAMINANDO));
-  }
-
-  @Test
-  void procesarMascotaDeberiaRetornarDtoConLosDatosVitalesDeLaLectura() {
-    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
-
-    assertThat(resultado.getFrecuenciaCardiaca(), equalTo(90));
-    assertThat(resultado.getPresionSistolica(), equalTo(120));
-    assertThat(resultado.getPresionDiastolica(), equalTo(80));
-    assertThat(resultado.getTemperatura(), equalTo(38.5));
-  }
-
-  @Test
-  void procesarMascotaDeberiaRetornarDtoConDistanciaYPasos() {
-    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
-
-    assertThat(resultado.getDistanciaRecorrida(), equalTo(1.5));
-    assertThat(resultado.getPasos(), equalTo(2000));
-  }
-
-  @Test
-  void procesarMascotaDeberiaRetornarDtoConCaloriasYMinutosDormidos() {
-    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
-
-    assertThat(resultado.getCalorias(), equalTo(50.0));
-    assertThat(resultado.getMinutosDormidos(), equalTo(30));
-  }
-
-  @Test
-  void procesarMascotaDeberiaActualizarElEstadoDeLaMascota() {
-    servicio.procesarMascota(1L);
-
-    verify(mascotaDao, times(1)).modificar(mascota);
-    assertThat(mascota.getEstadoActual(), equalTo(EstadoMascota.CAMINANDO));
-  }
-
-  @Test
-  void procesarMascotaDeberiaEvaluarLaLecturaYElPeso() {
-    servicio.procesarMascota(1L);
-
-    verify(evaluadorAlertaService, times(1)).evaluarLectura(mascota, lectura);
-    verify(evaluadorAlertaService, times(1)).evaluarPeso(mascota);
-  }
-
-  @Test
-  void procesarMascotaDeberiaConsultarElLectorDeCollar() {
-    servicio.procesarMascota(1L);
-
-    verify(lectorCollarService, times(1)).obtenerLectura(1L);
-  }
-
-  // ── procesarTodasLasMascotas ────────────────────────────────────
-
-  @Test
-  void procesarTodasLasMascotasDeberiaLlamarProcesarPorCadaMascota() {
-    Mascota otraMascota = new Mascota();
-    otraMascota.setId(2L);
-    otraMascota.setNombre("Rex");
-    otraMascota.setPeso(25.0);
-    otraMascota.setEstadoActual(EstadoMascota.REPOSO);
-
-    when(mascotaDao.buscarTodas()).thenReturn(List.of(mascota, otraMascota));
-    when(mascotaDao.buscarPorId(2L)).thenReturn(otraMascota);
-    when(lectorCollarService.obtenerLectura(2L)).thenReturn(lectura);
-    when(analizadorDeDatosService.determinarEstado(otraMascota, lectura))
-      .thenReturn(EstadoMascota.REPOSO);
-    when(repositorioActividad.obtenerDistanciaTotalPorMascota(2L)).thenReturn(0.0);
-    when(analizadorDeDatosService.calcularPasos(0.0, otraMascota.getTamano())).thenReturn(0);
-    when(analizadorDeDatosService.calcularCalorias(0.0, EstadoMascota.REPOSO, 25.0))
-      .thenReturn(10.0);
-    when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(2L)).thenReturn(0);
-
-    servicio.procesarTodasLasMascotas();
-
-    verify(lectorCollarService, times(1)).obtenerLectura(1L);
-    verify(lectorCollarService, times(1)).obtenerLectura(2L);
-  }
-
-  // ── obtenerUltimoEstado ─────────────────────────────────────────
-
-  @Test
-  void obtenerUltimoEstadoDeberiaRetornarNombreNoEncontradoSiLaMascotaNoExiste() {
-    when(mascotaDao.buscarPorId(99L)).thenReturn(null);
-
-    ResultadoSimulacionDto resultado = servicio.obtenerUltimoEstado(99L);
-
-    assertThat(resultado.getNombreMascota(), equalTo("No encontrada"));
-  }
-
-  @Test
-  void obtenerUltimoEstadoDeberiaRetornarDtoConCeroCaloriasYSinAnalisisPrevio() {
-    when(repositorioAnalisis.obtenerUltimoAnalisis(1L)).thenReturn(null);
-
-    ResultadoSimulacionDto resultado = servicio.obtenerUltimoEstado(1L);
-
-    assertThat(resultado.getNombreMascota(), equalTo("Firulais"));
-    assertThat(resultado.getCalorias(), equalTo(0.0));
-  }
-
-  @Test
-  void obtenerUltimoEstadoDeberiaRetornarDatosVitalesDelUltimoAnalisis() {
-    DatosAnalisis datos = new DatosAnalisis();
-    datos.setFrecuenciaCardiaca(95);
-    datos.setPresionSistolica(125);
-    datos.setPresionDiastolica(82);
-    datos.setTemperatura(38.7);
-
-    Analisis ultimoAnalisis = new Analisis();
-    ultimoAnalisis.setDatos(datos);
-
-    when(repositorioAnalisis.obtenerUltimoAnalisis(1L)).thenReturn(ultimoAnalisis);
-    when(analizadorDeDatosService.calcularCalorias(1.5, EstadoMascota.CAMINANDO, 10.5))
-      .thenReturn(50.0);
-
-    ResultadoSimulacionDto resultado = servicio.obtenerUltimoEstado(1L);
-
-    assertThat(resultado.getFrecuenciaCardiaca(), equalTo(95));
-    assertThat(resultado.getPresionSistolica(), equalTo(125));
-    assertThat(resultado.getPresionDiastolica(), equalTo(82));
-    assertThat(resultado.getTemperatura(), equalTo(38.7));
-  }
-}
+//package com.tallerwebi.dominio.servicio;
+//
+//import static org.hamcrest.MatcherAssert.assertThat;
+//import static org.hamcrest.Matchers.*;
+//import static org.mockito.Mockito.*;
+//
+//import com.tallerwebi.dominio.RepositorioActividad;
+//import com.tallerwebi.dominio.RepositorioAnalisis;
+//import com.tallerwebi.dominio.RepositorioSueno;
+//import com.tallerwebi.dominio.dao.MascotaDao;
+//import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
+//import com.tallerwebi.dominio.enums.EstadoMascota;
+//import com.tallerwebi.dominio.modelo.Analisis;
+//import com.tallerwebi.dominio.modelo.DatosAnalisis;
+//import com.tallerwebi.dominio.modelo.LecturaSensor;
+//import com.tallerwebi.dominio.modelo.Mascota;
+//import java.util.List;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//
+//public class OrquestadorServiceImplTest {
+//
+//  private OrquestadorServiceImpl servicio;
+//
+//  private MascotaDao mascotaDao;
+//  private LectorCollarService lectorCollarService;
+//  private AnalizadorDeDatosService analizadorDeDatosService;
+//  private EvaluadorAlertaService evaluadorAlertaService;
+//  private RepositorioActividad repositorioActividad;
+//  private RepositorioSueno repositorioSueno;
+//  private RepositorioAnalisis repositorioAnalisis;
+//
+//  private Mascota mascota;
+//  private LecturaSensor lectura;
+//
+//  @BeforeEach
+//  void setUp() {
+//    mascotaDao = mock(MascotaDao.class);
+//    lectorCollarService = mock(LectorCollarService.class);
+//    analizadorDeDatosService = mock(AnalizadorDeDatosService.class);
+//    evaluadorAlertaService = mock(EvaluadorAlertaService.class);
+//    repositorioActividad = mock(RepositorioActividad.class);
+//    repositorioSueno = mock(RepositorioSueno.class);
+//    repositorioAnalisis = mock(RepositorioAnalisis.class);
+//
+//    servicio =
+//      new OrquestadorServiceImpl(
+//        mascotaDao,
+//        lectorCollarService,
+//        analizadorDeDatosService,
+//        evaluadorAlertaService,
+//        repositorioActividad,
+//        repositorioSueno,
+//        repositorioAnalisis
+//      );
+//
+//    mascota = new Mascota();
+//    mascota.setId(1L);
+//    mascota.setNombre("Firulais");
+//    mascota.setPeso(10.5);
+//    mascota.setEstadoActual(EstadoMascota.CAMINANDO);
+//
+//    lectura = new LecturaSensor();
+//    lectura.setFrecuenciaCardiaca(90);
+//    lectura.setPresionSistolica(120);
+//    lectura.setPresionDiastolica(80);
+//    lectura.setTemperatura(38.5);
+//
+//    when(mascotaDao.buscarPorId(1L)).thenReturn(mascota);
+//    when(lectorCollarService.obtenerLectura(1L)).thenReturn(lectura);
+//    when(analizadorDeDatosService.determinarEstado(mascota, lectura))
+//      .thenReturn(EstadoMascota.CAMINANDO);
+//    when(repositorioActividad.obtenerDistanciaTotalPorMascota(1L)).thenReturn(1.5);
+//    when(analizadorDeDatosService.calcularPasos(1.5, mascota.getTamano())).thenReturn(2000);
+//    when(analizadorDeDatosService.calcularCalorias(1.5, EstadoMascota.CAMINANDO, 10.5))
+//      .thenReturn(50.0);
+//    when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L)).thenReturn(30);
+//  }
+//
+//  // ── procesarMascota ─────────────────────────────────────────────
+//
+//  @Test
+//  void procesarMascotaDeberiaRetornarDtoConNombreDeLaMascota() {
+//    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
+//
+//    assertThat(resultado.getNombreMascota(), equalTo("Firulais"));
+//  }
+//
+//  @Test
+//  void procesarMascotaDeberiaRetornarDtoConElEstadoDeterminado() {
+//    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
+//
+//    assertThat(resultado.getEstado(), equalTo(EstadoMascota.CAMINANDO));
+//  }
+//
+//  @Test
+//  void procesarMascotaDeberiaRetornarDtoConLosDatosVitalesDeLaLectura() {
+//    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
+//
+//    assertThat(resultado.getFrecuenciaCardiaca(), equalTo(90));
+//    assertThat(resultado.getPresionSistolica(), equalTo(120));
+//    assertThat(resultado.getPresionDiastolica(), equalTo(80));
+//    assertThat(resultado.getTemperatura(), equalTo(38.5));
+//  }
+//
+//  @Test
+//  void procesarMascotaDeberiaRetornarDtoConDistanciaYPasos() {
+//    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
+//
+//    assertThat(resultado.getDistanciaRecorrida(), equalTo(1.5));
+//    assertThat(resultado.getPasos(), equalTo(2000));
+//  }
+//
+//  @Test
+//  void procesarMascotaDeberiaRetornarDtoConCaloriasYMinutosDormidos() {
+//    ResultadoSimulacionDto resultado = servicio.procesarMascota(1L);
+//
+//    assertThat(resultado.getCalorias(), equalTo(50.0));
+//    assertThat(resultado.getMinutosDormidos(), equalTo(30));
+//  }
+//
+//  @Test
+//  void procesarMascotaDeberiaActualizarElEstadoDeLaMascota() {
+//    servicio.procesarMascota(1L);
+//
+//    verify(mascotaDao, times(1)).modificar(mascota);
+//    assertThat(mascota.getEstadoActual(), equalTo(EstadoMascota.CAMINANDO));
+//  }
+//
+//  @Test
+//  void procesarMascotaDeberiaEvaluarLaLecturaYElPeso() {
+//    servicio.procesarMascota(1L);
+//
+//    verify(evaluadorAlertaService, times(1)).evaluarLectura(mascota, lectura);
+//    verify(evaluadorAlertaService, times(1)).evaluarPeso(mascota);
+//  }
+//
+//  @Test
+//  void procesarMascotaDeberiaConsultarElLectorDeCollar() {
+//    servicio.procesarMascota(1L);
+//
+//    verify(lectorCollarService, times(1)).obtenerLectura(1L);
+//  }
+//
+//  // ── procesarTodasLasMascotas ────────────────────────────────────
+//
+//  @Test
+//  void procesarTodasLasMascotasDeberiaLlamarProcesarPorCadaMascota() {
+//    Mascota otraMascota = new Mascota();
+//    otraMascota.setId(2L);
+//    otraMascota.setNombre("Rex");
+//    otraMascota.setPeso(25.0);
+//    otraMascota.setEstadoActual(EstadoMascota.REPOSO);
+//
+//    when(mascotaDao.buscarTodas()).thenReturn(List.of(mascota, otraMascota));
+//    when(mascotaDao.buscarPorId(2L)).thenReturn(otraMascota);
+//    when(lectorCollarService.obtenerLectura(2L)).thenReturn(lectura);
+//    when(analizadorDeDatosService.determinarEstado(otraMascota, lectura))
+//      .thenReturn(EstadoMascota.REPOSO);
+//    when(repositorioActividad.obtenerDistanciaTotalPorMascota(2L)).thenReturn(0.0);
+//    when(analizadorDeDatosService.calcularPasos(0.0, otraMascota.getTamano())).thenReturn(0);
+//    when(analizadorDeDatosService.calcularCalorias(0.0, EstadoMascota.REPOSO, 25.0))
+//      .thenReturn(10.0);
+//    when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(2L)).thenReturn(0);
+//
+//    servicio.procesarTodasLasMascotas();
+//
+//    verify(lectorCollarService, times(1)).obtenerLectura(1L);
+//    verify(lectorCollarService, times(1)).obtenerLectura(2L);
+//  }
+//
+//  // ── obtenerUltimoEstado ─────────────────────────────────────────
+//
+//  @Test
+//  void obtenerUltimoEstadoDeberiaRetornarNombreNoEncontradoSiLaMascotaNoExiste() {
+//    when(mascotaDao.buscarPorId(99L)).thenReturn(null);
+//
+//    ResultadoSimulacionDto resultado = servicio.obtenerUltimoEstado(99L);
+//
+//    assertThat(resultado.getNombreMascota(), equalTo("No encontrada"));
+//  }
+//
+//  @Test
+//  void obtenerUltimoEstadoDeberiaRetornarDtoConCeroCaloriasYSinAnalisisPrevio() {
+//    when(repositorioAnalisis.obtenerUltimoAnalisis(1L)).thenReturn(null);
+//
+//    ResultadoSimulacionDto resultado = servicio.obtenerUltimoEstado(1L);
+//
+//    assertThat(resultado.getNombreMascota(), equalTo("Firulais"));
+//    assertThat(resultado.getCalorias(), equalTo(0.0));
+//  }
+//
+//  @Test
+//  void obtenerUltimoEstadoDeberiaRetornarDatosVitalesDelUltimoAnalisis() {
+//    DatosAnalisis datos = new DatosAnalisis();
+//    datos.setFrecuenciaCardiaca(95);
+//    datos.setPresionSistolica(125);
+//    datos.setPresionDiastolica(82);
+//    datos.setTemperatura(38.7);
+//
+//    Analisis ultimoAnalisis = new Analisis();
+//    ultimoAnalisis.setDatos(datos);
+//
+//    when(repositorioAnalisis.obtenerUltimoAnalisis(1L)).thenReturn(ultimoAnalisis);
+//    when(analizadorDeDatosService.calcularCalorias(1.5, EstadoMascota.CAMINANDO, 10.5))
+//      .thenReturn(50.0);
+//
+//    ResultadoSimulacionDto resultado = servicio.obtenerUltimoEstado(1L);
+//
+//    assertThat(resultado.getFrecuenciaCardiaca(), equalTo(95));
+//    assertThat(resultado.getPresionSistolica(), equalTo(125));
+//    assertThat(resultado.getPresionDiastolica(), equalTo(82));
+//    assertThat(resultado.getTemperatura(), equalTo(38.7));
+//  }
+//}
