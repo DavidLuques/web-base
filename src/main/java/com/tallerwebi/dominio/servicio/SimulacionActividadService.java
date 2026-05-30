@@ -206,26 +206,7 @@ public class SimulacionActividadService {
   }
 
   private Integer calcularPasos(Double distanciaEnKm, TamanoMascota tamano) {
-    if (distanciaEnKm == null || distanciaEnKm == 0.0 || tamano == null) {
-      return 0;
-    }
-
-    int pasosPorKm;
-    switch (tamano) {
-      case PEQUENO:
-        pasosPorKm = 3200;
-        break;
-      case MEDIANO:
-        pasosPorKm = 2100;
-        break;
-      case GRANDE:
-        pasosPorKm = 1500;
-        break;
-      default:
-        pasosPorKm = 2100;
-        break;
-    }
-
-    return (int) Math.round(distanciaEnKm * pasosPorKm);
+    if (distanciaEnKm == null || distanciaEnKm == 0.0 || tamano == null) return 0;
+    return (int) Math.round(distanciaEnKm * tamano.getComportamiento().getPasosPorKm());
   }
 }

@@ -34,12 +34,12 @@ public class AlertaService {
   }
 
   public void evaluarPeso(Mascota mascota) {
-    if (mascota == null || mascota.getTamano() == null || mascota.getPeso() == null) {
-      return;
-    }
-    Double peso = mascota.getPeso();
-    Double pesoMinimo = obtenerPesoMinimo(mascota);
-    if (pesoMinimo != null && peso < pesoMinimo) {
+    if (mascota == null || mascota.getTamano() == null || mascota.getPeso() == null) return;
+
+    double peso = mascota.getPeso();
+    double pesoMin = mascota.getTamano().getComportamiento().getPesoMinimo();
+
+    if (peso < pesoMin) {
       crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
@@ -48,50 +48,24 @@ public class AlertaService {
         " (" +
         peso +
         " kg) esta por debajo del minimo recomendado (" +
-        pesoMinimo +
+        pesoMin +
         " kg)."
       );
-      return;
-    }
-    Double pesoMaximo = obtenerPesoMaximo(mascota);
-    if (pesoMaximo != null && peso > pesoMaximo) {
-      crearAlerta(
-        mascota,
-        TipoAlerta.ALERTA,
-        "Atencion: El peso de " +
-        mascota.getNombre() +
-        " (" +
-        peso +
-        " kg) esta por encima del maximo recomendado (" +
-        pesoMaximo +
-        " kg)."
-      );
-    }
-  }
-
-  private Double obtenerPesoMinimo(Mascota mascota) {
-    switch (mascota.getTamano()) {
-      case PEQUENO:
-        return 2.0;
-      case MEDIANO:
-        return 11.0;
-      case GRANDE:
-        return 25.0;
-      default:
-        return null;
-    }
-  }
-
-  private Double obtenerPesoMaximo(Mascota mascota) {
-    switch (mascota.getTamano()) {
-      case PEQUENO:
-        return 10.0;
-      case MEDIANO:
-        return 25.0;
-      case GRANDE:
-        return 45.0;
-      default:
-        return null;
+    } else {
+      double pesoMax = mascota.getTamano().getComportamiento().getPesoMaximo();
+      if (peso > pesoMax) {
+        crearAlerta(
+          mascota,
+          TipoAlerta.ALERTA,
+          "Atencion: El peso de " +
+          mascota.getNombre() +
+          " (" +
+          peso +
+          " kg) esta por encima del maximo recomendado (" +
+          pesoMax +
+          " kg)."
+        );
+      }
     }
   }
 
