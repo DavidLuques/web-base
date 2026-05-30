@@ -5,19 +5,16 @@ INSERT INTO Usuario(id, email, password, rol, activo, nombre, telefono, calle, c
 VALUES(null, 'prueba@prueba.com', '$2a$10$lp3skFsst8lv9wQ.Xwz5Ae/4tjgpzanFRIQxd/WrLJAL0HrNFp.BO', 'USER', true, 'Usuario prueba', null, null, null, null, null, null, null, null);
 
 INSERT INTO rango_vital_por_tamano
-(tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima)
-VALUES
-    ('PEQUENO', 100, 140, 110, 130, 70, 85);
+(tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima, temperaturaMinima, temperaturaMaxima)
+VALUES ('PEQUENO', 100, 140, 110, 130, 70, 85, 38.0, 39.2);
 
 INSERT INTO rango_vital_por_tamano
-(tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima)
-VALUES
-    ('MEDIANO', 80, 120, 115, 140, 75, 90);
+(tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima, temperaturaMinima, temperaturaMaxima)
+VALUES ('MEDIANO', 80, 120, 115, 140, 75, 90, 37.8, 39.2);
 
 INSERT INTO rango_vital_por_tamano
-(tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima)
-VALUES
-    ('GRANDE', 60, 100, 120, 150, 80, 95);
+(tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima, temperaturaMinima, temperaturaMaxima)
+VALUES ('GRANDE', 60, 100, 120, 150, 80, 95, 37.5, 38.9);
 
 INSERT INTO mascota(nombre, estado_actual, tamano, raza, genero, tipo, peso, esteril, usuario_id)
 VALUES ('Firulais', 'CAMINANDO', 'MEDIANO', 'Labrador', 'Macho', 'Perro', 10.5, true, 2);

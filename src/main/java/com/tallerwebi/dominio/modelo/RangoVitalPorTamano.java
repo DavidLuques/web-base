@@ -23,6 +23,9 @@ public class RangoVitalPorTamano {
   private Integer diastolicaMinima;
   private Integer diastolicaMaxima;
 
+  private Double temperaturaMinima;
+  private Double temperaturaMaxima;
+
   public RangoVitalPorTamano() {}
 
   public Long getId() {
@@ -83,5 +86,21 @@ public class RangoVitalPorTamano {
 
   public void setDiastolicaMaxima(Integer diastolicaMaxima) {
     this.diastolicaMaxima = diastolicaMaxima;
+  }
+
+  public Double getTemperaturaMinima() {
+    return temperaturaMinima;
+  }
+
+  public void setTemperaturaMinima(Double temperaturaMinima) {
+    this.temperaturaMinima = temperaturaMinima;
+  }
+
+  public Double getTemperaturaMaxima() {
+    return temperaturaMaxima;
+  }
+
+  public void setTemperaturaMaxima(Double temperaturaMaxima) {
+    this.temperaturaMaxima = temperaturaMaxima;
   }
 }
