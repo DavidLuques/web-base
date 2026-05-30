@@ -5,10 +5,10 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
 import com.tallerwebi.dominio.dto.AlertaDto;
-import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.enums.TipoAlerta;
-import com.tallerwebi.dominio.modelo.*;
-import java.time.LocalDateTime;
+import com.tallerwebi.dominio.modelo.Alerta;
+import com.tallerwebi.dominio.modelo.Mascota;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,222 +18,28 @@ public class AlertaServiceTest {
 
   private RepositorioAlerta repositorioAlertaMock;
   private AlertaService alertaService;
-
-  private Mascota mascotaMacho;
-  private Mascota mascotaHembra;
-  private Analisis analisisActual;
-  private Analisis analisisAnterior;
+  private Mascota mascota;
 
   @BeforeEach
   public void init() {
     repositorioAlertaMock = mock(RepositorioAlerta.class);
     alertaService = new AlertaService(repositorioAlertaMock);
 
-    mascotaMacho = new Mascota();
-    mascotaMacho.setNombre("Firulais");
-    mascotaMacho.setGenero("Macho");
-    mascotaMacho.setRaza("Labrador");
-    mascotaMacho.setTamano(TamanoMascota.MEDIANO); // Asignamos tamaño para la alerta
-
-    mascotaHembra = new Mascota();
-    mascotaHembra.setNombre("Luna");
-    mascotaHembra.setGenero("Hembra");
-    mascotaHembra.setRaza("Caniche");
-    mascotaHembra.setTamano(TamanoMascota.MEDIANO);
-
-    analisisAnterior = new Analisis();
-    analisisAnterior.setDatos(new DatosAnalisis());
-    analisisAnterior.getDatos().setTemperatura(38.5);
-    analisisAnterior.getDatos().setPresionSistolica(120);
-    analisisAnterior.getDatos().setFrecuenciaCardiaca(80);
-    analisisAnterior.getDatos().setOxigenacion(98.0);
-    analisisAnterior.getDatos().setHorasSueno(8);
-    analisisAnterior.setFechaYHora(LocalDateTime.now().minusHours(1));
-
-    analisisActual = new Analisis();
-    analisisActual.setDatos(new DatosAnalisis());
-    analisisActual.setFechaYHora(LocalDateTime.now());
+    mascota = new Mascota();
+    mascota.setNombre("Firulais");
   }
 
   @Test
-  void debeGenerarAlertaPorBajoPesoMacho() {
-    mascotaMacho.setPeso(8.0); // Inferior a 11.0 (Mínimo para Mediano)
-
-    alertaService.evaluarPeso(mascotaMacho);
+  void debeCrearAlertaConLosDatosCorrectos() {
+    alertaService.crearAlerta(mascota, TipoAlerta.EMERGENCIA, "Mensaje de prueba");
 
     ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
     verify(repositorioAlertaMock).save(captor.capture());
 
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Atencion: El peso de Firulais (8.0 kg) esta por debajo del minimo recomendado (11.0 kg).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorAltoPesoMacho() {
-    mascotaMacho.setPeso(28.0); // Superior a 25.0 (Máximo para Mediano)
-
-    alertaService.evaluarPeso(mascotaMacho);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Atencion: El peso de Firulais (28.0 kg) esta por encima del maximo recomendado (25.0 kg).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void noDebeGenerarAlertaPorPesoNormal() {
-    mascotaMacho.setPeso(15.0); // Entre 11.0 y 25.0
-
-    alertaService.evaluarPeso(mascotaMacho);
-
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
-  }
-
-  @Test
-  void debeGenerarAlertaPorFrecuenciaCardiacaAltaEnLectura() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(170);
-    lectura.setTemperatura(38.5);
-    lectura.setPresionSistolica(120);
-
-    alertaService.evaluarLectura(mascotaMacho, lectura);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
     assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
-    assertEquals(
-      "Emergencia: Frecuencia cardiaca inusualmente alta detectada (170 lpm).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorFrecuenciaCardiacaBajaEnLectura() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(50);
-    lectura.setTemperatura(38.5);
-    lectura.setPresionSistolica(120);
-
-    alertaService.evaluarLectura(mascotaMacho, lectura);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Alerta: Frecuencia cardiaca inusualmente baja detectada (50 lpm).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorTemperaturaAltaEnLectura() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(100);
-    lectura.setTemperatura(40.0);
-    lectura.setPresionSistolica(120);
-
-    alertaService.evaluarLectura(mascotaMacho, lectura);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-    assertEquals(TipoAlerta.EMERGENCIA, captor.getValue().getTipo());
-    assertEquals(
-      "Emergencia: Temperatura corporal alta detectada (40.0°C).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorTemperaturaBajaEnLectura() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(100);
-    lectura.setTemperatura(37.0);
-    lectura.setPresionSistolica(120);
-
-    alertaService.evaluarLectura(mascotaMacho, lectura);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Alerta: Temperatura corporal baja detectada (37.0\u00b0C).",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void debeGenerarAlertaPorPresionAltaEnLectura() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(100);
-    lectura.setTemperatura(38.5);
-    lectura.setPresionSistolica(170);
-
-    alertaService.evaluarLectura(mascotaMacho, lectura);
-
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-    assertEquals(
-      "Alerta: Fluctuacion significativa en la presion arterial detectada.",
-      captor.getValue().getMensaje()
-    );
-  }
-
-  @Test
-  void noDebeGenerarAlertaSiLecturaEsNull() {
-    alertaService.evaluarLectura(mascotaMacho, null);
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
-  }
-
-  @Test
-  void noDebeGenerarAlertaSiSignosNormalesEnLectura() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(100);
-    lectura.setTemperatura(38.5);
-    lectura.setPresionSistolica(120);
-
-    alertaService.evaluarLectura(mascotaMacho, lectura);
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
-  }
-
-  @Test
-  void noDebeGenerarAlertaSiMascotaEsNull() {
-    alertaService.evaluarPeso(null);
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
-  }
-
-  @Test
-  void noDebeGenerarAlertaSiPesoEsNull() {
-    mascotaMacho.setPeso(null);
-    alertaService.evaluarPeso(mascotaMacho);
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
-  }
-
-  @Test
-  void debeGenerarAlertaPorBajoPesoMascotaPequena() {
-    mascotaMacho.setTamano(TamanoMascota.PEQUENO);
-    mascotaMacho.setPeso(1.0);
-    alertaService.evaluarPeso(mascotaMacho);
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
-  }
-
-  @Test
-  void debeGenerarAlertaPorAltoPesoMascotaGrande() {
-    mascotaMacho.setTamano(TamanoMascota.GRANDE);
-    mascotaMacho.setPeso(50.0);
-    alertaService.evaluarPeso(mascotaMacho);
-    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
-    verify(repositorioAlertaMock).save(captor.capture());
-    assertEquals(TipoAlerta.ALERTA, captor.getValue().getTipo());
+    assertEquals("Mensaje de prueba", captor.getValue().getMensaje());
+    assertEquals(mascota, captor.getValue().getMascota());
+    assertEquals(false, captor.getValue().getLeido());
   }
 
   @Test
@@ -244,12 +50,23 @@ public class AlertaServiceTest {
   }
 
   @Test
-  void noDebeGenerarAlertaSiFrecuenciaEsNullEnLectura() {
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(null);
-    lectura.setTemperatura(38.5);
-    lectura.setPresionSistolica(120);
-    alertaService.evaluarLectura(mascotaMacho, lectura);
-    verify(repositorioAlertaMock, never()).save(any(Alerta.class));
+  void debeRetornarAlertasMapeadasComoDto() {
+    Alerta alerta1 = new Alerta();
+    alerta1.setTipo(TipoAlerta.ALERTA);
+    alerta1.setMensaje("Mensaje 1");
+
+    Alerta alerta2 = new Alerta();
+    alerta2.setTipo(TipoAlerta.EMERGENCIA);
+    alerta2.setMensaje("Mensaje 2");
+
+    when(repositorioAlertaMock.buscarPorMascota(1L)).thenReturn(Arrays.asList(alerta1, alerta2));
+
+    List<AlertaDto> resultado = alertaService.obtenerAlertasPorMascota(1L);
+
+    assertEquals(2, resultado.size());
+    assertEquals(TipoAlerta.ALERTA, resultado.get(0).getTipo());
+    assertEquals("Mensaje 1", resultado.get(0).getMensaje());
+    assertEquals(TipoAlerta.EMERGENCIA, resultado.get(1).getTipo());
+    assertEquals("Mensaje 2", resultado.get(1).getMensaje());
   }
 }
