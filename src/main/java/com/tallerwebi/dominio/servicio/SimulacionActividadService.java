@@ -34,7 +34,7 @@ public class SimulacionActividadService {
   private final ServicioAnalisis servicioAnalisis;
   private final RepositorioAnalisis repositorioAnalisis;
   private final RepositorioSueno repositorioSueno;
-  private final AlertaService alertaService;
+  private final EvaluadorAlertaService evaluadorAlertaService;
 
   @Autowired
   public SimulacionActividadService(
@@ -46,7 +46,7 @@ public class SimulacionActividadService {
     ServicioAnalisis servicioAnalisis,
     RepositorioAnalisis repositorioAnalisis,
     RepositorioSueno repositorioSueno,
-    AlertaService alertaService
+    EvaluadorAlertaService evaluadorAlertaService
   ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
@@ -56,7 +56,7 @@ public class SimulacionActividadService {
     this.servicioAnalisis = servicioAnalisis;
     this.repositorioAnalisis = repositorioAnalisis;
     this.repositorioSueno = repositorioSueno;
-    this.alertaService = alertaService;
+    this.evaluadorAlertaService = evaluadorAlertaService;
   }
 
   private void registrarActividadSegunEstado(Mascota mascota, EstadoMascota estado) {
@@ -90,8 +90,8 @@ public class SimulacionActividadService {
     EstadoMascota estado = motorActividadService.analizar(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
-    alertaService.evaluarLectura(mascota, lectura);
-    alertaService.evaluarPeso(mascota);
+    evaluadorAlertaService.evaluarLectura(mascota, lectura);
+    evaluadorAlertaService.evaluarPeso(mascota);
 
     if (estado == EstadoMascota.DURMIENDO) {
       RegistroSueno registro = new RegistroSueno();
