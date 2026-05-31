@@ -3,7 +3,7 @@ package com.tallerwebi.presentacion.controlador;
 import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.servicio.AlertaService;
-import com.tallerwebi.dominio.servicio.SimulacionActividadService;
+import com.tallerwebi.dominio.servicio.OrquestadorService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,24 +15,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/analisis")
-public class ControladorSimulacion {
+public class ControladorMonitoreo {
 
-  private final SimulacionActividadService simulacionActividadService;
+  private final OrquestadorService orquestadorService;
   private final AlertaService alertaService;
 
   @Autowired
-  public ControladorSimulacion(
-    SimulacionActividadService simulacionActividadService,
-    AlertaService alertaService
-  ) {
-    this.simulacionActividadService = simulacionActividadService;
+  public ControladorMonitoreo(OrquestadorService orquestadorService, AlertaService alertaService) {
+    this.orquestadorService = orquestadorService;
     this.alertaService = alertaService;
   }
 
   @GetMapping("/{idMascota}")
   @ResponseBody
-  public ResultadoSimulacionDto simular(@PathVariable Long idMascota) {
-    return simulacionActividadService.simularDetalle(idMascota);
+  public ResultadoSimulacionDto procesarMascota(@PathVariable Long idMascota) {
+    return orquestadorService.procesarMascota(idMascota);
   }
 
   @GetMapping("/alertas/{idMascota}")
@@ -56,13 +53,13 @@ public class ControladorSimulacion {
   @GetMapping(value = "/estado/{idMascota}", produces = "application/json;charset=UTF-8")
   @ResponseBody
   public ResultadoSimulacionDto obtenerEstado(@PathVariable Long idMascota) {
-    return simulacionActividadService.obtenerEstadoActual(idMascota);
+    return orquestadorService.obtenerUltimoEstado(idMascota);
   }
 
   @GetMapping("/dashboard/{idMascota}")
-  public String vistaDashboardFigma(@PathVariable Long idMascota, Model model) {
+  public String vistaDashboard(@PathVariable Long idMascota, Model model) {
     model.addAttribute("idMascota", idMascota);
-    ResultadoSimulacionDto estado = simulacionActividadService.obtenerEstadoActual(idMascota);
+    ResultadoSimulacionDto estado = orquestadorService.obtenerUltimoEstado(idMascota);
     model.addAttribute("mascotaNombre", estado != null ? estado.getNombreMascota() : "Mascota");
     return "dashboard";
   }

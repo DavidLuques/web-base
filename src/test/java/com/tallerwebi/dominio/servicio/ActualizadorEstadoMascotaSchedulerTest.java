@@ -7,30 +7,27 @@ import org.junit.jupiter.api.Test;
 
 public class ActualizadorEstadoMascotaSchedulerTest {
 
-  private SimulacionActividadService simulacionActividadServiceMock;
   private ActualizadorEstadoMascotaScheduler scheduler;
+  private OrquestadorService orquestadorServiceMock;
 
   @BeforeEach
   public void init() {
-    simulacionActividadServiceMock = mock(SimulacionActividadService.class);
-    scheduler = new ActualizadorEstadoMascotaScheduler(simulacionActividadServiceMock);
+    orquestadorServiceMock = mock(OrquestadorService.class);
+
+    scheduler = new ActualizadorEstadoMascotaScheduler(orquestadorServiceMock);
   }
 
   @Test
-  public void cuandoSeEjecutaElSchedulerDeActualizarEstadoEntoncesDebeLlamarAlServicio() {
-    // Ejecución
+  public void cuandoSeActualizanLosEstadosDebeProcesarTodasLasMascotas() {
     scheduler.actualizarEstadosDeMascotas();
 
-    // Verificación
-    verify(simulacionActividadServiceMock, times(1)).simularDetalleParaTodas();
+    verify(orquestadorServiceMock, times(1)).procesarTodasLasMascotas();
   }
 
   @Test
-  public void cuandoSeEjecutaElSchedulerDeActualizarFrecuenciaEntoncesDebeLlamarAlServicio() {
-    // Ejecución
-    scheduler.actualizarFrecuenciaCardiaca();
+  public void cuandoSeRefrescanLasLecturasDebeActualizarTodasLasLecturas() {
+    scheduler.refrescarLecturaDelCollar();
 
-    // Verificación
-    verify(simulacionActividadServiceMock, times(1)).actualizarFrecuenciaParaTodas();
+    verify(orquestadorServiceMock, times(1)).refrescarTodasLasLecturas();
   }
 }

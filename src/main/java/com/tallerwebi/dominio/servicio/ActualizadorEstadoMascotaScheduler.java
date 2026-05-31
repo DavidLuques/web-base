@@ -10,20 +10,20 @@ public class ActualizadorEstadoMascotaScheduler {
   private static final long DOS_MINUTOS_EN_MS = 2 * 60 * 1000;
   private static final long DIEZ_SEGUNDOS_EN_MS = 10 * 1000;
 
-  private final SimulacionActividadService simulacionActividadService;
+  private final OrquestadorService orquestadorService;
 
   @Autowired
-  public ActualizadorEstadoMascotaScheduler(SimulacionActividadService simulacionActividadService) {
-    this.simulacionActividadService = simulacionActividadService;
+  public ActualizadorEstadoMascotaScheduler(OrquestadorService orquestadorService) {
+    this.orquestadorService = orquestadorService;
   }
 
   @Scheduled(fixedRate = DOS_MINUTOS_EN_MS)
   public void actualizarEstadosDeMascotas() {
-    simulacionActividadService.simularDetalleParaTodas();
+    orquestadorService.procesarTodasLasMascotas();
   }
 
   @Scheduled(fixedRate = DIEZ_SEGUNDOS_EN_MS)
-  public void actualizarFrecuenciaCardiaca() {
-    simulacionActividadService.actualizarFrecuenciaParaTodas();
+  public void refrescarLecturaDelCollar() {
+    orquestadorService.refrescarTodasLasLecturas();
   }
 }

@@ -20,7 +20,6 @@ public class LectorCollarServiceImpl implements LectorCollarService {
   private static final double VARIACION_GPS_LEVE = 0.001;
   private static final double VARIACION_GPS_NORMAL = 0.0005;
 
-  // Estado incremental — en el futuro vendrá de la BD
   private Double latitudActual = -34.7222;
   private Double longitudActual = -58.5250;
   private Double temperaturaActual = 38.5;
@@ -83,8 +82,6 @@ public class LectorCollarServiceImpl implements LectorCollarService {
 
     return lectura;
   }
-
-  // ── privados: cada uno avanza gradualmente desde el valor anterior ──
 
   private void inicializarPresionSiEsNecesario(RangoVitalPorTamano rango) {
     if (sistolicaActual == null) sistolicaActual =

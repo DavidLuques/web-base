@@ -20,9 +20,7 @@ public class EstadoReposo implements ComportamientoEstado {
   }
 
   @Override
-  public void actualizarGps(double[] coordenada, Random random) {
-    /* no se mueve */
-  }
+  public void actualizarGps(double[] coordenada, Random random) {}
 
   @Override
   public double getTemperaturaBase() {
