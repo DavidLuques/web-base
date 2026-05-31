@@ -15,112 +15,112 @@ import org.springframework.web.servlet.ModelAndView;
 
 public class ControladorConfiguracionTest {
 
-    private ControladorConfiguracion controlador;
-    private ServicioUsuario servicioUsuarioMock;
-    private HttpServletRequest requestMock;
-    private HttpSession sessionMock;
+  private ControladorConfiguracion controlador;
+  private ServicioUsuario servicioUsuarioMock;
+  private HttpServletRequest requestMock;
+  private HttpSession sessionMock;
 
-    @BeforeEach
-    public void init() {
-        servicioUsuarioMock = mock(ServicioUsuario.class);
-        requestMock = mock(HttpServletRequest.class);
-        sessionMock = mock(HttpSession.class);
+  @BeforeEach
+  public void init() {
+    servicioUsuarioMock = mock(ServicioUsuario.class);
+    requestMock = mock(HttpServletRequest.class);
+    sessionMock = mock(HttpSession.class);
 
-        when(requestMock.getSession()).thenReturn(sessionMock);
+    when(requestMock.getSession()).thenReturn(sessionMock);
 
-        controlador = new ControladorConfiguracion(servicioUsuarioMock);
-    }
+    controlador = new ControladorConfiguracion(servicioUsuarioMock);
+  }
 
-    @Test
-    public void cuandoElUsuarioEstaLogueadoRetornaLaVistaConfiguraciones() {
-        Long idUsuario = 1L;
-        Usuario usuario = new Usuario();
+  @Test
+  public void cuandoElUsuarioEstaLogueadoRetornaLaVistaConfiguraciones() {
+    Long idUsuario = 1L;
+    Usuario usuario = new Usuario();
 
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-        when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
 
-        ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
+    ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
 
-        assertThat(mav.getViewName(), equalTo("configuraciones"));
-    }
+    assertThat(mav.getViewName(), equalTo("configuraciones"));
+  }
 
-    @Test
-    public void cuandoElUsuarioNoEstaLogueadoRedireccionaAlLogin() {
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
+  @Test
+  public void cuandoElUsuarioNoEstaLogueadoRedireccionaAlLogin() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
 
-        ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
+    ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
 
-        assertThat(mav.getViewName(), equalTo("redirect:/login"));
-    }
+    assertThat(mav.getViewName(), equalTo("redirect:/login"));
+  }
 
-    @Test
-    public void cuandoElUsuarioEstaLogueadoElModeloContieneElUsuario() {
-        Long idUsuario = 1L;
-        Usuario usuario = new Usuario();
+  @Test
+  public void cuandoElUsuarioEstaLogueadoElModeloContieneElUsuario() {
+    Long idUsuario = 1L;
+    Usuario usuario = new Usuario();
 
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-        when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
 
-        ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
+    ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
 
-        assertThat(mav.getModel().get("usuario"), equalTo(usuario));
-    }
+    assertThat(mav.getModel().get("usuario"), equalTo(usuario));
+  }
 
-    @Test
-    public void cuandoSePassaIdMascotaElModeloLaContiene() {
-        Long idUsuario = 1L;
-        Long idMascota = 5L;
-        Usuario usuario = new Usuario();
+  @Test
+  public void cuandoSePassaIdMascotaElModeloLaContiene() {
+    Long idUsuario = 1L;
+    Long idMascota = 5L;
+    Usuario usuario = new Usuario();
 
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-        when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
 
-        ModelAndView mav = controlador.irAConfiguraciones(requestMock, idMascota);
+    ModelAndView mav = controlador.irAConfiguraciones(requestMock, idMascota);
 
-        assertThat(mav.getModel().get("idMascota"), equalTo(idMascota));
-    }
+    assertThat(mav.getModel().get("idMascota"), equalTo(idMascota));
+  }
 
-    @Test
-    public void cuandoNoSePassaIdMascotaElModeloLaTieneNula() {
-        Long idUsuario = 1L;
-        Usuario usuario = new Usuario();
+  @Test
+  public void cuandoNoSePassaIdMascotaElModeloLaTieneNula() {
+    Long idUsuario = 1L;
+    Usuario usuario = new Usuario();
 
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-        when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
 
-        ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
+    ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
 
-        assertThat(mav.getModel().get("idMascota"), nullValue());
-    }
+    assertThat(mav.getModel().get("idMascota"), nullValue());
+  }
 
-    @Test
-    public void cuandoElUsuarioEstaLogueadoSeLlamaAlServicioUnaVez() {
-        Long idUsuario = 1L;
-        Usuario usuario = new Usuario();
+  @Test
+  public void cuandoElUsuarioEstaLogueadoSeLlamaAlServicioUnaVez() {
+    Long idUsuario = 1L;
+    Usuario usuario = new Usuario();
 
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-        when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuario);
 
-        controlador.irAConfiguraciones(requestMock, null);
+    controlador.irAConfiguraciones(requestMock, null);
 
-        verify(servicioUsuarioMock, times(1)).obtenerPerfil(idUsuario);
-    }
+    verify(servicioUsuarioMock, times(1)).obtenerPerfil(idUsuario);
+  }
 
-    @Test
-    public void cuandoElUsuarioNoEstaLogueadoNoSeLlamaAlServicio() {
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
+  @Test
+  public void cuandoElUsuarioNoEstaLogueadoNoSeLlamaAlServicio() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
 
-        controlador.irAConfiguraciones(requestMock, null);
+    controlador.irAConfiguraciones(requestMock, null);
 
-        verify(servicioUsuarioMock, never()).obtenerPerfil(any());
-    }
+    verify(servicioUsuarioMock, never()).obtenerPerfil(any());
+  }
 
-    @Test
-    public void cuandoElUsuarioNoEstaLogueadoElModeloEstaVacio() {
-        when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
+  @Test
+  public void cuandoElUsuarioNoEstaLogueadoElModeloEstaVacio() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
 
-        ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
+    ModelAndView mav = controlador.irAConfiguraciones(requestMock, null);
 
-        assertThat(mav.getModel().isEmpty(), equalTo(true));
-    }
+    assertThat(mav.getModel().isEmpty(), equalTo(true));
+  }
 }

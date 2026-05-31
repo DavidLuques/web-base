@@ -124,112 +124,111 @@ public class ControladorMonitoreoTest {
 
     assertThat(vista, equalTo("dashboard"));
   }
-  
+
   @Test
   public void cuandoProcesarMascotaDevuelveNombreCorrecto() {
-      Long mascotaId = 2L;
+    Long mascotaId = 2L;
 
-      ResultadoSimulacionDto dto = new ResultadoSimulacionDto(
-          "Firulais",
-          EstadoMascota.CAMINANDO,
-          null,
-          null
-      );
+    ResultadoSimulacionDto dto = new ResultadoSimulacionDto(
+      "Firulais",
+      EstadoMascota.CAMINANDO,
+      null,
+      null
+    );
 
-      when(orquestadorServiceMock.procesarMascota(mascotaId)).thenReturn(dto);
+    when(orquestadorServiceMock.procesarMascota(mascotaId)).thenReturn(dto);
 
-      ResultadoSimulacionDto resultado = controlador.procesarMascota(mascotaId);
+    ResultadoSimulacionDto resultado = controlador.procesarMascota(mascotaId);
 
-      assertThat(resultado.getNombreMascota(), equalTo("Firulais"));
+    assertThat(resultado.getNombreMascota(), equalTo("Firulais"));
   }
 
   @Test
   public void cuandoIngresoAlDashboardYElEstadoEsNuloElNombreEsMascota() {
-      Long mascotaId = 1L;
+    Long mascotaId = 1L;
 
-      when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(null);
+    when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(null);
 
-      String vista = controlador.vistaDashboard(mascotaId, modelMock);
+    String vista = controlador.vistaDashboard(mascotaId, modelMock);
 
-      verify(modelMock).addAttribute("mascotaNombre", "Mascota");
-      assertThat(vista, equalTo("dashboard"));
+    verify(modelMock).addAttribute("mascotaNombre", "Mascota");
+    assertThat(vista, equalTo("dashboard"));
   }
 
   @Test
   public void cuandoSolicitoEstadoConEstadoCaminandoDevuelveElEstadoCorrecto() {
-      Long mascotaId = 3L;
+    Long mascotaId = 3L;
 
-      ResultadoSimulacionDto dto = new ResultadoSimulacionDto(
-          "Rex",
-          EstadoMascota.CAMINANDO,
-          null,
-          null
-      );
+    ResultadoSimulacionDto dto = new ResultadoSimulacionDto(
+      "Rex",
+      EstadoMascota.CAMINANDO,
+      null,
+      null
+    );
 
-      when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
+    when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
 
-      ResultadoSimulacionDto resultado = controlador.obtenerEstado(mascotaId);
+    ResultadoSimulacionDto resultado = controlador.obtenerEstado(mascotaId);
 
-      assertThat(resultado.getEstado(), equalTo(EstadoMascota.CAMINANDO));
+    assertThat(resultado.getEstado(), equalTo(EstadoMascota.CAMINANDO));
   }
 
   @Test
   public void cuandoIngresoALaVistaDeSimulacionAgregaElIdAlModelo() {
-      Long mascotaId = 5L;
+    Long mascotaId = 5L;
 
-      controlador.vista(mascotaId, modelMock);
+    controlador.vista(mascotaId, modelMock);
 
-      verify(modelMock).addAttribute("idMascota", 5L);
+    verify(modelMock).addAttribute("idMascota", 5L);
   }
 
   @Test
   public void cuandoIngresoALaVistaDeAlertasAgregaElIdAlModelo() {
-      Long mascotaId = 7L;
+    Long mascotaId = 7L;
 
-      controlador.verPantallaDeAlertas(mascotaId, modelMock);
+    controlador.verPantallaDeAlertas(mascotaId, modelMock);
 
-      verify(modelMock).addAttribute("idMascota", 7L);
+    verify(modelMock).addAttribute("idMascota", 7L);
   }
 
   @Test
   public void cuandoIngresoAlDashboardAgregaElIdAlModelo() {
-      Long mascotaId = 4L;
+    Long mascotaId = 4L;
 
-      ResultadoSimulacionDto dto = new ResultadoSimulacionDto(
-          "Luna",
-          EstadoMascota.REPOSO,
-          null,
-          null
-      );
+    ResultadoSimulacionDto dto = new ResultadoSimulacionDto(
+      "Luna",
+      EstadoMascota.REPOSO,
+      null,
+      null
+    );
 
-      when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
+    when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
 
-      controlador.vistaDashboard(mascotaId, modelMock);
+    controlador.vistaDashboard(mascotaId, modelMock);
 
-      verify(modelMock).addAttribute("idMascota", 4L);
+    verify(modelMock).addAttribute("idMascota", 4L);
   }
 
   @Test
   public void cuandoProcesarMascotaSeLlamaAlServicioUnaVez() {
-      Long mascotaId = 1L;
+    Long mascotaId = 1L;
 
-      when(orquestadorServiceMock.procesarMascota(mascotaId)).thenReturn(
-          new ResultadoSimulacionDto("Toby", EstadoMascota.CAMINANDO, null, null)
-      );
+    when(orquestadorServiceMock.procesarMascota(mascotaId))
+      .thenReturn(new ResultadoSimulacionDto("Toby", EstadoMascota.CAMINANDO, null, null));
 
-      controlador.procesarMascota(mascotaId);
+    controlador.procesarMascota(mascotaId);
 
-      verify(orquestadorServiceMock, times(1)).procesarMascota(mascotaId);
+    verify(orquestadorServiceMock, times(1)).procesarMascota(mascotaId);
   }
 
   @Test
   public void cuandoObtengoAlertasSeLlamaAlServicioUnaVez() {
-      Long mascotaId = 1L;
+    Long mascotaId = 1L;
 
-      when(alertaServiceMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(new ArrayList<>());
+    when(alertaServiceMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(new ArrayList<>());
 
-      controlador.obtenerAlertasDeMascota(mascotaId);
+    controlador.obtenerAlertasDeMascota(mascotaId);
 
-      verify(alertaServiceMock, times(1)).obtenerAlertasPorMascota(mascotaId);
+    verify(alertaServiceMock, times(1)).obtenerAlertasPorMascota(mascotaId);
   }
 }
