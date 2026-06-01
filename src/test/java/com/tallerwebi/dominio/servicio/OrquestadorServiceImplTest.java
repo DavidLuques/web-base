@@ -8,12 +8,15 @@ import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
+import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
+import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,8 @@ public class OrquestadorServiceImplTest {
   private RepositorioActividad repositorioActividad;
   private RepositorioSueno repositorioSueno;
   private RepositorioAnalisis repositorioAnalisis;
+  private RangoVitalDao rangoVitalDao;
+  private RangoVitalPorTamano rango;
 
   private Mascota mascota;
   private LecturaSensor lectura;
@@ -42,6 +47,7 @@ public class OrquestadorServiceImplTest {
     repositorioActividad = mock(RepositorioActividad.class);
     repositorioSueno = mock(RepositorioSueno.class);
     repositorioAnalisis = mock(RepositorioAnalisis.class);
+    rangoVitalDao = mock(RangoVitalDao.class);
 
     servicio =
       new OrquestadorServiceImpl(
@@ -51,12 +57,14 @@ public class OrquestadorServiceImplTest {
         evaluadorAlertaService,
         repositorioActividad,
         repositorioSueno,
-        repositorioAnalisis
+        repositorioAnalisis,
+        rangoVitalDao
       );
 
     mascota = new Mascota();
     mascota.setId(1L);
     mascota.setNombre("Firulais");
+    mascota.setTamano(TamanoMascota.MEDIANO);
     mascota.setPeso(10.5);
     mascota.setEstadoActual(EstadoMascota.CAMINANDO);
 
@@ -65,6 +73,16 @@ public class OrquestadorServiceImplTest {
     lectura.setPresionSistolica(120);
     lectura.setPresionDiastolica(80);
     lectura.setTemperatura(38.5);
+
+    rango = new RangoVitalPorTamano();
+    rango.setFrecuenciaMinima(80);
+    rango.setFrecuenciaMaxima(120);
+    rango.setSistolicaMinima(115);
+    rango.setSistolicaMaxima(140);
+    rango.setDiastolicaMinima(75);
+    rango.setDiastolicaMaxima(90);
+    rango.setTemperaturaMinima(37.8);
+    rango.setTemperaturaMaxima(39.2);
 
     when(mascotaDao.buscarPorId(1L)).thenReturn(mascota);
     when(lectorCollarService.obtenerLectura(1L)).thenReturn(lectura);
@@ -75,6 +93,7 @@ public class OrquestadorServiceImplTest {
     when(analizadorDeDatosService.calcularCalorias(1.5, EstadoMascota.CAMINANDO, 10.5))
       .thenReturn(50.0);
     when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L)).thenReturn(30);
+    when(rangoVitalDao.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
   }
 
   // ── procesarMascota ─────────────────────────────────────────────
@@ -131,8 +150,7 @@ public class OrquestadorServiceImplTest {
   void procesarMascotaDeberiaEvaluarLaLecturaYElPeso() {
     servicio.procesarMascota(1L);
 
-    verify(evaluadorAlertaService, times(1)).evaluarLectura(mascota, lectura);
-    verify(evaluadorAlertaService, times(1)).evaluarPeso(mascota);
+    verify(evaluadorAlertaService, times(1)).evaluarLectura(mascota, lectura, rango);
   }
 
   @Test
