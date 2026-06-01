@@ -87,7 +87,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
 
     persistirSuenoSiCorresponde(mascota, estado);
-    persistirActividadSiCorresponde(mascota, estado);
+    persistirActividadSiCorresponde(mascota, estado, lectura);
     persistirLectura(mascota, lectura);
 
     return armarDto(mascota, lectura, estado);
@@ -179,14 +179,28 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     repositorioSueno.guardar(registro);
   }
 
-  private void persistirActividadSiCorresponde(Mascota mascota, EstadoMascota estado) {
+  private void persistirActividadSiCorresponde(
+    Mascota mascota,
+    EstadoMascota estado,
+    LecturaSensor lecturaActual
+  ) {
     if (!estado.getComportamiento().registraActividad()) return;
-    double distanciaEnKm = estado.getComportamiento().getVelocidadKmH() * (MINUTOS_POR_TICK / 60.0);
-    Actividad actividad = new Actividad();
-    actividad.setDistanciaRecorrida(distanciaEnKm);
-    actividad.setFechaYHora(LocalDateTime.now());
-    actividad.setMascota(mascota);
-    repositorioActividad.guardar(actividad);
+    Analisis ultimoAnalisis = repositorioAnalisis.obtenerUltimoAnalisis(mascota.getId());
+    if (ultimoAnalisis == null) return;
+    double distanciaEnKm = analizadorDeDatosService.calcularDistanciaEntreUbicaciones(
+      ultimoAnalisis.getLatitud(),
+      ultimoAnalisis.getLongitud(),
+      lecturaActual.getLatitud(),
+      lecturaActual.getLongitud()
+    );
+
+    if (distanciaEnKm > 0) {
+      Actividad actividad = new Actividad();
+      actividad.setDistanciaRecorrida(distanciaEnKm);
+      actividad.setFechaYHora(LocalDateTime.now());
+      actividad.setMascota(mascota);
+      repositorioActividad.guardar(actividad);
+    }
   }
 
   private ResultadoSimulacionDto armarDto(
