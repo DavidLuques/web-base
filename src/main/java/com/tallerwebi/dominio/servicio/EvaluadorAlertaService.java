@@ -3,19 +3,23 @@ package com.tallerwebi.dominio.servicio;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EvaluadorAlertaService {
 
-  private static final int FRECUENCIA_MAXIMA = 160;
-  private static final int FRECUENCIA_MINIMA = 60;
-  private static final int PRESION_SISTOLICA_CRITICA = 125;
-  private static final BigDecimal TEMP_MAXIMA = new BigDecimal("39.5");
-  private static final BigDecimal TEMP_MINIMA = new BigDecimal("37.5");
   private static final String SUFIJO_LPM = " lpm).";
-  private static final String SUFIJO_GRADOS = "°C).";
+  private static final String SUFIJO_GRADOS = "°C";
+  private static final String SUFIJO_MMHG = " mmHg";
+  private static final String SUFIJO_VALOR_MAXIMO =
+    ", cuando el valor maximo normal deberia ser de hasta ";
+  private static final String SUFIJO_VALOR_MINIMO =
+    ", cuando el valor minimo normal deberia ser de hasta ";
+  private static final String PREFIJO_ANOMALIA_PRESION =
+    "Alerta: Anomalia en la medicion de la presion arterial de ";
+  private static final String INFIJO_LA_PRESION = ". La presion ";
 
   private final AlertaService alertaService;
 
@@ -33,9 +37,9 @@ public class EvaluadorAlertaService {
         TipoAlerta.ALERTA,
         "Atencion: El peso de " +
         mascota.getNombre() +
-        " (" +
+        " es " +
         peso +
-        " kg) esta por debajo del minimo recomendado (" +
+        " kg y esta por debajo del minimo recomendado (" +
         pesoMinimo +
         " kg)."
       );
@@ -48,65 +52,194 @@ public class EvaluadorAlertaService {
         TipoAlerta.ALERTA,
         "Atencion: El peso de " +
         mascota.getNombre() +
-        " (" +
+        " es " +
         peso +
-        " kg) esta por encima del maximo recomendado (" +
+        " kg y esta por encima del maximo recomendado (" +
         pesoMaximo +
         " kg)."
       );
     }
   }
 
-  public void evaluarLectura(Mascota mascota, LecturaSensor lectura) {
+  public void evaluarLectura(Mascota mascota, LecturaSensor lectura, RangoVitalPorTamano rango) {
     if (lectura == null) return;
-    evaluarFrecuenciaLectura(mascota, lectura);
-    evaluarTemperaturaLectura(mascota, lectura);
-    evaluarPresionLectura(mascota, lectura);
+    evaluarPeso(mascota);
+    evaluarFrecuenciaCardiacaLectura(mascota, lectura, rango);
+    evaluarTemperaturaLectura(mascota, lectura, rango);
+    evaluarPresionSistolicaLectura(mascota, lectura, rango);
+    evaluarPresionDiastolicaLectura(mascota, lectura, rango);
   }
 
-  private void evaluarFrecuenciaLectura(Mascota mascota, LecturaSensor lectura) {
-    Integer fc = lectura.getFrecuenciaCardiaca();
-    if (fc == null) return;
-    if (fc > FRECUENCIA_MAXIMA) {
+  private void evaluarFrecuenciaCardiacaLectura(
+    Mascota mascota,
+    LecturaSensor lectura,
+    RangoVitalPorTamano rango
+  ) {
+    Integer frecuenciaCardiaca = lectura.getFrecuenciaCardiaca();
+    if (frecuenciaCardiaca == null) return;
+    Integer frecuenciaCardiacaMaxima = rango.getFrecuenciaMaxima();
+    if (frecuenciaCardiaca > frecuenciaCardiacaMaxima) {
       alertaService.crearAlerta(
         mascota,
         TipoAlerta.EMERGENCIA,
-        "Emergencia: Frecuencia cardiaca inusualmente alta detectada (" + fc + SUFIJO_LPM
+        "Emergencia: La frecuencia cardiaca de" +
+        mascota.getNombre() +
+        " es inusualmente alta. La " +
+        "frecuencia cardiaca es de " +
+        frecuenciaCardiaca +
+        SUFIJO_LPM +
+        SUFIJO_VALOR_MAXIMO +
+        frecuenciaCardiacaMaxima +
+        SUFIJO_LPM +
+        "."
       );
-    } else if (fc < FRECUENCIA_MINIMA) {
+      return;
+    }
+    Integer frecuenciaCardiacaMinima = rango.getFrecuenciaMinima();
+    if (frecuenciaCardiaca < frecuenciaCardiacaMinima) {
       alertaService.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Alerta: Frecuencia cardiaca inusualmente baja detectada (" + fc + SUFIJO_LPM
+        "Emergencia: La frecuencia cardiaca de" +
+        mascota.getNombre() +
+        " es inusualmente baja. La " +
+        "frecuencia cardiaca es de " +
+        frecuenciaCardiaca +
+        SUFIJO_LPM +
+        SUFIJO_VALOR_MINIMO +
+        frecuenciaCardiacaMinima +
+        SUFIJO_LPM +
+        "."
       );
     }
   }
 
-  private void evaluarTemperaturaLectura(Mascota mascota, LecturaSensor lectura) {
+  private void evaluarTemperaturaLectura(
+    Mascota mascota,
+    LecturaSensor lectura,
+    RangoVitalPorTamano rango
+  ) {
     if (lectura.getTemperatura() == null) return;
     BigDecimal temp = BigDecimal.valueOf(lectura.getTemperatura());
-    if (temp.compareTo(TEMP_MAXIMA) > 0) {
+    BigDecimal tempMax = BigDecimal.valueOf(rango.getTemperaturaMaxima());
+    if (temp.compareTo(tempMax) > 0) {
       alertaService.crearAlerta(
         mascota,
         TipoAlerta.EMERGENCIA,
-        "Emergencia: Temperatura corporal alta detectada (" + temp + SUFIJO_GRADOS
+        "Emergencia: La temperatura corporal de " +
+        mascota.getNombre() +
+        " es alta. La temperatura corporal " +
+        "es de " +
+        temp +
+        SUFIJO_GRADOS +
+        SUFIJO_VALOR_MAXIMO +
+        tempMax +
+        SUFIJO_GRADOS +
+        "."
       );
-    } else if (temp.compareTo(TEMP_MINIMA) < 0) {
+      return;
+    }
+    BigDecimal tempMin = BigDecimal.valueOf(rango.getTemperaturaMinima());
+    if (temp.compareTo(tempMin) < 0) {
       alertaService.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Alerta: Temperatura corporal baja detectada (" + temp + SUFIJO_GRADOS
+        "Emergencia: La temperatura corporal de " +
+        mascota.getNombre() +
+        " es baja. La temperatura corporal " +
+        "es de " +
+        temp +
+        SUFIJO_GRADOS +
+        SUFIJO_VALOR_MINIMO +
+        tempMin +
+        SUFIJO_GRADOS +
+        "."
       );
     }
   }
 
-  private void evaluarPresionLectura(Mascota mascota, LecturaSensor lectura) {
-    Integer presion = lectura.getPresionSistolica();
-    if (presion != null && presion > PRESION_SISTOLICA_CRITICA) {
+  private void evaluarPresionSistolicaLectura(
+    Mascota mascota,
+    LecturaSensor lectura,
+    RangoVitalPorTamano rango
+  ) {
+    Integer presionSistolica = lectura.getPresionSistolica();
+    Integer presionSistolicaMaxima = rango.getSistolicaMaxima();
+    if (presionSistolica != null && presionSistolica > presionSistolicaMaxima) {
       alertaService.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
-        "Alerta: Fluctuacion significativa en la presion arterial detectada."
+        PREFIJO_ANOMALIA_PRESION +
+        mascota.getNombre() +
+        INFIJO_LA_PRESION +
+        "arterial sistolica es de " +
+        presionSistolica +
+        SUFIJO_MMHG +
+        SUFIJO_VALOR_MAXIMO +
+        presionSistolicaMaxima +
+        SUFIJO_MMHG +
+        "."
+      );
+      return;
+    }
+    Integer presionSistolicaMinima = rango.getSistolicaMinima();
+    if (presionSistolica != null && presionSistolica < presionSistolicaMinima) {
+      alertaService.crearAlerta(
+        mascota,
+        TipoAlerta.ALERTA,
+        PREFIJO_ANOMALIA_PRESION +
+        mascota.getNombre() +
+        INFIJO_LA_PRESION +
+        "arterial sistolica es de " +
+        presionSistolica +
+        SUFIJO_MMHG +
+        SUFIJO_VALOR_MINIMO +
+        presionSistolicaMinima +
+        SUFIJO_MMHG +
+        "."
+      );
+    }
+  }
+
+  private void evaluarPresionDiastolicaLectura(
+    Mascota mascota,
+    LecturaSensor lectura,
+    RangoVitalPorTamano rango
+  ) {
+    Integer presionDiastolica = lectura.getPresionDiastolica();
+    Integer presionDiastolicaMaxima = rango.getDiastolicaMaxima();
+    if (presionDiastolica != null && presionDiastolica > presionDiastolicaMaxima) {
+      alertaService.crearAlerta(
+        mascota,
+        TipoAlerta.ALERTA,
+        PREFIJO_ANOMALIA_PRESION +
+        mascota.getNombre() +
+        INFIJO_LA_PRESION +
+        "arterial diastolica es de " +
+        presionDiastolica +
+        SUFIJO_MMHG +
+        SUFIJO_VALOR_MAXIMO +
+        presionDiastolicaMaxima +
+        SUFIJO_MMHG +
+        "."
+      );
+      return;
+    }
+    Integer presionDiastolicaMinima = rango.getDiastolicaMinima();
+    if (presionDiastolica != null && presionDiastolica < presionDiastolicaMinima) {
+      alertaService.crearAlerta(
+        mascota,
+        TipoAlerta.ALERTA,
+        PREFIJO_ANOMALIA_PRESION +
+        mascota.getNombre() +
+        INFIJO_LA_PRESION +
+        "arterial diastolica es de " +
+        presionDiastolica +
+        SUFIJO_MMHG +
+        SUFIJO_VALOR_MINIMO +
+        presionDiastolicaMinima +
+        SUFIJO_MMHG +
+        "."
       );
     }
   }

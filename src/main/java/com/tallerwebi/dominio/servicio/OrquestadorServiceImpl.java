@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
+import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Actividad;
@@ -11,6 +12,7 @@ import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import com.tallerwebi.dominio.modelo.RegistroSueno;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +33,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private final RepositorioActividad repositorioActividad;
   private final RepositorioSueno repositorioSueno;
   private final RepositorioAnalisis repositorioAnalisis;
+  private final RangoVitalDao rangoVitalDao;
 
   @Autowired
   public OrquestadorServiceImpl(
@@ -40,7 +43,8 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     EvaluadorAlertaService evaluadorAlertaService,
     RepositorioActividad repositorioActividad,
     RepositorioSueno repositorioSueno,
-    RepositorioAnalisis repositorioAnalisis
+    RepositorioAnalisis repositorioAnalisis,
+    RangoVitalDao rangoVitalDao
   ) {
     this.mascotaDao = mascotaDao;
     this.lectorCollarService = lectorCollarService;
@@ -49,6 +53,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     this.repositorioActividad = repositorioActividad;
     this.repositorioSueno = repositorioSueno;
     this.repositorioAnalisis = repositorioAnalisis;
+    this.rangoVitalDao = rangoVitalDao;
   }
 
   @Override
@@ -72,14 +77,14 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   @Override
   public ResultadoSimulacionDto procesarMascota(Long idMascota) {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
     LecturaSensor lectura = lectorCollarService.obtenerLectura(idMascota);
 
     EstadoMascota estado = analizadorDeDatosService.determinarEstado(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura);
-    evaluadorAlertaService.evaluarPeso(mascota);
+    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
 
     persistirSuenoSiCorresponde(mascota, estado);
     persistirActividadSiCorresponde(mascota, estado);

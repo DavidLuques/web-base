@@ -31,7 +31,7 @@ public class AlertaService {
 
   @Transactional
   public List<AlertaDto> obtenerAlertasPorMascota(Long idMascota) {
-    if (idMascota == null) return java.util.Collections.emptyList();
+    if (idMascota == null) return java.util.Collections.emptyList(); //Evita la excepcion, devolviendo una lista vacia
     return repositorioAlerta
       .buscarPorMascota(idMascota)
       .stream()
