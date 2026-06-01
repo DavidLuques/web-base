@@ -17,7 +17,7 @@ public class ActualizadorEstadoMascotaScheduler {
     this.orquestadorService = orquestadorService;
   }
 
-  @Scheduled(fixedRate = DIEZ_SEGUNDOS_EN_MS)
+  @Scheduled(fixedRate = DOS_MINUTOS_EN_MS)
   public void actualizarEstadosDeMascotas() {
     orquestadorService.procesarTodasLasMascotas();
   }
