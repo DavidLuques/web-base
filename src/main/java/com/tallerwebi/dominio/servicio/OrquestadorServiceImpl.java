@@ -15,7 +15,9 @@ import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import com.tallerwebi.dominio.modelo.RegistroSueno;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,6 +145,23 @@ public class OrquestadorServiceImpl implements OrquestadorService {
       calorias,
       minutosDormidos
     );
+  }
+
+  @Override
+  public Map<String, Object> obtenerUltimaUbicacion(Long idMascota) {
+    Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(idMascota);
+    Map<String, Object> respuesta = new HashMap<>();
+
+    if (ultimo != null) {
+      respuesta.put("latitud", ultimo.getLatitud());
+      respuesta.put("longitud", ultimo.getLongitud());
+    } else {
+      // Valores por defecto si aún no hay lecturas
+      respuesta.put("latitud", -34.7222);
+      respuesta.put("longitud", -58.5250);
+    }
+
+    return respuesta;
   }
 
   // ── privados ─────────────────────────────────────────────

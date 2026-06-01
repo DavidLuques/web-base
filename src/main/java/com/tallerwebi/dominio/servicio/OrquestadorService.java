@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
+import java.util.Map;
 
 public interface OrquestadorService {
   ResultadoSimulacionDto procesarMascota(Long idMascota);
@@ -12,4 +13,6 @@ public interface OrquestadorService {
   ResultadoSimulacionDto refrescarLectura(Long idMascota);
 
   void refrescarTodasLasLecturas();
+
+  Map<String, Object> obtenerUltimaUbicacion(Long idMascota);
 }
