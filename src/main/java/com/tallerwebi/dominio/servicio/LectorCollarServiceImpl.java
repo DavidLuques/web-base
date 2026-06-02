@@ -61,28 +61,6 @@ public class LectorCollarServiceImpl implements LectorCollarService {
     return lectura;
   }
 
-  @Override
-  public LecturaSensor obtenerLecturaCritica(Long idMascota) {
-    Mascota mascota = mascotaDao.buscarPorId(idMascota);
-    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
-
-    LecturaSensor lectura = new LecturaSensor();
-    lectura.setFrecuenciaCardiaca(rango.getFrecuenciaMaxima() + 40);
-    lectura.setTemperatura(41.5);
-    lectura.setPresionSistolica(rango.getSistolicaMaxima() + 30);
-    lectura.setPresionDiastolica(rango.getDiastolicaMaxima() + 20);
-    lectura.setAccelX(siguienteMovimiento() * 2);
-    lectura.setAccelY(siguienteMovimiento() * 2);
-    lectura.setAccelZ(siguienteMovimiento() * 2);
-    lectura.setGyroX(siguienteRotacion() * 2);
-    lectura.setGyroY(siguienteRotacion() * 2);
-    lectura.setGyroZ(siguienteRotacion() * 2);
-    lectura.setLatitud(siguienteLatitud());
-    lectura.setLongitud(siguienteLongitud());
-
-    return lectura;
-  }
-
   private void inicializarPresionSiEsNecesario(RangoVitalPorTamano rango) {
     if (sistolicaActual == null) sistolicaActual =
       valorMedioEntre(rango.getSistolicaMinima(), rango.getSistolicaMaxima());
