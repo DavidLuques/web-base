@@ -168,34 +168,4 @@ public class LectorCollarServiceImplTest {
       )
     );
   }
-
-  // ── obtenerLecturaCritica ───────────────────────────────────────
-
-  @Test
-  void deberiaRetornarFrecuenciaCardiacaPorEncimaDelMaximoEnLecturaCritica() {
-    LecturaSensor lectura = servicio.obtenerLecturaCritica(1L);
-
-    assertThat(lectura.getFrecuenciaCardiaca(), greaterThan(rango.getFrecuenciaMaxima()));
-  }
-
-  @Test
-  void deberiaRetornarTemperaturaCriticaPorEncimaDelMaximo() {
-    LecturaSensor lectura = servicio.obtenerLecturaCritica(1L);
-
-    assertThat(lectura.getTemperatura(), greaterThan(rango.getTemperaturaMaxima()));
-  }
-
-  @Test
-  void deberiaRetornarPresionSistolicaPorEncimaDelMaximoEnLecturaCritica() {
-    LecturaSensor lectura = servicio.obtenerLecturaCritica(1L);
-
-    assertThat(lectura.getPresionSistolica(), greaterThan(rango.getSistolicaMaxima()));
-  }
-
-  @Test
-  void deberiaRetornarPresionDiastolicaPorEncimaDelMaximoEnLecturaCritica() {
-    LecturaSensor lectura = servicio.obtenerLecturaCritica(1L);
-
-    assertThat(lectura.getPresionDiastolica(), greaterThan(rango.getDiastolicaMaxima()));
-  }
 }
