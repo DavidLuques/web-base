@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioActividad;
@@ -18,6 +19,7 @@ import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -229,5 +231,33 @@ public class OrquestadorServiceImplTest {
     assertThat(resultado.getPresionSistolica(), equalTo(125));
     assertThat(resultado.getPresionDiastolica(), equalTo(82));
     assertThat(resultado.getTemperatura(), equalTo(38.7));
+  }
+
+  @Test
+  public void deberiaDevolverLaUltimaUbicacionRegistrada() {
+    Long idMascota = 1L;
+    Analisis analisisMock = new Analisis();
+    analisisMock.setLatitud(-34.5000);
+    analisisMock.setLongitud(-58.4000);
+
+    when(repositorioAnalisis.obtenerUltimoAnalisis(idMascota)).thenReturn(analisisMock);
+
+    Map<String, Object> resultado = servicio.obtenerUltimaUbicacion(idMascota);
+
+    assertEquals(-34.5000, resultado.get("latitud"));
+    assertEquals(-58.4000, resultado.get("longitud"));
+    verify(repositorioAnalisis, times(1)).obtenerUltimoAnalisis(idMascota);
+  }
+
+  @Test
+  public void deberiaDevolverUbicacionPorDefectoSiNoHayLecturasPrevias() {
+    Long idMascota = 1L;
+    when(repositorioAnalisis.obtenerUltimoAnalisis(idMascota)).thenReturn(null);
+
+    Map<String, Object> resultado = servicio.obtenerUltimaUbicacion(idMascota);
+
+    assertEquals(-34.7222, resultado.get("latitud"));
+    assertEquals(-58.5250, resultado.get("longitud"));
+    verify(repositorioAnalisis, times(1)).obtenerUltimoAnalisis(idMascota);
   }
 }
