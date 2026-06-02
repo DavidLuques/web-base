@@ -65,7 +65,7 @@ public class ServicioMascotaImplTest {
     assertNotNull(mascotaGuardada);
     assertEquals("Firulais", mascotaGuardada.getNombre());
     assertEquals(TamanoMascota.MEDIANO, mascotaGuardada.getTamano());
-    assertEquals(EstadoMascota.REPOSO, mascotaGuardada.getEstadoActual());
+    assertEquals(EstadoMascota.CORRIENDO, mascotaGuardada.getEstadoActual());
     assertEquals(usuarioMock, mascotaGuardada.getUsuario());
     assertNotNull(mascotaGuardada.getDatos());
     assertEquals("Perro", mascotaGuardada.getDatos().getTipo());

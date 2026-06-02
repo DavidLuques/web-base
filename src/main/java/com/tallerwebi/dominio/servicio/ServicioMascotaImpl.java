@@ -36,7 +36,7 @@ public class ServicioMascotaImpl implements ServicioMascota {
     Mascota mascota = new Mascota();
     mascota.setNombre(datos.getNombre());
     mascota.setTamano(datos.getTamano());
-    mascota.setEstadoActual(EstadoMascota.REPOSO); // Estado por defecto
+    mascota.setEstadoActual(EstadoMascota.CORRIENDO); // Estado por defecto
     mascota.setUsuario(usuario);
 
     DatosMascota datosMascota = new DatosMascota();
