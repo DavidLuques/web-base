@@ -1,5 +1,6 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.RepositorioAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
 import java.util.List;
 import org.hibernate.SessionFactory;
@@ -31,5 +32,21 @@ public class AlertaImpl implements RepositorioAlerta {
       )
       .setParameter("idMascota", idMascota)
       .getResultList();
+  }
+
+  @Override
+  public Alerta buscarUltimaAlertaDePesoPorMascota(Long idMascota) {
+    List<Alerta> alertas = sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT a FROM Alerta a WHERE a.mascota.id = :idMascota " +
+        "AND a.mensaje LIKE :prefijo ORDER BY a.fechaYHora DESC",
+        Alerta.class
+      )
+      .setParameter("idMascota", idMascota)
+      .setParameter("prefijo", "Atencion: El peso%")
+      .setMaxResults(1)
+      .getResultList();
+    return alertas.isEmpty() ? null : alertas.get(0);
   }
 }
