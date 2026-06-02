@@ -19,8 +19,8 @@
       <i th:class="${paginaActiva == 'alertas'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="bell"></i>
     </a>
     <a th:href="@{/analisis/valla/{id}(id=${idMascota})}"
-       th:class="${paginaActiva == 'alertas'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
-      <i th:class="${paginaActiva == 'alertas'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="map-pin"></i>
+       th:class="${paginaActiva == 'valla'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+      <i th:class="${paginaActiva == 'valla'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="map-pin"></i>
     </a>
   </nav>
   <div class="mt-auto w-full flex flex-col gap-2">
