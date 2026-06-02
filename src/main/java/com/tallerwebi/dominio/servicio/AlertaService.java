@@ -19,6 +19,10 @@ public class AlertaService {
     this.repositorioAlerta = repositorioAlerta;
   }
 
+  public Alerta buscarUltimaAlertaDePeso(Long idMascota) {
+    return repositorioAlerta.buscarUltimaAlertaDePesoPorMascota(idMascota);
+  }
+
   public void crearAlerta(Mascota mascota, TipoAlerta tipo, String mensaje) {
     Alerta alerta = new Alerta();
     alerta.setMascota(mascota);

@@ -7,4 +7,6 @@ public interface RepositorioAlerta {
   void save(Alerta alerta);
 
   List<Alerta> buscarPorMascota(Long idMascota);
+
+  Alerta buscarUltimaAlertaDePesoPorMascota(Long idMascota);
 }
