@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.enums.TipoAlerta;
+import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -53,6 +54,7 @@ public class EvaluadorAlertaServiceTest {
   @Test
   void debeGenerarAlertaPorBajoPeso() {
     mascota.setPeso(8.0);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("debajo"));
   }
@@ -60,6 +62,7 @@ public class EvaluadorAlertaServiceTest {
   @Test
   void debeGenerarAlertaPorAltoPeso() {
     mascota.setPeso(28.0);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("encima"));
   }
@@ -96,6 +99,7 @@ public class EvaluadorAlertaServiceTest {
   void debeGenerarAlertaPorBajoPesoMascotaPequena() {
     mascota.setTamano(TamanoMascota.PEQUENO);
     mascota.setPeso(1.0);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
@@ -104,6 +108,7 @@ public class EvaluadorAlertaServiceTest {
   void debeGenerarAlertaPorAltoPesoMascotaGrande() {
     mascota.setTamano(TamanoMascota.GRANDE);
     mascota.setPeso(50.0);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
@@ -125,6 +130,7 @@ public class EvaluadorAlertaServiceTest {
   @Test
   void debeGenerarAlertaPorPesoExactamenteUnDecimalDebajoDeLimiteMinimo() {
     mascota.setPeso(10.9);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
@@ -132,6 +138,7 @@ public class EvaluadorAlertaServiceTest {
   @Test
   void debeGenerarAlertaPorPesoExactamenteUnDecimalEncimaDeLimiteMaximo() {
     mascota.setPeso(25.1);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
@@ -139,6 +146,7 @@ public class EvaluadorAlertaServiceTest {
   @Test
   void elMensajeDeAlertaPorBajoPesoContieneElNombreDeLaMascota() {
     mascota.setPeso(8.0);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("Firulais"));
   }
@@ -146,8 +154,33 @@ public class EvaluadorAlertaServiceTest {
   @Test
   void elMensajeDeAlertaPorAltoPesoContieneElPesoActual() {
     mascota.setPeso(28.0);
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
     evaluadorAlertaService.evaluarPeso(mascota);
     verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("28.0"));
+  }
+
+  @Test
+  void noDebeGenerarAlertaSiElPesoNoCambioDesdeUltimaAlerta() {
+    mascota.setPeso(8.0);
+    Alerta ultimaAlerta = new Alerta();
+    ultimaAlerta.setMensaje(
+      "Atencion: El peso de Firulais es 8.0 kg y esta por debajo del minimo recomendado (11.0 kg)."
+    );
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(ultimaAlerta);
+    evaluadorAlertaService.evaluarPeso(mascota);
+    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+  }
+
+  @Test
+  void debeGenerarAlertaSiElPesoCambioDesdeUltimaAlerta() {
+    mascota.setPeso(7.5);
+    Alerta ultimaAlerta = new Alerta();
+    ultimaAlerta.setMensaje(
+      "Atencion: El peso de Firulais es 8.0 kg y esta por debajo del minimo recomendado (11.0 kg)."
+    );
+    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(ultimaAlerta);
+    evaluadorAlertaService.evaluarPeso(mascota);
+    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("7.5"));
   }
 
   // LECTURA

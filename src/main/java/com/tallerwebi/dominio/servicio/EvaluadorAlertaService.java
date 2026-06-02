@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.enums.TipoAlerta;
+import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -27,11 +28,26 @@ public class EvaluadorAlertaService {
     this.alertaService = alertaService;
   }
 
+  public void evaluarLectura(Mascota mascota, LecturaSensor lectura, RangoVitalPorTamano rango) {
+    if (lectura == null) return;
+    evaluarPeso(mascota);
+    evaluarFrecuenciaCardiacaLectura(mascota, lectura, rango);
+    evaluarTemperaturaLectura(mascota, lectura, rango);
+    evaluarPresionSistolicaLectura(mascota, lectura, rango);
+    evaluarPresionDiastolicaLectura(mascota, lectura, rango);
+  }
+
   public void evaluarPeso(Mascota mascota) {
     if (mascota == null || mascota.getTamano() == null || mascota.getPeso() == null) return;
     Double peso = mascota.getPeso();
+    if (estaBajoDePeso(mascota, peso)) return;
+    evaluarSobrePeso(mascota, peso);
+  }
+
+  private boolean estaBajoDePeso(Mascota mascota, Double peso) {
     Double pesoMinimo = obtenerPesoMinimo(mascota);
-    if (pesoMinimo != null && peso < pesoMinimo) {
+    if (pesoMinimo == null || peso >= pesoMinimo) return false;
+    if (pesoDistintoAlAnterior(mascota, peso)) {
       alertaService.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
@@ -43,10 +59,14 @@ public class EvaluadorAlertaService {
         pesoMinimo +
         " kg)."
       );
-      return;
     }
+    return true;
+  }
+
+  private void evaluarSobrePeso(Mascota mascota, Double peso) {
     Double pesoMaximo = obtenerPesoMaximo(mascota);
-    if (pesoMaximo != null && peso > pesoMaximo) {
+    if (pesoMaximo == null || peso <= pesoMaximo) return;
+    if (pesoDistintoAlAnterior(mascota, peso)) {
       alertaService.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
@@ -61,13 +81,10 @@ public class EvaluadorAlertaService {
     }
   }
 
-  public void evaluarLectura(Mascota mascota, LecturaSensor lectura, RangoVitalPorTamano rango) {
-    if (lectura == null) return;
-    evaluarPeso(mascota);
-    evaluarFrecuenciaCardiacaLectura(mascota, lectura, rango);
-    evaluarTemperaturaLectura(mascota, lectura, rango);
-    evaluarPresionSistolicaLectura(mascota, lectura, rango);
-    evaluarPresionDiastolicaLectura(mascota, lectura, rango);
+  private boolean pesoDistintoAlAnterior(Mascota mascota, Double pesoActual) {
+    Alerta ultima = alertaService.buscarUltimaAlertaDePeso(mascota.getId());
+    if (ultima == null) return true; // primera vez, siempre dispara
+    return !ultima.getMensaje().contains("" + pesoActual);
   }
 
   private void evaluarFrecuenciaCardiacaLectura(
