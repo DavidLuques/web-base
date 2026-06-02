@@ -39,4 +39,9 @@ public class MascotaDaoImpl implements MascotaDao {
       .setParameter("usuarioId", usuarioId)
       .list();
   }
+
+  @Override
+  public void guardar(Mascota mascota) {
+    sessionFactory.getCurrentSession().save(mascota);
+  }
 }

@@ -16,7 +16,7 @@
 
   <main class="flex-1 flex flex-col h-full overflow-y-auto">
 
-    <div th:replace="fragmentos/header :: header(${mascotaNombre}, ${idMascota})"></div>
+    <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'vista', 'Simulador de Signos Vitales')"></header>
 
     <!-- ESTADO -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex justify-between items-center">

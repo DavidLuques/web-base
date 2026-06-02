@@ -4,7 +4,9 @@ import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.servicio.AlertaService;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
+import com.tallerwebi.dominio.servicio.ServicioMascota;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,11 +21,17 @@ public class ControladorMonitoreo {
 
   private final OrquestadorService orquestadorService;
   private final AlertaService alertaService;
+  private final ServicioMascota servicioMascota;
 
   @Autowired
-  public ControladorMonitoreo(OrquestadorService orquestadorService, AlertaService alertaService) {
+  public ControladorMonitoreo(
+    OrquestadorService orquestadorService,
+    AlertaService alertaService,
+    ServicioMascota servicioMascota
+  ) {
     this.orquestadorService = orquestadorService;
     this.alertaService = alertaService;
+    this.servicioMascota = servicioMascota;
   }
 
   @GetMapping("/{idMascota}")
@@ -33,8 +41,16 @@ public class ControladorMonitoreo {
   }
 
   @GetMapping("/alertas/{idMascota}")
-  public String verPantallaDeAlertas(@PathVariable Long idMascota, Model model) {
+  public String verPantallaDeAlertas(
+    @PathVariable Long idMascota,
+    Model model,
+    HttpServletRequest request
+  ) {
     model.addAttribute("idMascota", idMascota);
+    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    if (idUsuario != null) {
+      model.addAttribute("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    }
     return "alertas";
   }
 
@@ -45,8 +61,12 @@ public class ControladorMonitoreo {
   }
 
   @GetMapping("/vista/{idMascota}")
-  public String vista(@PathVariable Long idMascota, Model model) {
+  public String vista(@PathVariable Long idMascota, Model model, HttpServletRequest request) {
     model.addAttribute("idMascota", idMascota);
+    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    if (idUsuario != null) {
+      model.addAttribute("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    }
     return "simulacion";
   }
 
@@ -57,8 +77,16 @@ public class ControladorMonitoreo {
   }
 
   @GetMapping("/dashboard/{idMascota}")
-  public String vistaDashboard(@PathVariable Long idMascota, Model model) {
+  public String vistaDashboard(
+    @PathVariable Long idMascota,
+    Model model,
+    HttpServletRequest request
+  ) {
     model.addAttribute("idMascota", idMascota);
+    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    if (idUsuario != null) {
+      model.addAttribute("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    }
     ResultadoSimulacionDto estado = orquestadorService.obtenerUltimoEstado(idMascota);
     model.addAttribute("mascotaNombre", estado != null ? estado.getNombreMascota() : "Mascota");
     return "dashboard";

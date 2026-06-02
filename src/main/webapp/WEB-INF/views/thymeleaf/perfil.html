@@ -16,6 +16,7 @@
 <div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'configuraciones')"></div>
 
 <main class="flex-1 flex flex-col h-full overflow-hidden">
+  <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'perfil', 'Perfil de Usuario')"></header>
   <div class="flex-1 p-8 overflow-y-auto">
     <div class="max-w-2xl mx-auto mt-8">
       
