@@ -156,7 +156,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
       respuesta.put("latitud", ultimo.getLatitud());
       respuesta.put("longitud", ultimo.getLongitud());
     } else {
-      // Valores por defecto si aún no hay lecturas
+      // Valores por defecto si todavía no hay lecturas
       respuesta.put("latitud", -34.7222);
       respuesta.put("longitud", -58.5250);
     }

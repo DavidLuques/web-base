@@ -1,13 +1,12 @@
-/* Contenedor principal del mapa falso */
 .plano-cartesiano {
     position: relative;
-    width: 600px;
+    width: 100%;
     height: 600px;
-    background-color: #f8fafc; /* slate-50 de Tailwind */
-    border: 2px solid #e2e8f0; /* slate-200 */
-    border-radius: 1rem;       /* 16px - redondeado moderno */
+    background-color: #6C8E68; 
+    border: 2px solid #e2e8f0; 
+    border-radius: 1rem;      
     overflow: hidden;
-    margin: 0 auto;            /* Centrado horizontal */
+    margin: 0 auto;           
     box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
 }
 
@@ -25,30 +24,20 @@
     transition: all 0.3s ease;
 }
 
-/* El punto central (La Casa) */
 .punto-casa {
     position: absolute;
     top: 50%; 
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 14px; 
-    height: 14px;
-    background-color: #334155; /* slate-700 */
-    border-radius: 50%;
     z-index: 10;
+    color: #334155;
 }
 
-/* El punto móvil (La Mascota) */
 .punto-mascota {
     position: absolute;
     top: 50%; 
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 18px; 
-    height: 18px;
-    background-color: #22c55e; /* green-500 */
-    border-radius: 50%;
     z-index: 20;
-    transition: left 0.5s ease, top 0.5s ease, background-color 0.3s ease;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    transition: left 0.5s ease, top 0.5s ease, color 0.3s ease;
 }
