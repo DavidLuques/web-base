@@ -12,6 +12,7 @@ fetch("/spring/analisis/rangos/" + idMascota)
 // =========================
 // MODAL
 // =========================
+// eslint-disable-next-line no-unused-vars
 function abrirModal(tipo) {
   var modal     = document.getElementById("modal-vermas");
   var titulo    = document.getElementById("modal-titulo");
