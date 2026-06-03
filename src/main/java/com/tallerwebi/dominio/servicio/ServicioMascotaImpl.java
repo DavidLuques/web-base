@@ -66,4 +66,62 @@ public class ServicioMascotaImpl implements ServicioMascota {
   public Mascota obtenerMascotaPorId(Long id) {
     return mascotaDao.buscarPorId(id);
   }
+
+  @Override
+  public DatosAltaMascota obtenerDatosMascota(Long id) {
+    Mascota mascota = mascotaDao.buscarPorId(id);
+    if (mascota == null) {
+      return null;
+    }
+    DatosAltaMascota datos = new DatosAltaMascota();
+    datos.setNombre(mascota.getNombre());
+    datos.setTamano(mascota.getTamano());
+    if (mascota.getDatos() != null) {
+      datos.setTipo(mascota.getDatos().getTipo());
+      datos.setRaza(mascota.getDatos().getRaza());
+      datos.setGenero(mascota.getDatos().getGenero());
+      datos.setPeso(mascota.getDatos().getPeso());
+      if (mascota.getDatos().getFechaNacimiento() != null) {
+        datos.setFechaNacimiento(mascota.getDatos().getFechaNacimiento().toString());
+      }
+    }
+    return datos;
+  }
+
+  @Override
+  public void actualizarMascota(Long idMascota, DatosAltaMascota datos) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    if (mascota != null) {
+      mascota.setNombre(datos.getNombre());
+      mascota.setTamano(datos.getTamano());
+      if (mascota.getDatos() == null) {
+        mascota.setDatos(new DatosMascota());
+      }
+      mascota.getDatos().setTipo(datos.getTipo());
+      mascota.getDatos().setRaza(datos.getRaza());
+      mascota.getDatos().setGenero(datos.getGenero());
+      mascota.getDatos().setPeso(datos.getPeso());
+
+      if (datos.getFechaNacimiento() != null && !datos.getFechaNacimiento().isEmpty()) {
+        mascota
+          .getDatos()
+          .setFechaNacimiento(
+            LocalDate.parse(datos.getFechaNacimiento(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+          );
+      } else {
+        mascota.getDatos().setFechaNacimiento(null);
+      }
+
+      mascotaDao.modificar(mascota);
+    }
+  }
+
+  @Override
+  public void eliminarMascota(Long id) {
+    Mascota mascota = mascotaDao.buscarPorId(id);
+    if (mascota != null) {
+      mascota.setActivo(false);
+      mascotaDao.modificar(mascota);
+    }
+  }
 }

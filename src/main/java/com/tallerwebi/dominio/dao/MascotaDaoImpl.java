@@ -28,14 +28,20 @@ public class MascotaDaoImpl implements MascotaDao {
 
   @Override
   public List<Mascota> buscarTodas() {
-    return sessionFactory.getCurrentSession().createQuery("FROM Mascota", Mascota.class).list();
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("FROM Mascota m WHERE m.activo = true", Mascota.class)
+      .list();
   }
 
   @Override
   public List<Mascota> buscarPorUsuarioId(Long usuarioId) {
     return sessionFactory
       .getCurrentSession()
-      .createQuery("FROM Mascota m WHERE m.usuario.id = :usuarioId", Mascota.class)
+      .createQuery(
+        "FROM Mascota m WHERE m.usuario.id = :usuarioId AND m.activo = true",
+        Mascota.class
+      )
       .setParameter("usuarioId", usuarioId)
       .list();
   }
@@ -43,5 +49,10 @@ public class MascotaDaoImpl implements MascotaDao {
   @Override
   public void guardar(Mascota mascota) {
     sessionFactory.getCurrentSession().save(mascota);
+  }
+
+  @Override
+  public void eliminar(Mascota mascota) {
+    sessionFactory.getCurrentSession().delete(mascota);
   }
 }
