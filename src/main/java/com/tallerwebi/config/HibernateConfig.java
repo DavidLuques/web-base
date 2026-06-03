@@ -9,6 +9,9 @@ import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * Clase encargada de...
+ */
 @Configuration
 @EnableTransactionManagement(proxyTargetClass = true)
 public class HibernateConfig {

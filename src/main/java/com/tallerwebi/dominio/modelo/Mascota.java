@@ -5,6 +5,9 @@ import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import javax.persistence.*;
 
+/**
+ * Entidad del sistema
+ */
 @Entity
 @Table(name = "mascota")
 public class Mascota {

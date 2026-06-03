@@ -4,6 +4,9 @@ import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import java.util.Map;
 
+/**
+ * Servicio de lógica de negocio.
+ */
 public interface OrquestadorService {
   ResultadoSimulacionDto procesarMascota(Long idMascota);
 

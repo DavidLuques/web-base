@@ -1,5 +1,8 @@
 package com.tallerwebi.dominio.modelo;
 
+/**
+ * Entidad del sistema
+ */
 public class LecturaSensor {
 
   private DatosAnalisis datos;

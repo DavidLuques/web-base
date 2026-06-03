@@ -1,5 +1,8 @@
 package com.tallerwebi.dominio.excepcion;
 
+/**
+ *  excepcion.
+ */
 public class UsuarioExistente extends Exception {
 
   /* Identificador para la serialización de la clase, requerido por PMD en excepciones */

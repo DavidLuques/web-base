@@ -1,5 +1,8 @@
 package com.tallerwebi.dominio.dto;
 
+/**
+ *  datos.
+ */
 public class DatosVitalesDto {
 
   private Integer frecuenciaCardiaca;

@@ -1,5 +1,8 @@
 package com.tallerwebi.presentacion;
 
+/**
+ *  datos.
+ */
 public class DatosPerfil {
 
   private String nombre;

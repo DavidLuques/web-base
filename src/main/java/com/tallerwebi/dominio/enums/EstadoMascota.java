@@ -6,6 +6,9 @@ import com.tallerwebi.dominio.estado.EstadoCorriendo;
 import com.tallerwebi.dominio.estado.EstadoDurmiendo;
 import com.tallerwebi.dominio.estado.EstadoReposo;
 
+/**
+ *  datos.
+ */
 public enum EstadoMascota {
   DURMIENDO(new EstadoDurmiendo()),
   REPOSO(new EstadoReposo()),

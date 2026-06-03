@@ -3,6 +3,9 @@ package com.tallerwebi.dominio.modelo;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import javax.persistence.*;
 
+/**
+ * Entidad del sistema
+ */
 @Entity
 @Table(name = "rango_vital_por_tamano")
 public class RangoVitalPorTamano {

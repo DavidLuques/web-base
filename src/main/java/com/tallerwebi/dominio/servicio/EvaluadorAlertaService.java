@@ -8,6 +8,9 @@ import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de lógica de negocio.
+ */
 @Service
 public class EvaluadorAlertaService {
 

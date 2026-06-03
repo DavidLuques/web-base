@@ -10,6 +10,9 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de lógica de negocio.
+ */
 @Service("servicioUsuario")
 @Transactional
 public class ServicioUsuarioImpl implements ServicioUsuario {

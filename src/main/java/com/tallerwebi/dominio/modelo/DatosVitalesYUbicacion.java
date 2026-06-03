@@ -2,6 +2,9 @@ package com.tallerwebi.dominio.modelo;
 
 import javax.persistence.Embeddable;
 
+/**
+ * Entidad del sistema
+ */
 @Embeddable
 public class DatosVitalesYUbicacion {
 

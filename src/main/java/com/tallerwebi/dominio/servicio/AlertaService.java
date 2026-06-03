@@ -10,6 +10,9 @@ import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio de lógica de negocio.
+ */
 @Service
 public class AlertaService {
 

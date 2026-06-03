@@ -2,6 +2,9 @@ package com.tallerwebi.dominio.dto;
 
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 
+/**
+ *  datos.
+ */
 public class RangosVitalesDto {
 
   private Integer frecuenciaMinima;

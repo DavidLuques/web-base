@@ -5,6 +5,9 @@ import com.tallerwebi.dominio.tamano.TamanoGrande;
 import com.tallerwebi.dominio.tamano.TamanoMediano;
 import com.tallerwebi.dominio.tamano.TamanoPequeno;
 
+/**
+ *  datos.
+ */
 public enum TamanoMascota {
   PEQUENO(new TamanoPequeno()),
   MEDIANO(new TamanoMediano()),

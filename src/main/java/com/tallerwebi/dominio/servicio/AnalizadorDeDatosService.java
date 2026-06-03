@@ -5,6 +5,9 @@ import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 
+/**
+ * Servicio de lógica de negocio.
+ */
 public interface AnalizadorDeDatosService {
   EstadoMascota determinarEstado(Mascota mascota, LecturaSensor lectura);
 

@@ -3,6 +3,9 @@ package com.tallerwebi.dominio.modelo;
 import java.time.LocalDateTime;
 import javax.persistence.*;
 
+/**
+ * Entidad del sistema
+ */
 @Entity
 @Table(name = "registro_sueno")
 public class RegistroSueno {

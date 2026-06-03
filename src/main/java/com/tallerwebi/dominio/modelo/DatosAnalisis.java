@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 
+/**
+ * Entidad del sistema
+ */
 @Embeddable
 public class DatosAnalisis {
 

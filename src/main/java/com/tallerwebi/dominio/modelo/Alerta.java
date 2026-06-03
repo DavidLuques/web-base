@@ -5,6 +5,9 @@ import com.tallerwebi.dominio.enums.TipoAlerta;
 import java.time.LocalDateTime;
 import javax.persistence.*;
 
+/**
+ * Entidad del sistema
+ */
 @Entity
 @Table(name = "alerta")
 public class Alerta {

@@ -2,6 +2,9 @@ package com.tallerwebi.dominio.dto;
 
 import com.tallerwebi.dominio.enums.EstadoMascota;
 
+/**
+ *  datos.
+ */
 public class ResultadoSimulacionDto {
 
   private String nombreMascota;

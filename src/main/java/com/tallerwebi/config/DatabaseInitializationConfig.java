@@ -8,6 +8,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
+/**
+ * Clase encargada de...
+ */
 @Configuration
 public class DatabaseInitializationConfig {
 

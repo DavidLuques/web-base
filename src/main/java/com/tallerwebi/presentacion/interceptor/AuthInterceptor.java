@@ -4,6 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+/**
+ *  datos.
+ */
 public class AuthInterceptor implements HandlerInterceptor {
 
   @Override

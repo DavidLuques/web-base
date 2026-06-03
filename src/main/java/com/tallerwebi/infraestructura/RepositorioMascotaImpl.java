@@ -6,6 +6,9 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Repositorio de acceso a datos.
+ */
 @Repository("repositorioMascota")
 public class RepositorioMascotaImpl implements RepositorioMascota {
 

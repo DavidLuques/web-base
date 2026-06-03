@@ -2,6 +2,9 @@ package com.tallerwebi.dominio.estado;
 
 import java.util.Random;
 
+/**
+ *  datos.
+ */
 public interface ComportamientoEstado {
   double generarMovimiento(Random random);
   double generarGyro(Random random);

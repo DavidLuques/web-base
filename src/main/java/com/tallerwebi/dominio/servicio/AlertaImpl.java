@@ -7,6 +7,9 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Servicio de lógica de negocio.
+ */
 @Repository("repositorioAlerta")
 public class AlertaImpl implements RepositorioAlerta {
 

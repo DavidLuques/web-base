@@ -2,6 +2,9 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.enums.TamanoMascota;
 
+/**
+ * as
+ */
 public class DatosAltaMascota {
 
   private String nombre;

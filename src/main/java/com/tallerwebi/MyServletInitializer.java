@@ -5,6 +5,9 @@ import com.tallerwebi.config.HibernateConfig;
 import com.tallerwebi.config.SpringWebConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+/**
+ * Servlet.
+ */
 public class MyServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
   @Override

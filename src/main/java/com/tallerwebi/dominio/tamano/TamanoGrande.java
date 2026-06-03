@@ -1,5 +1,8 @@
 package com.tallerwebi.dominio.tamano;
 
+/**
+ *  datos.
+ */
 public class TamanoGrande implements ComportamientoTamano {
 
   @Override

@@ -2,6 +2,9 @@ package com.tallerwebi.dominio.dto;
 
 import com.tallerwebi.dominio.enums.TipoAlerta;
 
+/**
+ *  datos.
+ */
 public class AlertaDto {
 
   private Long id;
