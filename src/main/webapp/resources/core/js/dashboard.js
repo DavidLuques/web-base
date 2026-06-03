@@ -1,4 +1,5 @@
-/* global ApexCharts, idMascota */
+/* global ApexCharts, idMascota, lucide */
+/* exported abrirModal, cerrarModal */
 
 var ultimosDatos  = {};
 var rangosVitales = {};
@@ -83,7 +84,7 @@ function cerrarModal() {
 }
 
 document.getElementById("modal-vermas").addEventListener("click", function(e) {
-  if (e.target === this) cerrarModal();
+  if (e.target === this) { cerrarModal(); }
 });
 
 function construirContenidoModal(valorActual, rangoEsperado, actual, min, max, descripcion) {
@@ -95,24 +96,24 @@ function construirContenidoModal(valorActual, rangoEsperado, actual, min, max, d
 }
 
 function construirFilaInfo(etiqueta, valor) {
-  return '<div class="flex justify-between items-center bg-slate-50 rounded-xl px-4 py-3">' +
-           '<span class="text-slate-500 font-medium">' + etiqueta + '</span>' +
-           '<span class="text-slate-800 font-bold">' + valor + '</span>' +
-         '</div>';
+  return "<div class=\"flex justify-between items-center bg-slate-50 rounded-xl px-4 py-3\">" +
+           "<span class=\"text-slate-500 font-medium\">" + etiqueta + "</span>" +
+           "<span class=\"text-slate-800 font-bold\">" + valor + "</span>" +
+         "</div>";
 }
 
 function construirEstado(dentro, hayDatos) {
   if (!hayDatos) {
-    return '<div class="rounded-xl px-4 py-3 bg-slate-100 text-slate-500 text-center font-medium">Sin datos suficientes para evaluar</div>';
+    return "<div class=\"rounded-xl px-4 py-3 bg-slate-100 text-slate-500 text-center font-medium\">Sin datos suficientes para evaluar</div>";
   }
   if (dentro) {
-    return '<div class="rounded-xl px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-center font-semibold">\u2713 Dentro del rango esperado</div>';
+    return "<div class=\"rounded-xl px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-center font-semibold\">\u2713 Dentro del rango esperado</div>";
   }
-  return '<div class="rounded-xl px-4 py-3 bg-rose-50 border border-rose-200 text-rose-700 text-center font-semibold">\u26a0 Fuera del rango esperado</div>';
+  return "<div class=\"rounded-xl px-4 py-3 bg-rose-50 border border-rose-200 text-rose-700 text-center font-semibold\">\u26a0 Fuera del rango esperado</div>";
 }
 
 function construirDescripcion(texto) {
-  return '<p class="text-slate-400 text-xs leading-relaxed px-1">' + texto + '</p>';
+  return "<p class=\"text-slate-400 text-xs leading-relaxed px-1\">" + texto + "</p>";
 }
 
 // =========================
@@ -130,7 +131,7 @@ var STORAGE_KEY          = "dashboard_" + idMascota;
 function cargarEstado() {
   try {
     var guardado = sessionStorage.getItem(STORAGE_KEY);
-    if (!guardado) return;
+    if (!guardado) { return; }
     var s = JSON.parse(guardado);
     historialHoras       = s.historialHoras       || [];
     historialFrecuencia  = s.historialFrecuencia  || [];
@@ -180,10 +181,10 @@ function getRadialConfig(color, label, formatFunction) {
   };
 }
 
-var chartFrecuencia  = new ApexCharts(document.querySelector("#chart-frecuencia"),  getRadialConfig("#3b82f6", "bpm",   function(val) { return Math.round(val * 1.8); }));
+var chartFrecuencia  = new ApexCharts(document.querySelector("#chart-frecuencia"),  getRadialConfig("#3b82f6", "bpm",    function(val) { return Math.round(val * 1.8); }));
 var chartTemperatura = new ApexCharts(document.querySelector("#chart-temperatura"), getRadialConfig("#10b981", "\u00b0C", function(val) { return (val / 100 * 50).toFixed(1); }));
-var chartPresion     = new ApexCharts(document.querySelector("#chart-presion"),     getRadialConfig("#f59e0b", "mmHg",  function(val) { return val + "/80"; }));
-var chartPasos       = new ApexCharts(document.querySelector("#chart-pasos"),       getRadialConfig("#8b5cf6", "pasos", function(val) {
+var chartPresion     = new ApexCharts(document.querySelector("#chart-presion"),     getRadialConfig("#f59e0b", "mmHg",   function(val) { return val + "/80"; }));
+var chartPasos       = new ApexCharts(document.querySelector("#chart-pasos"),       getRadialConfig("#8b5cf6", "pasos",  function(val) {
   var pasosReales = Math.round((val / 100) * 10000);
   return pasosReales > 1000 ? (pasosReales / 1000).toFixed(1) + "k" : pasosReales;
 }));
@@ -245,12 +246,12 @@ function conectarYActualizar() {
 
       var horaActual = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       historialHoras.push(horaActual);
-      if (historialHoras.length > MAX_PUNTOS) historialHoras.shift();
+      if (historialHoras.length > MAX_PUNTOS) { historialHoras.shift(); }
 
       if (data.frecuenciaCardiaca != null) {
         chartFrecuencia.updateOptions({ series: [(data.frecuenciaCardiaca / 180) * 100], plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return data.frecuenciaCardiaca; } } } } } });
         historialFrecuencia.push(data.frecuenciaCardiaca);
-        if (historialFrecuencia.length > MAX_PUNTOS) historialFrecuencia.shift();
+        if (historialFrecuencia.length > MAX_PUNTOS) { historialFrecuencia.shift(); }
         chartLineaFrecuencia.updateSeries([{ data: historialFrecuencia }]);
         chartLineaFrecuencia.updateOptions({ xaxis: { categories: historialHoras } });
       }
@@ -258,7 +259,7 @@ function conectarYActualizar() {
       if (data.temperatura != null) {
         chartTemperatura.updateOptions({ series: [(data.temperatura / 45) * 100], plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return data.temperatura.toFixed(1); } } } } } });
         historialTemperatura.push(data.temperatura.toFixed(1));
-        if (historialTemperatura.length > MAX_PUNTOS) historialTemperatura.shift();
+        if (historialTemperatura.length > MAX_PUNTOS) { historialTemperatura.shift(); }
         chartLineaTemperatura.updateSeries([{ data: historialTemperatura }]);
         chartLineaTemperatura.updateOptions({ xaxis: { categories: historialHoras } });
       }
@@ -275,7 +276,7 @@ function conectarYActualizar() {
       if (data.pasos != null) {
         chartPasos.updateOptions({ series: [Math.min((data.pasos / 10000) * 100, 100)], plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return data.pasos > 1000 ? (data.pasos / 1000).toFixed(1) + "k" : data.pasos; } } } } } });
         historialPasos.push(data.pasos);
-        if (historialPasos.length > MAX_PUNTOS) historialPasos.shift();
+        if (historialPasos.length > MAX_PUNTOS) { historialPasos.shift(); }
         chartLineaPasos.updateSeries([{ data: historialPasos }]);
         chartLineaPasos.updateOptions({ xaxis: { categories: historialHoras } });
       }
@@ -291,7 +292,7 @@ function cargarAlertasRecientes() {
     .then(function(alertas) {
       var contenedor = document.getElementById("contenedor-alertas");
       if (!alertas || alertas.length === 0) {
-        contenedor.innerHTML = '<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center"><p class="text-xs text-emerald-600 font-medium">Sin alertas recientes</p></div>';
+        contenedor.innerHTML = "<div class=\"bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center\"><p class=\"text-xs text-emerald-600 font-medium\">Sin alertas recientes</p></div>";
         return;
       }
       var ultimas = alertas.slice(-3).reverse();
@@ -299,13 +300,13 @@ function cargarAlertasRecientes() {
         var esEmergencia = alerta.tipo === "EMERGENCIA";
         var bgClass  = esEmergencia ? "bg-rose-50 border-rose-200" : "bg-amber-50 border-amber-200";
         var dotColor = esEmergencia ? "bg-rose-500" : "bg-amber-500";
-        return '<div class="' + bgClass + ' border rounded-xl p-4 flex flex-col gap-1">' +
-                 '<div class="flex items-center gap-2">' +
-                   '<div class="w-2 h-2 rounded-full ' + dotColor + ' shrink-0"></div>' +
-                   '<span class="font-bold text-slate-800 text-sm">' + alerta.tipo + '</span>' +
-                 '</div>' +
-                 '<p class="text-xs text-slate-600 ml-4 leading-relaxed">' + alerta.mensaje + '</p>' +
-               '</div>';
+        return "<div class=\"" + bgClass + " border rounded-xl p-4 flex flex-col gap-1\">" +
+                 "<div class=\"flex items-center gap-2\">" +
+                   "<div class=\"w-2 h-2 rounded-full " + dotColor + " shrink-0\"></div>" +
+                   "<span class=\"font-bold text-slate-800 text-sm\">" + alerta.tipo + "</span>" +
+                 "</div>" +
+                 "<p class=\"text-xs text-slate-600 ml-4 leading-relaxed\">" + alerta.mensaje + "</p>" +
+               "</div>";
       }).join("");
     })
     .catch(function(err) { console.error("Error al cargar alertas en dashboard:", err); });
