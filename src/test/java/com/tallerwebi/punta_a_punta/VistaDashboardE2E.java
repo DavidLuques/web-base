@@ -73,6 +73,16 @@ public class VistaDashboardE2E {
     entoncesDeberiaVerLosGraficosRenderizados();
   }
 
+  @Test
+  void deberiaMostrarMensajeDeNoEncontradaCuandoElIdNoExiste() {
+    dadoQueElUsuarioIniciaSesion("test@unlam.edu.ar", "test");
+    
+    cuandoSeEncuentraEnElDashboardDeLaMascota(999L);
+    
+    entoncesDeberiaVerElMensajeMascotaNoEncontrada();
+  }
+
+
   private void cuandoTocaElIconoDeActividad() {
     vistaDashboard.darClickEnIconoActividad();
   }
@@ -109,5 +119,11 @@ public class VistaDashboardE2E {
   private void entoncesDeberiaVerLosPanelesDeSalud() {
     assertTrue(vistaDashboard.panelFrecuenciaEsVisible(), "El panel de Frecuencia Cardíaca no se cargó en la pantalla");
     assertTrue(vistaDashboard.panelTemperaturaEsVisible(), "El panel de Temperatura no se cargó en la pantalla");
+  }
+
+  private void entoncesDeberiaVerElMensajeMascotaNoEncontrada() {
+    String textoPantalla = vistaDashboard.obtenerNombreDeMascota();
+
+    org.hamcrest.MatcherAssert.assertThat(textoPantalla, org.hamcrest.Matchers.equalToIgnoringCase("No encontrada"));
   }
 }
