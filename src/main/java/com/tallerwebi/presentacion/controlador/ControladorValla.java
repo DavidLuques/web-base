@@ -45,4 +45,11 @@ public class ControladorValla {
     Map<String, Object> ubicacion = orquestadorService.obtenerUltimaUbicacion(id);
     return ResponseEntity.ok(ubicacion);
   }
+
+  @GetMapping("/api/mascotas/{id}/vallado")
+  @ResponseBody
+  public ResponseEntity<Map<String, Object>> obtenerVallado(@PathVariable Long id) {
+    Map<String, Object> vallado = orquestadorService.obtenerVallado(id);
+    return ResponseEntity.ok(vallado);
+  }
 }

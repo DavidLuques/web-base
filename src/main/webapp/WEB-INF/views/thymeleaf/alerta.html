@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Centro de Alertas - PetTracker</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+<div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'alertas')"></div>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+
+    <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'alertas', 'Historial de Alertas Críticas')"></header>
+
+    <div class="flex-1 p-8 overflow-y-auto">
+        <div class="max-w-4xl mx-auto w-full">
+
+            <div class="flex justify-between items-center mb-6">
+                <p class="text-sm text-slate-500">Mostrando las alertas generadas por los signos vitales en tiempo real.</p>
+                <span id="contador-alertas" class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">0 Alertas</span>
+            </div>
+
+            <div id="lista-alertas-exclusiva" class="flex flex-col gap-4">
+                <div class="text-center py-12 text-slate-400">
+                    <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2" role="status" aria-label="loading"></div>
+                    <p class="text-sm">Buscando alertas en el servidor...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script th:src="@{/js/alerta.js}"></script>
+
+<script th:inline="javascript">
+    const idMascota = [[${idMascota}]];
+    inicializarAlertas(idMascota);
+</script>
+</body>
+</html>

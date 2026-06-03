@@ -10,6 +10,7 @@ import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
+import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
@@ -18,6 +19,7 @@ import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
+import com.tallerwebi.dominio.modelo.Vallado;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +38,7 @@ public class OrquestadorServiceImplTest {
   private RepositorioAnalisis repositorioAnalisis;
   private RangoVitalDao rangoVitalDao;
   private RangoVitalPorTamano rango;
+  private ValladoDao valladoDao;
 
   private Mascota mascota;
   private LecturaSensor lectura;
@@ -50,6 +53,7 @@ public class OrquestadorServiceImplTest {
     repositorioSueno = mock(RepositorioSueno.class);
     repositorioAnalisis = mock(RepositorioAnalisis.class);
     rangoVitalDao = mock(RangoVitalDao.class);
+    valladoDao = mock(ValladoDao.class);
 
     servicio =
       new OrquestadorServiceImpl(
@@ -60,7 +64,8 @@ public class OrquestadorServiceImplTest {
         repositorioActividad,
         repositorioSueno,
         repositorioAnalisis,
-        rangoVitalDao
+        rangoVitalDao,
+        valladoDao
       );
 
     mascota = new Mascota();
