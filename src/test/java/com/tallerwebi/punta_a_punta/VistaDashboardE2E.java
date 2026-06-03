@@ -2,13 +2,11 @@ package com.tallerwebi.punta_a_punta;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.microsoft.playwright.*;
 import com.tallerwebi.punta_a_punta.vistas.VistaDashboard;
 import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -73,12 +71,11 @@ public class VistaDashboardE2E {
   @Test
   void deberiaMostrarMensajeDeNoEncontradaCuandoElIdNoExiste() {
     dadoQueElUsuarioIniciaSesion("test@unlam.edu.ar", "test");
-    
+
     cuandoSeEncuentraEnElDashboardDeLaMascota(999L);
-    
+
     entoncesDeberiaVerElMensajeMascotaNoEncontrada();
   }
-
 
   private void cuandoTocaElIconoDeActividad() {
     vistaDashboard.darClickEnIconoActividad();
@@ -114,13 +111,22 @@ public class VistaDashboardE2E {
   }
 
   private void entoncesDeberiaVerLosPanelesDeSalud() {
-    assertTrue(vistaDashboard.panelFrecuenciaEsVisible(), "El panel de Frecuencia Cardíaca no se cargó en la pantalla");
-    assertTrue(vistaDashboard.panelTemperaturaEsVisible(), "El panel de Temperatura no se cargó en la pantalla");
+    assertTrue(
+      vistaDashboard.panelFrecuenciaEsVisible(),
+      "El panel de Frecuencia Cardíaca no se cargó en la pantalla"
+    );
+    assertTrue(
+      vistaDashboard.panelTemperaturaEsVisible(),
+      "El panel de Temperatura no se cargó en la pantalla"
+    );
   }
 
   private void entoncesDeberiaVerElMensajeMascotaNoEncontrada() {
     String textoPantalla = vistaDashboard.obtenerNombreDeMascota();
 
-    org.hamcrest.MatcherAssert.assertThat(textoPantalla, org.hamcrest.Matchers.equalToIgnoringCase("No encontrada"));
+    org.hamcrest.MatcherAssert.assertThat(
+      textoPantalla,
+      org.hamcrest.Matchers.equalToIgnoringCase("No encontrada")
+    );
   }
 }

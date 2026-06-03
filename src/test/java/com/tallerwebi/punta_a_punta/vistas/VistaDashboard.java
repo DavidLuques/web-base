@@ -16,16 +16,17 @@ public class VistaDashboard {
 
   public void esperarAQueCargueElFetch() {
     page
-        .locator("#nombre-mascota")
-        .waitFor(
-            new com.microsoft.playwright.Locator.WaitForOptions()
-                .setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE));
+      .locator("#nombre-mascota")
+      .waitFor(
+        new com.microsoft.playwright.Locator.WaitForOptions()
+          .setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE)
+      );
   }
 
   public String obtenerNombreDeMascota() {
     return page.locator("#nombre-mascota").innerText();
   }
-  
+
   public void darClickEnIconoActividad() {
     page.locator("a[href*='/analisis/vista/']").click();
   }
