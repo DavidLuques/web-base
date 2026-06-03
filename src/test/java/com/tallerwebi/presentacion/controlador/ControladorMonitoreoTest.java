@@ -9,8 +9,11 @@ import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.servicio.AlertaService;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
+import com.tallerwebi.dominio.servicio.ServicioMascota;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
@@ -20,15 +23,23 @@ public class ControladorMonitoreoTest {
   private ControladorMonitoreo controlador;
   private OrquestadorService orquestadorServiceMock;
   private AlertaService alertaServiceMock;
+  private ServicioMascota servicioMascotaMock;
   private Model modelMock;
+  private HttpServletRequest requestMock;
+  private HttpSession sessionMock;
 
   @BeforeEach
   public void init() {
     orquestadorServiceMock = mock(OrquestadorService.class);
     alertaServiceMock = mock(AlertaService.class);
+    servicioMascotaMock = mock(ServicioMascota.class);
     modelMock = mock(Model.class);
+    requestMock = mock(HttpServletRequest.class);
+    sessionMock = mock(HttpSession.class);
+    when(requestMock.getSession()).thenReturn(sessionMock);
 
-    controlador = new ControladorMonitoreo(orquestadorServiceMock, alertaServiceMock);
+    controlador =
+      new ControladorMonitoreo(orquestadorServiceMock, alertaServiceMock, servicioMascotaMock);
   }
 
   @Test
@@ -86,7 +97,7 @@ public class ControladorMonitoreoTest {
   public void cuandoIngresoALaVistaDeAlertasRetornaLaVistaCorrecta() {
     Long mascotaId = 1L;
 
-    String vista = controlador.verPantallaDeAlertas(mascotaId, modelMock);
+    String vista = controlador.verPantallaDeAlertas(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", mascotaId);
 
@@ -97,7 +108,7 @@ public class ControladorMonitoreoTest {
   public void cuandoIngresoALaVistaDeSimulacionRetornaLaVistaCorrecta() {
     Long mascotaId = 1L;
 
-    String vista = controlador.vista(mascotaId, modelMock);
+    String vista = controlador.vista(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", mascotaId);
 
@@ -117,7 +128,7 @@ public class ControladorMonitoreoTest {
 
     when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
 
-    String vista = controlador.vistaDashboard(mascotaId, modelMock);
+    String vista = controlador.vistaDashboard(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", mascotaId);
     verify(modelMock).addAttribute("mascotaNombre", "Firulais");
@@ -149,7 +160,7 @@ public class ControladorMonitoreoTest {
 
     when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(null);
 
-    String vista = controlador.vistaDashboard(mascotaId, modelMock);
+    String vista = controlador.vistaDashboard(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("mascotaNombre", "Mascota");
     assertThat(vista, equalTo("dashboard"));
@@ -177,7 +188,7 @@ public class ControladorMonitoreoTest {
   public void cuandoIngresoALaVistaDeSimulacionAgregaElIdAlModelo() {
     Long mascotaId = 5L;
 
-    controlador.vista(mascotaId, modelMock);
+    controlador.vista(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", 5L);
   }
@@ -186,7 +197,7 @@ public class ControladorMonitoreoTest {
   public void cuandoIngresoALaVistaDeAlertasAgregaElIdAlModelo() {
     Long mascotaId = 7L;
 
-    controlador.verPantallaDeAlertas(mascotaId, modelMock);
+    controlador.verPantallaDeAlertas(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", 7L);
   }
@@ -204,7 +215,7 @@ public class ControladorMonitoreoTest {
 
     when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
 
-    controlador.vistaDashboard(mascotaId, modelMock);
+    controlador.vistaDashboard(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", 4L);
   }

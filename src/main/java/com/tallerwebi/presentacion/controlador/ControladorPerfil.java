@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion.controlador;
 
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosPerfil;
 import javax.servlet.http.HttpServletRequest;
@@ -17,10 +18,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorPerfil {
 
   private ServicioUsuario servicioUsuario;
+  private ServicioMascota servicioMascota;
 
   @Autowired
-  public ControladorPerfil(ServicioUsuario servicioUsuario) {
+  public ControladorPerfil(ServicioUsuario servicioUsuario, ServicioMascota servicioMascota) {
     this.servicioUsuario = servicioUsuario;
+    this.servicioMascota = servicioMascota;
   }
 
   @RequestMapping(path = "/perfil", method = RequestMethod.GET)
@@ -51,6 +54,7 @@ public class ControladorPerfil {
     ModelMap modelo = new ModelMap();
     modelo.put("datosPerfil", datosPerfil);
     modelo.put("idMascota", idMascota);
+    modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
     return new ModelAndView("perfil", modelo);
   }
 
@@ -76,6 +80,7 @@ public class ControladorPerfil {
       modelo.put("datosPerfil", datosPerfil);
       modelo.put("error", e.getMessage());
       modelo.put("idMascota", idMascota);
+      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
       return new ModelAndView("perfil", modelo);
     }
   }

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.modelo.Direccion;
+import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosPerfil;
 import javax.servlet.http.HttpServletRequest;
@@ -18,17 +19,20 @@ public class ControladorPerfilTest {
   private ControladorPerfil controlador;
   private ControladorConfiguracion controladorConfiguracion;
   private ServicioUsuario servicioUsuarioMock;
+  private ServicioMascota servicioMascotaMock;
   private HttpServletRequest requestMock;
   private HttpSession sessionMock;
 
   @BeforeEach
   public void init() {
     servicioUsuarioMock = mock(ServicioUsuario.class);
+    servicioMascotaMock = mock(ServicioMascota.class);
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
     when(requestMock.getSession()).thenReturn(sessionMock);
-    controlador = new ControladorPerfil(servicioUsuarioMock);
-    controladorConfiguracion = new ControladorConfiguracion(servicioUsuarioMock);
+    controlador = new ControladorPerfil(servicioUsuarioMock, servicioMascotaMock);
+    controladorConfiguracion =
+      new ControladorConfiguracion(servicioUsuarioMock, servicioMascotaMock);
   }
 
   @Test

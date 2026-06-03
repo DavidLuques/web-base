@@ -10,4 +10,6 @@ public interface MascotaDao {
 
   List<Mascota> buscarTodas();
   List<Mascota> buscarPorUsuarioId(Long usuarioId);
+
+  void guardar(Mascota mascota);
 }
