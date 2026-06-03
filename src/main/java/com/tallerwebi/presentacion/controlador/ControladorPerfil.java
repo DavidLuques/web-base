@@ -1,6 +1,6 @@
 package com.tallerwebi.presentacion.controlador;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosPerfil;
@@ -16,6 +16,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class ControladorPerfil {
+
+  private static final String REDIRECT_LOGIN = "redirect:/login";
+  private static final String ATRIBUTO_DATOS_PERFIL = "datosPerfil";
 
   private ServicioUsuario servicioUsuario;
   private ServicioMascota servicioMascota;
@@ -33,40 +36,52 @@ public class ControladorPerfil {
   ) {
     Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
     if (idUsuario == null) {
-      return new ModelAndView("redirect:/login");
+      return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    Usuario usuario = servicioUsuario.obtenerPerfil(idUsuario);
-
-    DatosPerfil datosPerfil = new DatosPerfil();
-    datosPerfil.setNombre(usuario.getNombre());
-    datosPerfil.setEmail(usuario.getEmail());
-    datosPerfil.setTelefono(usuario.getTelefono());
-
-    if (usuario.getUbicacion() != null) {
-      datosPerfil.setCalle(usuario.getUbicacion().getCalle());
-      datosPerfil.setCiudad(usuario.getUbicacion().getCiudad());
-      datosPerfil.setProvincia(usuario.getUbicacion().getProvincia());
-      datosPerfil.setPais(usuario.getUbicacion().getPais());
-      datosPerfil.setCodigoPostal(usuario.getUbicacion().getCodigoPostal());
+    try {
+      DatosPerfil datosPerfil = servicioUsuario.obtenerDatosPerfil(idUsuario);
+      ModelMap modelo = new ModelMap();
+      modelo.put(ATRIBUTO_DATOS_PERFIL, datosPerfil);
+      modelo.put("idMascota", idMascota);
+      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      return new ModelAndView("ver-perfil", modelo);
+    } catch (UsuarioNoEncontrado e) {
+      return new ModelAndView(REDIRECT_LOGIN);
     }
-
-    ModelMap modelo = new ModelMap();
-    modelo.put("datosPerfil", datosPerfil);
-    modelo.put("idMascota", idMascota);
-    modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
-    return new ModelAndView("perfil", modelo);
   }
 
-  @RequestMapping(path = "/perfil/actualizar", method = RequestMethod.POST)
-  public ModelAndView actualizarPerfil(
-    @ModelAttribute("datosPerfil") DatosPerfil datosPerfil,
+  @RequestMapping(path = "/perfil/editar", method = RequestMethod.GET)
+  public ModelAndView editarPerfil(
     HttpServletRequest request,
     @RequestParam(required = false) Long idMascota
   ) {
     Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
     if (idUsuario == null) {
-      return new ModelAndView("redirect:/login");
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+
+    try {
+      DatosPerfil datosPerfil = servicioUsuario.obtenerDatosPerfil(idUsuario);
+      ModelMap modelo = new ModelMap();
+      modelo.put(ATRIBUTO_DATOS_PERFIL, datosPerfil);
+      modelo.put("idMascota", idMascota);
+      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      return new ModelAndView("perfil", modelo);
+    } catch (UsuarioNoEncontrado e) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+  }
+
+  @RequestMapping(path = "/perfil/actualizar", method = RequestMethod.POST)
+  public ModelAndView actualizarPerfil(
+    @ModelAttribute(ATRIBUTO_DATOS_PERFIL) DatosPerfil datosPerfil,
+    HttpServletRequest request,
+    @RequestParam(required = false) Long idMascota
+  ) {
+    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    if (idUsuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
     }
 
     try {
@@ -75,9 +90,9 @@ public class ControladorPerfil {
         ? "redirect:/perfil?exito=true&idMascota=" + idMascota
         : "redirect:/perfil?exito=true";
       return new ModelAndView(redirectUrl);
-    } catch (RuntimeException e) {
+    } catch (UsuarioNoEncontrado e) {
       ModelMap modelo = new ModelMap();
-      modelo.put("datosPerfil", datosPerfil);
+      modelo.put(ATRIBUTO_DATOS_PERFIL, datosPerfil);
       modelo.put("error", e.getMessage());
       modelo.put("idMascota", idMascota);
       modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));

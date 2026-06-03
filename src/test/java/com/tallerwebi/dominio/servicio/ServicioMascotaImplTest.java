@@ -181,4 +181,70 @@ public class ServicioMascotaImplTest {
 
     verify(mascotaDaoMock).buscarPorId(10L);
   }
+
+  @Test
+  public void dadoUnIdValidoCuandoObtengoDatosMascotaRetornaDatosMapeados() {
+    Mascota mascota = new Mascota();
+    mascota.setId(1L);
+    mascota.setNombre("Boby");
+    mascota.setTamano(TamanoMascota.PEQUENO);
+    com.tallerwebi.dominio.modelo.DatosMascota datosMascota =
+      new com.tallerwebi.dominio.modelo.DatosMascota();
+    datosMascota.setTipo("Perro");
+    datosMascota.setPeso(5.0);
+    mascota.setDatos(datosMascota);
+
+    when(mascotaDaoMock.buscarPorId(1L)).thenReturn(mascota);
+
+    DatosAltaMascota resultado = servicioMascota.obtenerDatosMascota(1L);
+
+    assertNotNull(resultado);
+    assertEquals("Boby", resultado.getNombre());
+    assertEquals(TamanoMascota.PEQUENO, resultado.getTamano());
+    assertEquals("Perro", resultado.getTipo());
+    assertEquals(5.0, resultado.getPeso());
+  }
+
+  @Test
+  public void dadoUnIdInvalidoCuandoObtengoDatosMascotaRetornaNull() {
+    when(mascotaDaoMock.buscarPorId(99L)).thenReturn(null);
+
+    DatosAltaMascota resultado = servicioMascota.obtenerDatosMascota(99L);
+
+    assertNull(resultado);
+  }
+
+  @Test
+  public void dadoDatosValidosCuandoActualizaMascotaSeGuardaCorrectamente() {
+    Mascota mascota = new Mascota();
+    mascota.setId(1L);
+    when(mascotaDaoMock.buscarPorId(1L)).thenReturn(mascota);
+
+    DatosAltaMascota datos = new DatosAltaMascota();
+    datos.setNombre("Boby Editado");
+    datos.setPeso(6.0);
+    datos.setFechaNacimiento("2021-05-10");
+
+    servicioMascota.actualizarMascota(1L, datos);
+
+    ArgumentCaptor<Mascota> captor = ArgumentCaptor.forClass(Mascota.class);
+    verify(mascotaDaoMock).modificar(captor.capture());
+
+    Mascota mascotaModificada = captor.getValue();
+    assertEquals("Boby Editado", mascotaModificada.getNombre());
+    assertEquals(6.0, mascotaModificada.getDatos().getPeso());
+    assertNotNull(mascotaModificada.getDatos().getFechaNacimiento());
+  }
+
+  @Test
+  public void dadoUnIdValidoCuandoEliminarMascotaLlamaAlDaoEliminar() {
+    Mascota mascota = new Mascota();
+    mascota.setId(1L);
+    when(mascotaDaoMock.buscarPorId(1L)).thenReturn(mascota);
+
+    servicioMascota.eliminarMascota(1L);
+
+    assertFalse(mascota.getActivo());
+    verify(mascotaDaoMock).modificar(mascota);
+  }
 }

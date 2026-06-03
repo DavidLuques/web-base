@@ -25,4 +25,14 @@ public class RepositorioMascotaImpl implements RepositorioMascota {
   public void guardar(Mascota mascota) {
     sessionFactory.getCurrentSession().save(mascota);
   }
+
+  @Override
+  public void actualizar(Mascota mascota) {
+    sessionFactory.getCurrentSession().update(mascota);
+  }
+
+  @Override
+  public void eliminar(Mascota mascota) {
+    sessionFactory.getCurrentSession().delete(mascota);
+  }
 }

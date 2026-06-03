@@ -16,8 +16,8 @@ INSERT INTO rango_vital_por_tamano
 (tamano, frecuenciaMinima, frecuenciaMaxima, sistolicaMinima, sistolicaMaxima, diastolicaMinima, diastolicaMaxima, temperaturaMinima, temperaturaMaxima)
 VALUES ('GRANDE', 60, 100, 120, 150, 80, 95, 37.5, 38.9);
 
-INSERT INTO mascota(nombre, estado_actual, tamano, raza, genero, tipo, peso, esteril, usuario_id)
-VALUES ('Firulais', 'CAMINANDO', 'MEDIANO', 'Labrador', 'Macho', 'Perro', 10.5, true, 1);
+INSERT INTO mascota(nombre, estado_actual, tamano, raza, genero, tipo, peso, esteril, usuario_id, activo)
+VALUES ('Firulais', 'CAMINANDO', 'MEDIANO', 'Labrador', 'Macho', 'Perro', 10.5, true, 1, true);
 
 CREATE TABLE IF NOT EXISTS registro_sueno (
                                               id BIGINT AUTO_INCREMENT PRIMARY KEY,

@@ -46,4 +46,22 @@ public class RepositorioMascotaTest {
     assertNotNull(resultado);
     verify(sessionMock, times(1)).get(Mascota.class, 1L);
   }
+
+  @Test
+  public void queActualiceUnaMascotaExitosamente() {
+    Mascota mascota = new Mascota();
+
+    repositorioMascota.actualizar(mascota);
+
+    verify(sessionMock, times(1)).update(mascota);
+  }
+
+  @Test
+  public void queElimineUnaMascotaExitosamente() {
+    Mascota mascota = new Mascota();
+
+    repositorioMascota.eliminar(mascota);
+
+    verify(sessionMock, times(1)).delete(mascota);
+  }
 }

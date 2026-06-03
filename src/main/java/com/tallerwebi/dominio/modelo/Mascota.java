@@ -23,6 +23,8 @@ public class Mascota {
   @Column(name = "tamano")
   private TamanoMascota tamano;
 
+  private Boolean activo = true;
+
   @Embedded
   private DatosMascota datos;
 
@@ -140,5 +142,13 @@ public class Mascota {
 
   public void setImagenMascota(String imagenMascota) {
     datos.setImagenMascota(imagenMascota);
+  }
+
+  public Boolean getActivo() {
+    return activo;
+  }
+
+  public void setActivo(Boolean activo) {
+    this.activo = activo;
   }
 }

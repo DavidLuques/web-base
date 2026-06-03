@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Mascota</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+<div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'configuraciones')"></div>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+  <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'configuraciones', 'Perfil de Mascota')"></header>
+  <div class="flex-1 p-8 overflow-y-auto">
+    <div class="max-w-2xl mx-auto mt-8">
+      
+      <!-- Breadcrumb and Title -->
+      <div class="mb-8 flex items-center gap-4">
+        <a th:href="@{/configuraciones(idMascota=${idMascota})}" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 shadow-sm border border-slate-200 transition-all">
+          <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Mi Mascota</h1>
+          <p class="text-slate-500">Visualiza la información de tu mascota</p>
+        </div>
+      </div>
+
+      <!-- Success Alert -->
+      <div th:if="${param.exito}" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3 animate-[slideIn_0.3s_ease-out]">
+        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+          <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+        </div>
+        <p class="font-medium">¡Mascota actualizada correctamente!</p>
+      </div>
+
+      <!-- Detail Card -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
+        <div class="space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1">
+              <label class="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                <i data-lucide="user" class="w-4 h-4 text-slate-400"></i> Nombre
+              </label>
+              <p class="text-lg font-medium text-slate-800" th:text="${datosMascota.nombre}"></p>
+            </div>
+            
+            <div class="space-y-1">
+              <label class="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                <i data-lucide="tag" class="w-4 h-4 text-slate-400"></i> Tipo
+              </label>
+              <p class="text-lg font-medium text-slate-800" th:text="${datosMascota.tipo ?: '-'}"></p>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                <i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Raza
+              </label>
+              <p class="text-lg font-medium text-slate-800" th:text="${datosMascota.raza ?: '-'}"></p>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-slate-400"></i> Género
+              </label>
+              <p class="text-lg font-medium text-slate-800" th:text="${datosMascota.genero ?: '-'}"></p>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i> Peso (kg)
+              </label>
+              <p class="text-lg font-medium text-slate-800" th:text="${datosMascota.peso ?: '-'}"></p>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> Fecha de Nacimiento
+              </label>
+              <p class="text-lg font-medium text-slate-800" th:text="${datosMascota.fechaNacimiento ?: '-'}"></p>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                <i data-lucide="maximize" class="w-4 h-4 text-slate-400"></i> Tamaño
+              </label>
+              <p class="text-lg font-medium text-slate-800" th:text="${datosMascota.tamano != null ? datosMascota.tamano.name() : '-'}"></p>
+            </div>
+          </div>
+
+          <hr class="border-slate-100 my-8">
+
+          <div class="pt-6 flex justify-between items-center">
+            <form th:action="@{/configuraciones/mascota/eliminar}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta mascota? Esta acción no se puede deshacer.');">
+              <input type="hidden" name="idMascota" th:value="${idMascota}" />
+              <button type="submit" class="text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-medium py-3 px-6 rounded-xl transition-colors flex items-center gap-2">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                Eliminar Mascota
+              </button>
+            </form>
+            
+            <a th:href="@{/configuraciones/mascota/editar(idMascota=${idMascota})}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+              <i data-lucide="edit-2" class="w-5 h-5"></i>
+              Editar Mascota
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
