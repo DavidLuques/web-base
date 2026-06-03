@@ -48,24 +48,24 @@ public class VistaDashboardE2E {
   }
 
   @Test
-  void deberiaCargarLosDatosDeLaMascotaMedianteFetchAlEntrarAlDashboard() {
+  void deberiaCargarElNombreDeLaMascotaAlEntrarAlDashboard() {
     dadoQueElUsuarioIniciaSesion("test@unlam.edu.ar", "test");
-    cuandoNavegaAlDashboardDeLaMascota(1L);
+    cuandoSeEncuentraEnElDashboardDeLaMascota(1L);
     entoncesDeberiaVerElNombreDeLaMascotaActualizado();
   }
 
   @Test
-  void deberiaNavegarALaVistaAnteriorAlTocarElIconoDeActividad() {
+  void deberiaNavegarALaVistaActividadAlTocarElIconoDeActividad() {
     dadoQueElUsuarioIniciaSesion("test@unlam.edu.ar", "test");
-    cuandoNavegaAlDashboardDeLaMascota(1L);
+    cuandoSeEncuentraEnElDashboardDeLaMascota(1L);
     cuandoTocaElIconoDeActividad();
-    entoncesDeberiaSerRedirigidoALaVistaAntigua();
+    entoncesDeberiaSerRedirigidoALaVistaActividad();
   }
 
   @Test
-  void deberiaRenderizarLosGraficosDeApexCharts() {
+  void deberiaRenderizarLosGraficosDeLaVista() {
     dadoQueElUsuarioIniciaSesion("test@unlam.edu.ar", "test");
-    cuandoNavegaAlDashboardDeLaMascota(1L);
+    cuandoSeEncuentraEnElDashboardDeLaMascota(1L);
     entoncesDeberiaVerLosGraficosRenderizados();
   }
 
@@ -73,7 +73,7 @@ public class VistaDashboardE2E {
     vistaDashboard.darClickEnIconoActividad();
   }
 
-  private void entoncesDeberiaSerRedirigidoALaVistaAntigua() {
+  private void entoncesDeberiaSerRedirigidoALaVistaActividad() {
     context
       .pages()
       .get(0)
@@ -98,7 +98,7 @@ public class VistaDashboardE2E {
     vistaLogin.darClickEnIniciarSesion();
   }
 
-  private void cuandoNavegaAlDashboardDeLaMascota(Long idMascota) {
+  private void cuandoSeEncuentraEnElDashboardDeLaMascota(Long idMascota) {
     vistaDashboard.navegar(idMascota);
   }
 
