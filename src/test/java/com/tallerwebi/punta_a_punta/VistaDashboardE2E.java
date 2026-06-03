@@ -8,11 +8,15 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import com.microsoft.playwright.*;
 import com.tallerwebi.punta_a_punta.vistas.VistaDashboard;
 import com.tallerwebi.punta_a_punta.vistas.VistaLogin;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class VistaDashboardE2E {
 
@@ -48,10 +52,10 @@ public class VistaDashboardE2E {
   }
 
   @Test
-  void deberiaCargarElNombreDeLaMascotaAlEntrarAlDashboard() {
+  void deberiaCargarLaEstructuraDeMetricasAlEntrarAlDashboard() {
     dadoQueElUsuarioIniciaSesion("test@unlam.edu.ar", "test");
     cuandoSeEncuentraEnElDashboardDeLaMascota(1L);
-    entoncesDeberiaVerElNombreDeLaMascotaActualizado();
+    entoncesDeberiaVerLosPanelesDeSalud();
   }
 
   @Test
@@ -102,11 +106,8 @@ public class VistaDashboardE2E {
     vistaDashboard.navegar(idMascota);
   }
 
-  private void entoncesDeberiaVerElNombreDeLaMascotaActualizado() {
-    vistaDashboard.esperarAQueCargueElFetch();
-
-    String nombreMascota = vistaDashboard.obtenerNombreDeMascota();
-
-    assertThat(nombreMascota, not(equalToIgnoringCase("Mascota")));
+  private void entoncesDeberiaVerLosPanelesDeSalud() {
+    assertTrue(vistaDashboard.panelFrecuenciaEsVisible(), "El panel de Frecuencia Cardíaca no se cargó en la pantalla");
+    assertTrue(vistaDashboard.panelTemperaturaEsVisible(), "El panel de Temperatura no se cargó en la pantalla");
   }
 }

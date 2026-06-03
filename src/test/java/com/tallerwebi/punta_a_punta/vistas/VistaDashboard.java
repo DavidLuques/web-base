@@ -14,9 +14,6 @@ public class VistaDashboard {
     page.navigate("http://localhost:8080/spring/analisis/dashboard/" + idMascota);
   }
 
-  public String obtenerNombreDeMascota() {
-    return page.locator("#nombre-mascota").innerText();
-  }
 
   public void esperarAQueCargueElFetch() {
     page
@@ -36,4 +33,11 @@ public class VistaDashboard {
     page.waitForSelector(".apexcharts-canvas");
     return page.locator(".apexcharts-canvas").count() > 0;
   }
+
+  public boolean panelFrecuenciaEsVisible() {
+    return this.page.locator("p:has-text('Frecuencia Cardíaca')").isVisible();
+}
+
+public boolean panelTemperaturaEsVisible() {
+    return this.page.locator("p:has-text('Temperatura')").isVisible();}
 }
