@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion.controlador;
 
 import com.tallerwebi.dominio.dto.AlertaDto;
+import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.servicio.AlertaService;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
@@ -74,6 +75,12 @@ public class ControladorMonitoreo {
   @ResponseBody
   public ResultadoSimulacionDto obtenerEstado(@PathVariable Long idMascota) {
     return orquestadorService.obtenerUltimoEstado(idMascota);
+  }
+
+  @GetMapping(value = "/rangos/{idMascota}", produces = "application/json;charset=UTF-8")
+  @ResponseBody
+  public RangosVitalesDto obtenerRangosVitales(@PathVariable Long idMascota) {
+    return orquestadorService.obtenerRangosVitales(idMascota);
   }
 
   @GetMapping("/dashboard/{idMascota}")

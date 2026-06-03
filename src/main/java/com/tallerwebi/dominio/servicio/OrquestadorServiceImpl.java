@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
+import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.Actividad;
@@ -64,6 +65,13 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     for (Mascota mascota : mascotas) {
       refrescarLectura(mascota.getId());
     }
+  }
+
+  @Override
+  public RangosVitalesDto obtenerRangosVitales(Long idMascota) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
+    return new RangosVitalesDto(rango);
   }
 
   @Override
