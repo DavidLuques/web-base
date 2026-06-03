@@ -294,4 +294,60 @@ public class AnalizadorDeDatosServiceImplTest {
 
     assertThat(estado, equalTo(EstadoMascota.CORRIENDO));
   }
+
+  @Test
+  public void cuandoPermaneceDormidoAvanzaAReposo() {
+    Mascota mascota = new Mascota();
+    mascota.setId(100L);
+    mascota.setTamano(TamanoMascota.MEDIANO);
+
+    RangoVitalPorTamano rango = new RangoVitalPorTamano();
+    rango.setFrecuenciaMinima(60);
+    rango.setFrecuenciaMaxima(140);
+
+    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(65);
+    lectura.setAccelX(0.1);
+    lectura.setAccelY(0.1);
+    lectura.setAccelZ(0.1);
+    lectura.setGyroX(0.1);
+    lectura.setGyroY(0.1);
+    lectura.setGyroZ(0.1);
+
+    analizador.determinarEstado(mascota, lectura);
+
+    EstadoMascota resultado = analizador.determinarEstado(mascota, lectura);
+
+    assertThat(resultado, equalTo(EstadoMascota.REPOSO));
+  }
+
+  @Test
+  public void cuandoPermaneceCorriendoRetrocedeACaminando() {
+    Mascota mascota = new Mascota();
+    mascota.setId(101L);
+    mascota.setTamano(TamanoMascota.MEDIANO);
+
+    RangoVitalPorTamano rango = new RangoVitalPorTamano();
+    rango.setFrecuenciaMinima(60);
+    rango.setFrecuenciaMaxima(140);
+
+    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+
+    LecturaSensor lectura = new LecturaSensor();
+    lectura.setFrecuenciaCardiaca(138);
+    lectura.setAccelX(5.0);
+    lectura.setAccelY(5.0);
+    lectura.setAccelZ(5.0);
+    lectura.setGyroX(5.0);
+    lectura.setGyroY(5.0);
+    lectura.setGyroZ(5.0);
+
+    analizador.determinarEstado(mascota, lectura);
+
+    EstadoMascota resultado = analizador.determinarEstado(mascota, lectura);
+
+    assertThat(resultado, equalTo(EstadoMascota.CAMINANDO));
+  }
 }

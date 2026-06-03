@@ -105,4 +105,80 @@ public class ServicioMascotaImplTest {
     assertEquals("Usuario no encontrado", exception.getMessage());
     verify(mascotaDaoMock, never()).guardar(any(Mascota.class));
   }
+
+  @Test
+  public void cuandoLaFechaNacimientoEsNullNoSeAsignaFecha() {
+    DatosAltaMascota datos = new DatosAltaMascota();
+
+    datos.setNombre("Firulais");
+    datos.setTamano(TamanoMascota.MEDIANO);
+    datos.setFechaNacimiento(null);
+
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(servicioUsuarioMock.obtenerPerfil(1L)).thenReturn(usuario);
+
+    doAnswer(invocation -> {
+        Mascota mascota = invocation.getArgument(0);
+        mascota.setId(1L);
+        return null;
+      })
+      .when(mascotaDaoMock)
+      .guardar(any(Mascota.class));
+
+    servicioMascota.registrarMascota(datos, 1L);
+
+    ArgumentCaptor<Mascota> captor = ArgumentCaptor.forClass(Mascota.class);
+
+    verify(mascotaDaoMock).guardar(captor.capture());
+
+    assertNull(captor.getValue().getDatos().getFechaNacimiento());
+  }
+
+  @Test
+  public void cuandoLaFechaNacimientoEsVaciaNoSeAsignaFecha() {
+    DatosAltaMascota datos = new DatosAltaMascota();
+
+    datos.setNombre("Firulais");
+    datos.setTamano(TamanoMascota.MEDIANO);
+    datos.setFechaNacimiento("");
+
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    when(servicioUsuarioMock.obtenerPerfil(1L)).thenReturn(usuario);
+
+    doAnswer(invocation -> {
+        Mascota mascota = invocation.getArgument(0);
+        mascota.setId(1L);
+        return null;
+      })
+      .when(mascotaDaoMock)
+      .guardar(any(Mascota.class));
+
+    servicioMascota.registrarMascota(datos, 1L);
+
+    ArgumentCaptor<Mascota> captor = ArgumentCaptor.forClass(Mascota.class);
+
+    verify(mascotaDaoMock).guardar(captor.capture());
+
+    assertNull(captor.getValue().getDatos().getFechaNacimiento());
+  }
+
+  @Test
+  public void dadoUnIdValidoCuandoObtengoMascotaPorIdRetornaLaMascota() {
+    Mascota mascota = new Mascota();
+    mascota.setId(10L);
+    mascota.setNombre("Luna");
+
+    when(mascotaDaoMock.buscarPorId(10L)).thenReturn(mascota);
+
+    Mascota resultado = servicioMascota.obtenerMascotaPorId(10L);
+
+    assertNotNull(resultado);
+    assertEquals("Luna", resultado.getNombre());
+
+    verify(mascotaDaoMock).buscarPorId(10L);
+  }
 }

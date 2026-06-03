@@ -260,7 +260,7 @@ public class OrquestadorServiceImplTest {
     assertEquals(-58.5250, resultado.get("longitud"));
     verify(repositorioAnalisis, times(1)).obtenerUltimoAnalisis(idMascota);
   }
-  
+
   @Test
   void obtenerRangosVitalesDeberiaBuscarMascotaYRetornarDto() {
     var resultado = servicio.obtenerRangosVitales(1L);
@@ -270,29 +270,23 @@ public class OrquestadorServiceImplTest {
     verify(mascotaDao).buscarPorId(1L);
     verify(rangoVitalDao).buscarPorTamano(TamanoMascota.MEDIANO);
   }
-  
+
   @Test
   void refrescarTodasLasLecturasDeberiaProcesarCadaMascota() {
     Mascota mascota2 = new Mascota();
     mascota2.setId(2L);
 
-    when(mascotaDao.buscarTodas())
-      .thenReturn(List.of(mascota, mascota2));
+    when(mascotaDao.buscarTodas()).thenReturn(List.of(mascota, mascota2));
 
-    when(mascotaDao.buscarPorId(2L))
-      .thenReturn(mascota2);
+    when(mascotaDao.buscarPorId(2L)).thenReturn(mascota2);
 
-    when(lectorCollarService.obtenerLectura(2L))
-      .thenReturn(lectura);
+    when(lectorCollarService.obtenerLectura(2L)).thenReturn(lectura);
 
-    when(repositorioActividad.obtenerDistanciaTotalPorMascota(2L))
-      .thenReturn(0.0);
+    when(repositorioActividad.obtenerDistanciaTotalPorMascota(2L)).thenReturn(0.0);
 
-    when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(2L))
-      .thenReturn(0);
+    when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(2L)).thenReturn(0);
 
-    when(analizadorDeDatosService.calcularPasos(anyDouble(), any()))
-      .thenReturn(0);
+    when(analizadorDeDatosService.calcularPasos(anyDouble(), any())).thenReturn(0);
 
     when(analizadorDeDatosService.calcularCalorias(anyDouble(), any(), anyDouble()))
       .thenReturn(0.0);
@@ -302,10 +296,9 @@ public class OrquestadorServiceImplTest {
     verify(lectorCollarService).obtenerLectura(1L);
     verify(lectorCollarService).obtenerLectura(2L);
   }
-  
+
   @Test
   void procesarMascotaDeberiaGuardarActividadCuandoHayMovimiento() {
-
     Analisis analisisPrevio = new Analisis();
     analisisPrevio.setLatitud(-34.0);
     analisisPrevio.setLongitud(-58.0);
@@ -313,52 +306,50 @@ public class OrquestadorServiceImplTest {
     lectura.setLatitud(-34.1);
     lectura.setLongitud(-58.1);
 
-    when(repositorioAnalisis.obtenerUltimoAnalisis(1L))
-      .thenReturn(analisisPrevio);
+    when(repositorioAnalisis.obtenerUltimoAnalisis(1L)).thenReturn(analisisPrevio);
 
-    when(analizadorDeDatosService.calcularDistanciaEntreUbicaciones(
-      anyDouble(),
-      anyDouble(),
-      anyDouble(),
-      anyDouble()
-    )).thenReturn(1.2);
+    when(
+      analizadorDeDatosService.calcularDistanciaEntreUbicaciones(
+        anyDouble(),
+        anyDouble(),
+        anyDouble(),
+        anyDouble()
+      )
+    )
+      .thenReturn(1.2);
 
     servicio.procesarMascota(1L);
 
-    verify(repositorioActividad)
-      .guardar(any());
+    verify(repositorioActividad).guardar(any());
   }
-  
+
   @Test
   void procesarMascotaNoDeberiaGuardarActividadSiLaDistanciaEsCero() {
-
     Analisis analisisPrevio = new Analisis();
 
-    when(repositorioAnalisis.obtenerUltimoAnalisis(1L))
-      .thenReturn(analisisPrevio);
+    when(repositorioAnalisis.obtenerUltimoAnalisis(1L)).thenReturn(analisisPrevio);
 
-    when(analizadorDeDatosService.calcularDistanciaEntreUbicaciones(
-      anyDouble(),
-      anyDouble(),
-      anyDouble(),
-      anyDouble()
-    )).thenReturn(0.0);
+    when(
+      analizadorDeDatosService.calcularDistanciaEntreUbicaciones(
+        anyDouble(),
+        anyDouble(),
+        anyDouble(),
+        anyDouble()
+      )
+    )
+      .thenReturn(0.0);
 
     servicio.procesarMascota(1L);
 
-    verify(repositorioActividad, never())
-      .guardar(any());
+    verify(repositorioActividad, never()).guardar(any());
   }
-  
+
   @Test
   void procesarMascotaNoDeberiaGuardarActividadSinAnalisisPrevio() {
-
-    when(repositorioAnalisis.obtenerUltimoAnalisis(1L))
-      .thenReturn(null);
+    when(repositorioAnalisis.obtenerUltimoAnalisis(1L)).thenReturn(null);
 
     servicio.procesarMascota(1L);
 
-    verify(repositorioActividad, never())
-      .guardar(any());
+    verify(repositorioActividad, never()).guardar(any());
   }
 }

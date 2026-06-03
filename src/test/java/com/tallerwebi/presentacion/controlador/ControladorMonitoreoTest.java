@@ -154,7 +154,7 @@ public class ControladorMonitoreoTest {
 
     assertThat(resultado.getNombreMascota(), equalTo("Firulais"));
   }
-  
+
   @Test
   public void cuandoIngresoALaVistaDeAlertasConUsuarioLogueadoAgregaMisMascotas() {
     Long mascotaId = 1L;
@@ -162,27 +162,19 @@ public class ControladorMonitoreoTest {
 
     List<?> mascotas = new ArrayList<>();
 
-    when(sessionMock.getAttribute("ID_USUARIO"))
-      .thenReturn(idUsuario);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
 
-    when(servicioMascotaMock.obtenerMascotasPorUsuario(idUsuario))
-      .thenReturn((List) mascotas);
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(idUsuario)).thenReturn((List) mascotas);
 
-    controlador.verPantallaDeAlertas(
-      mascotaId,
-      modelMock,
-      requestMock
-    );
+    controlador.verPantallaDeAlertas(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", mascotaId);
 
-    verify(modelMock)
-      .addAttribute("misMascotas", mascotas);
+    verify(modelMock).addAttribute("misMascotas", mascotas);
 
-    verify(servicioMascotaMock)
-      .obtenerMascotasPorUsuario(idUsuario);
+    verify(servicioMascotaMock).obtenerMascotasPorUsuario(idUsuario);
   }
-  
+
   @Test
   public void cuandoIngresoALaVistaDeSimulacionConUsuarioLogueadoAgregaMisMascotas() {
     Long mascotaId = 1L;
@@ -190,27 +182,19 @@ public class ControladorMonitoreoTest {
 
     List<?> mascotas = new ArrayList<>();
 
-    when(sessionMock.getAttribute("ID_USUARIO"))
-      .thenReturn(idUsuario);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
 
-    when(servicioMascotaMock.obtenerMascotasPorUsuario(idUsuario))
-      .thenReturn((List) mascotas);
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(idUsuario)).thenReturn((List) mascotas);
 
-    controlador.vista(
-      mascotaId,
-      modelMock,
-      requestMock
-    );
+    controlador.vista(mascotaId, modelMock, requestMock);
 
     verify(modelMock).addAttribute("idMascota", mascotaId);
 
-    verify(modelMock)
-      .addAttribute("misMascotas", mascotas);
+    verify(modelMock).addAttribute("misMascotas", mascotas);
 
-    verify(servicioMascotaMock)
-      .obtenerMascotasPorUsuario(idUsuario);
+    verify(servicioMascotaMock).obtenerMascotasPorUsuario(idUsuario);
   }
-  
+
   @Test
   public void cuandoIngresoAlDashboardConUsuarioLogueadoAgregaMisMascotas() {
     Long mascotaId = 1L;
@@ -218,69 +202,50 @@ public class ControladorMonitoreoTest {
 
     List<?> mascotas = new ArrayList<>();
 
-    ResultadoSimulacionDto dto =
-      new ResultadoSimulacionDto(
-        "Luna",
-        EstadoMascota.REPOSO,
-        null,
-        null
-      );
-
-    when(sessionMock.getAttribute("ID_USUARIO"))
-      .thenReturn(idUsuario);
-
-    when(servicioMascotaMock.obtenerMascotasPorUsuario(idUsuario))
-      .thenReturn((List) mascotas);
-
-    when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId))
-      .thenReturn(dto);
-
-    controlador.vistaDashboard(
-      mascotaId,
-      modelMock,
-      requestMock
+    ResultadoSimulacionDto dto = new ResultadoSimulacionDto(
+      "Luna",
+      EstadoMascota.REPOSO,
+      null,
+      null
     );
 
-    verify(modelMock)
-      .addAttribute("misMascotas", mascotas);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
 
-    verify(servicioMascotaMock)
-      .obtenerMascotasPorUsuario(idUsuario);
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(idUsuario)).thenReturn((List) mascotas);
+
+    when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
+
+    controlador.vistaDashboard(mascotaId, modelMock, requestMock);
+
+    verify(modelMock).addAttribute("misMascotas", mascotas);
+
+    verify(servicioMascotaMock).obtenerMascotasPorUsuario(idUsuario);
   }
-  
+
   @Test
   public void cuandoNoHayUsuarioEnSesionNoBuscaMascotas() {
     Long mascotaId = 1L;
 
-    when(sessionMock.getAttribute("ID_USUARIO"))
-      .thenReturn(null);
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
 
-    controlador.vista(
-      mascotaId,
-      modelMock,
-      requestMock
-    );
+    controlador.vista(mascotaId, modelMock, requestMock);
 
-    verify(servicioMascotaMock, never())
-      .obtenerMascotasPorUsuario(anyLong());
+    verify(servicioMascotaMock, never()).obtenerMascotasPorUsuario(anyLong());
   }
-  
+
   @Test
   public void cuandoSolicitoRangosVitalesDevuelveLosRangosCorrectos() {
     Long mascotaId = 1L;
 
     RangosVitalesDto rangosMock = mock(RangosVitalesDto.class);
 
-    when(orquestadorServiceMock.obtenerRangosVitales(mascotaId))
-      .thenReturn(rangosMock);
+    when(orquestadorServiceMock.obtenerRangosVitales(mascotaId)).thenReturn(rangosMock);
 
-    RangosVitalesDto resultado =
-      controlador.obtenerRangosVitales(mascotaId);
+    RangosVitalesDto resultado = controlador.obtenerRangosVitales(mascotaId);
 
     assertThat(resultado, equalTo(rangosMock));
 
-    verify(orquestadorServiceMock)
-      .obtenerRangosVitales(mascotaId);
+    verify(orquestadorServiceMock).obtenerRangosVitales(mascotaId);
   }
 
   @Test
