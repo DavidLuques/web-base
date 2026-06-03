@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.dominio.modelo.Direccion;
 import com.tallerwebi.presentacion.DatosPerfil;
 import javax.transaction.Transactional;
@@ -26,6 +27,29 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
   }
 
   @Override
+  public DatosPerfil obtenerDatosPerfil(Long id) {
+    Usuario usuario = repositorioUsuario.buscarPorId(id);
+    if (usuario == null) {
+      throw new UsuarioNoEncontrado("Usuario no encontrado");
+    }
+
+    DatosPerfil datosPerfil = new DatosPerfil();
+    datosPerfil.setNombre(usuario.getNombre());
+    datosPerfil.setEmail(usuario.getEmail());
+    datosPerfil.setTelefono(usuario.getTelefono());
+
+    if (usuario.getUbicacion() != null) {
+      datosPerfil.setCalle(usuario.getUbicacion().getCalle());
+      datosPerfil.setCiudad(usuario.getUbicacion().getCiudad());
+      datosPerfil.setProvincia(usuario.getUbicacion().getProvincia());
+      datosPerfil.setPais(usuario.getUbicacion().getPais());
+      datosPerfil.setCodigoPostal(usuario.getUbicacion().getCodigoPostal());
+    }
+
+    return datosPerfil;
+  }
+
+  @Override
   public void eliminar(Long id) {
     Usuario usuario = repositorioUsuario.buscarPorId(id);
     if (usuario != null) {
@@ -37,7 +61,7 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
   public void actualizarPerfil(Long id, DatosPerfil datosPerfil) {
     Usuario usuario = repositorioUsuario.buscarPorId(id);
     if (usuario == null) {
-      throw new RuntimeException("Usuario no encontrado");
+      throw new UsuarioNoEncontrado("Usuario no encontrado");
     }
 
     usuario.setNombre(datosPerfil.getNombre());

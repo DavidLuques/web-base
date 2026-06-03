@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.modelo.Direccion;
+import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosPerfil;
@@ -94,13 +94,13 @@ public class ControladorPerfilTest {
   public void queSiElUsuarioEstaLogueadoPuedaVerSuPerfil() {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-    Usuario usuarioSimulado = new Usuario();
-    usuarioSimulado.setNombre("Test");
-    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuarioSimulado);
+    DatosPerfil datosPerfilSimulado = new DatosPerfil();
+    datosPerfilSimulado.setNombre("Test");
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(datosPerfilSimulado);
 
     ModelAndView modelAndView = controlador.verPerfil(requestMock, null);
 
-    assertEquals("perfil", modelAndView.getViewName());
+    assertEquals("ver-perfil", modelAndView.getViewName());
     DatosPerfil datosPerfil = (DatosPerfil) modelAndView.getModel().get("datosPerfil");
     assertEquals("Test", datosPerfil.getNombre());
   }
@@ -109,16 +109,14 @@ public class ControladorPerfilTest {
   public void queAlVerPerfilConUbicacionSeCarguenLosDatosCorrectamente() {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-    Usuario usuarioSimulado = new Usuario();
-    usuarioSimulado.setNombre("Test");
-    Direccion direccion = new Direccion();
-    direccion.setCalle("Av Siempre Viva 742");
-    usuarioSimulado.setUbicacion(direccion);
-    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuarioSimulado);
+    DatosPerfil datosPerfilSimulado = new DatosPerfil();
+    datosPerfilSimulado.setNombre("Test");
+    datosPerfilSimulado.setCalle("Av Siempre Viva 742");
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(datosPerfilSimulado);
 
     ModelAndView modelAndView = controlador.verPerfil(requestMock, 99L);
 
-    assertEquals("perfil", modelAndView.getViewName());
+    assertEquals("ver-perfil", modelAndView.getViewName());
     DatosPerfil datosPerfil = (DatosPerfil) modelAndView.getModel().get("datosPerfil");
     assertEquals("Av Siempre Viva 742", datosPerfil.getCalle());
     assertEquals(99L, modelAndView.getModel().get("idMascota"));
@@ -162,24 +160,23 @@ public class ControladorPerfilTest {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
     DatosPerfil datosPerfil = new DatosPerfil();
 
-    doThrow(new RuntimeException("Error simulado"))
+    doThrow(new UsuarioNoEncontrado("Usuario no encontrado"))
       .when(servicioUsuarioMock)
       .actualizarPerfil(idUsuario, datosPerfil);
 
     ModelAndView modelAndView = controlador.actualizarPerfil(datosPerfil, requestMock, null);
 
     assertEquals("perfil", modelAndView.getViewName());
-    assertEquals("Error simulado", modelAndView.getModel().get("error"));
+    assertEquals("Usuario no encontrado", modelAndView.getModel().get("error"));
   }
 
   @Test
   public void queAlVerPerfilSinUbicacionLosCamposDeDireccionSeanNulos() {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-    Usuario usuarioSimulado = new Usuario();
-    usuarioSimulado.setNombre("Test");
-    usuarioSimulado.setUbicacion(null);
-    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuarioSimulado);
+    DatosPerfil datosPerfilSimulado = new DatosPerfil();
+    datosPerfilSimulado.setNombre("Test");
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(datosPerfilSimulado);
 
     ModelAndView mav = controlador.verPerfil(requestMock, null);
 
@@ -193,11 +190,11 @@ public class ControladorPerfilTest {
   public void queAlVerPerfilSeCarguenEmailYTelefono() {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-    Usuario usuarioSimulado = new Usuario();
-    usuarioSimulado.setNombre("Ana");
-    usuarioSimulado.setEmail("ana@mail.com");
-    usuarioSimulado.setTelefono(1198765432L);
-    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuarioSimulado);
+    DatosPerfil datosPerfilSimulado = new DatosPerfil();
+    datosPerfilSimulado.setNombre("Ana");
+    datosPerfilSimulado.setEmail("ana@mail.com");
+    datosPerfilSimulado.setTelefono(1198765432L);
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(datosPerfilSimulado);
 
     ModelAndView mav = controlador.verPerfil(requestMock, null);
 
@@ -210,7 +207,7 @@ public class ControladorPerfilTest {
   public void queAlVerPerfilElModeloContieneIdMascotaNuloSiNoSePasa() {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(new Usuario());
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(new DatosPerfil());
 
     ModelAndView mav = controlador.verPerfil(requestMock, null);
 
@@ -221,11 +218,11 @@ public class ControladorPerfilTest {
   public void queAlVerPerfilSeLlamaAlServicioUnaVez() {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(new Usuario());
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(new DatosPerfil());
 
     controlador.verPerfil(requestMock, null);
 
-    verify(servicioUsuarioMock, times(1)).obtenerPerfil(idUsuario);
+    verify(servicioUsuarioMock, times(1)).obtenerDatosPerfil(idUsuario);
   }
 
   @Test
@@ -235,7 +232,7 @@ public class ControladorPerfilTest {
     DatosPerfil datosPerfil = new DatosPerfil();
     datosPerfil.setNombre("Carlos");
 
-    doThrow(new RuntimeException("Fallo al guardar"))
+    doThrow(new UsuarioNoEncontrado("Fallo al guardar"))
       .when(servicioUsuarioMock)
       .actualizarPerfil(idUsuario, datosPerfil);
 
@@ -250,7 +247,7 @@ public class ControladorPerfilTest {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
     DatosPerfil datosPerfil = new DatosPerfil();
 
-    doThrow(new RuntimeException("Error"))
+    doThrow(new UsuarioNoEncontrado("Error"))
       .when(servicioUsuarioMock)
       .actualizarPerfil(idUsuario, datosPerfil);
 
@@ -283,15 +280,13 @@ public class ControladorPerfilTest {
   public void queAlVerPerfilConTodasLasDireccionesSeCarganCorrectamente() {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
-    Usuario usuarioSimulado = new Usuario();
-    Direccion direccion = new Direccion();
-    direccion.setCalle("Calle Falsa 123");
-    direccion.setCiudad("Rosario");
-    direccion.setProvincia("Santa Fe");
-    direccion.setPais("Argentina");
-    direccion.setCodigoPostal("2000");
-    usuarioSimulado.setUbicacion(direccion);
-    when(servicioUsuarioMock.obtenerPerfil(idUsuario)).thenReturn(usuarioSimulado);
+    DatosPerfil datosPerfilSimulado = new DatosPerfil();
+    datosPerfilSimulado.setCalle("Calle Falsa 123");
+    datosPerfilSimulado.setCiudad("Rosario");
+    datosPerfilSimulado.setProvincia("Santa Fe");
+    datosPerfilSimulado.setPais("Argentina");
+    datosPerfilSimulado.setCodigoPostal("2000");
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(datosPerfilSimulado);
 
     ModelAndView mav = controlador.verPerfil(requestMock, null);
 
@@ -299,5 +294,29 @@ public class ControladorPerfilTest {
     assertEquals("Rosario", datosPerfil.getCiudad());
     assertEquals("Santa Fe", datosPerfil.getProvincia());
     assertEquals("2000", datosPerfil.getCodigoPostal());
+  }
+
+  @Test
+  public void queSiElUsuarioNoEstaLogueadoAlEditarPerfilRedirijaALogin() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
+
+    ModelAndView modelAndView = controlador.editarPerfil(requestMock, null);
+
+    assertEquals("redirect:/login", modelAndView.getViewName());
+  }
+
+  @Test
+  public void queSiElUsuarioEstaLogueadoPuedaEditarSuPerfil() {
+    Long idUsuario = 1L;
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    DatosPerfil datosPerfilSimulado = new DatosPerfil();
+    datosPerfilSimulado.setNombre("Test");
+    when(servicioUsuarioMock.obtenerDatosPerfil(idUsuario)).thenReturn(datosPerfilSimulado);
+
+    ModelAndView modelAndView = controlador.editarPerfil(requestMock, null);
+
+    assertEquals("perfil", modelAndView.getViewName());
+    DatosPerfil datosPerfil = (DatosPerfil) modelAndView.getModel().get("datosPerfil");
+    assertEquals("Test", datosPerfil.getNombre());
   }
 }
