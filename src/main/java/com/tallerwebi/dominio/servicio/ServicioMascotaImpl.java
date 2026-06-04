@@ -127,4 +127,13 @@ public class ServicioMascotaImpl implements ServicioMascota {
       mascotaDao.modificar(mascota);
     }
   }
+
+  @Override
+  public void actualizarRadioValla(Long idMascota, Integer radioValla) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    if (mascota != null) {
+      mascota.setRadioValla(radioValla);
+      mascotaDao.modificar(mascota);
+    }
+  }
 }

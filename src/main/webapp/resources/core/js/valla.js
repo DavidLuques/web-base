@@ -16,6 +16,7 @@ function inicializarValla(idMascota) {
   const indicadorLuz = document.getElementById("indicador-luz");
   const estadoTexto = document.getElementById("estado-texto");
   const distanciaTexto = document.getElementById("distancia-texto");
+  const btnConfirmar = document.getElementById("btn-confirmar-radio");
 
   let radioValla = parseInt(inputRadio.value) || 150;
   let escalaVisual = parseFloat(inputZoom.value) || 1.0;
@@ -72,7 +73,39 @@ function inicializarValla(idMascota) {
     if (nuevoValor > 0) {
       radioValla = nuevoValor;
       aplicarEscalaVisual();
-      evaluarAlerta();
+    }
+  });
+
+  btnConfirmar.addEventListener("click", async () => {
+    evaluarAlerta();
+
+    const formData = new URLSearchParams();
+    formData.append("radio", radioValla.toString());
+
+    try {
+      const response = await fetch(`/spring/analisis/valla/${idMascota}/actualizar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        // Feedback visual temporal para que el usuario sepa que funcionó
+        const textoOriginal = btnConfirmar.innerText;
+        btnConfirmar.innerText = "Guardado";
+        btnConfirmar.classList.replace("bg-blue-600", "bg-emerald-600");
+        btnConfirmar.classList.replace("hover:bg-blue-700", "hover:bg-emerald-700");
+
+        setTimeout(() => {
+          btnConfirmar.innerText = textoOriginal;
+          btnConfirmar.classList.replace("bg-emerald-600", "bg-blue-600");
+          btnConfirmar.classList.replace("hover:bg-emerald-700", "hover:bg-blue-700");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error al guardar el radio:", error);
     }
   });
 

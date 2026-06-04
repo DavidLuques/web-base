@@ -164,10 +164,16 @@ public class OrquestadorServiceImpl implements OrquestadorService {
 
   @Override
   public Map<String, Object> obtenerVallado(Long idMascota) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+
     Map<String, Object> respuesta = new HashMap<>();
     respuesta.put(CLAVE_LATITUD, -34.7222);
     respuesta.put(CLAVE_LONGITUD, -58.5250);
-    respuesta.put(CLAVE_RADIO, 150.0);
+    if (mascota != null && mascota.getRadioValla() != null) {
+      respuesta.put(CLAVE_RADIO, mascota.getRadioValla().doubleValue());
+    } else {
+      respuesta.put(CLAVE_RADIO, 150.0);
+    }
     return respuesta;
   }
 
