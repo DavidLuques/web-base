@@ -36,6 +36,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private static final String CLAVE_LATITUD = "latitud";
   private static final String CLAVE_LONGITUD = "longitud";
   private static final String CLAVE_RADIO = "radio";
+  private static final int RADIO_TIERRA = 6371000;
 
   private final MascotaDao mascotaDao;
   private final LectorCollarService lectorCollarService;
@@ -96,7 +97,6 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   }
 
   public double calcularDistanciaHaversine(double lat1, double lon1, double lat2, double lon2) {
-    final int RADIO_TIERRA_METROS = 6371000;
     double dLat = Math.toRadians(lat2 - lat1);
     double dLon = Math.toRadians(lon2 - lon1);
     double senoDLatMedio = Math.sin(dLat / 2);
@@ -108,7 +108,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
         senoDLonMedio *
         senoDLonMedio;
     double distanciaAngular = 2 * Math.asin(Math.sqrt(distanciaAngularMitad));
-    return RADIO_TIERRA_METROS * distanciaAngular;
+    return RADIO_TIERRA * distanciaAngular;
   }
 
   @Override
