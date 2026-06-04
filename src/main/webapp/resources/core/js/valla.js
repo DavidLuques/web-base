@@ -153,5 +153,5 @@ function inicializarValla(idMascota) {
 
   cargarVallado();
   actualizarPosicion();
-setInterval(actualizarPosicion, 60000);
+  setInterval(actualizarPosicion, 60000);
 }
