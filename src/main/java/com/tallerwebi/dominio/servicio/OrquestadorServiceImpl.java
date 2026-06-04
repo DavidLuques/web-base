@@ -83,7 +83,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
 
-    // Evalúa signos vitales, peso y vallado (todo en un solo llamado)
+    // Evalúa signos vitales, peso y vallado
     evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
 
     persistirSuenoSiCorresponde(mascota, estado);
