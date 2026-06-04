@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion.controlador;
 
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.presentacion.DatosAltaMascota;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -90,11 +91,16 @@ public class ControladorPerfilMascota {
     @RequestParam(required = true) Long idMascota
   ) {
     Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
-    if (idUsuario == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (idUsuario == null) return new ModelAndView(REDIRECT_LOGIN);
 
     servicioMascota.eliminarMascota(idMascota);
-    return new ModelAndView("redirect:/configuraciones");
+
+    List<com.tallerwebi.dominio.modelo.Mascota> restantes =
+      servicioMascota.obtenerMascotasPorUsuario(idUsuario);
+
+    if (restantes == null || restantes.isEmpty()) {
+      return new ModelAndView("redirect:/sin-mascota");
+    }
+    return new ModelAndView("redirect:/analisis/dashboard/" + restantes.get(0).getId());
   }
 }

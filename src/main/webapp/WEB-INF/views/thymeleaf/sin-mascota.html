@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sin mascotas - PetTracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+    <div th:replace="fragmentos/sidebar :: sidebar(null, 'nueva-mascota')"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+
+        <div th:replace="fragmentos/header :: header('Sin mascotas', null, 'nueva-mascota', 'PetTracker')"></div>
+
+        <div class="flex-1 flex items-center justify-center p-8">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-12 max-w-md w-full text-center">
+
+                <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="paw-print" class="w-10 h-10 text-amber-500"></i>
+                </div>
+
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">No tenés mascotas registradas</h1>
+                <p class="text-slate-500 text-sm mb-8">
+                    Registrá tu primera mascota para comenzar a monitorear su salud.
+                </p>
+
+                <a href="/spring/configuraciones/mascota/nueva"
+                   class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    Registrar mascota
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

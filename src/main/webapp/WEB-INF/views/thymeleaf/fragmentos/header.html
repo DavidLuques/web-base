@@ -7,24 +7,23 @@
     <span th:text="${titulo}">Título</span> - 
     <span id="nombre-mascota" th:text="${mascotaNombre != null and mascotaNombre != 'Mascota' ? mascotaNombre : (mascotaAct != null ? mascotaAct.nombre : 'Mascota')}">Mascota</span>
   </h1>
-  <div class="flex gap-4">
-    <!-- Pet Switcher Dropdown -->
+<div class="flex gap-4">
+  <th:block th:if="${idMascota != null}">
+    <!-- Pet Switcher Dropdown — igual que antes -->
     <div class="relative group cursor-pointer z-50">
       <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 transition-colors group-hover:bg-amber-100">
         <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
           <i data-lucide="dog" class="w-4 h-4"></i>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm font-bold text-slate-800 leading-tight" th:text="${mascotaNombre != null and mascotaNombre != 'Mascota' ? mascotaNombre : (mascotaAct != null ? mascotaAct.nombre : 'Mascota')}">Mascota</span>
+          <span class="text-sm font-bold text-slate-800 leading-tight"
+                th:text="${mascotaNombre != null and mascotaNombre != 'Mascota' ? mascotaNombre : (mascotaAct != null ? mascotaAct.nombre : 'Mascota')}">Mascota</span>
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500"></i>
         </div>
       </div>
-      
-      <!-- Dropdown Menu -->
       <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden z-50">
         <div class="py-1">
-          <!-- Iterar sobre las mascotas del usuario -->
-          <a th:each="mascota : ${misMascotas}" 
+          <a th:each="mascota : ${misMascotas}"
              th:href="@{${vistaActual == 'configuraciones' || vistaActual == 'perfil' || vistaActual == 'nueva-mascota' ? '/' + vistaActual + '?idMascota=' + mascota.id : '/analisis/' + vistaActual + '/' + mascota.id}}"
              class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
              th:classappend="${mascota.id == idMascota} ? 'bg-amber-50/50' : ''">
@@ -37,8 +36,18 @@
         </div>
       </div>
     </div>
-  </div>
   </th:block>
+
+  <!-- Sin mascota: badge informativo -->
+  <th:block th:if="${idMascota == null}">
+    <div class="flex items-center gap-3 bg-slate-100 px-4 py-2 rounded-full border border-slate-200">
+      <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
+        <i data-lucide="paw-print" class="w-4 h-4"></i>
+      </div>
+      <span class="text-sm font-medium text-slate-400">Sin mascotas registradas</span>
+    </div>
+  </th:block>
+</div>
 </header>
 </body>
 </html>
