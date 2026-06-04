@@ -164,8 +164,6 @@ public class OrquestadorServiceImpl implements OrquestadorService {
 
   @Override
   public Map<String, Object> obtenerVallado(Long idMascota) {
-    // Vallado ahora se obtiene desde EvaluadorAlertaService
-    // Pero el frontend sigue necesitando este endpoint
     Map<String, Object> respuesta = new HashMap<>();
     respuesta.put(CLAVE_LATITUD, -34.7222);
     respuesta.put(CLAVE_LONGITUD, -58.5250);
