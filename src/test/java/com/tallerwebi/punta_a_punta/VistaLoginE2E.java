@@ -74,8 +74,7 @@ public class VistaLoginE2E {
   void deberiaRegistrarUnUsuarioEIniciarSesionAutomaticamente() throws MalformedURLException {
     dadoQueElUsuarioNavegaALaVistaDeRegistro();
     dadoQueElUsuarioSeRegistraCon("juan@unlam.edu.ar", "123456");
-    // Al registrarse, ya deberia auto-loguearse y redirigir
-    entoncesDeberiaSerRedirigidoALaVista1();
+    entoncesDeberiaSerRedirigidoASinMascota();
   }
 
   @Test
@@ -111,6 +110,7 @@ public class VistaLoginE2E {
   }
 
   private void entoncesDeberiaSerRedirigidoALaVista1() throws MalformedURLException {
+    System.out.println("URL actual antes del wait: " + context.pages().get(0).url());
     context
       .pages()
       .get(0)
@@ -150,5 +150,15 @@ public class VistaLoginE2E {
     vistaNuevoUsuario.escribirPais("Argentina");
     vistaNuevoUsuario.escribirCodigoPostal("1708");
     vistaNuevoUsuario.darClickEnRegistrarme();
+  }
+
+  private void entoncesDeberiaSerRedirigidoASinMascota() throws MalformedURLException {
+    context
+      .pages()
+      .get(0)
+      .waitForURL(url -> url.matches(".*\\/spring\\/sin-mascota(?:;jsessionid=[^/\\s]+)?(?:#.*)?$")
+      );
+    URL url = vistaLogin.obtenerURLActual();
+    assertThat(url.getPath(), matchesPattern("^/spring/sin-mascota(?:;jsessionid=[^/\\s]+)?$"));
   }
 }

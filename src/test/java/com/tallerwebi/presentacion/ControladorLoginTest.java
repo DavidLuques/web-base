@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import com.tallerwebi.dominio.modelo.Mascota;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,8 +54,28 @@ public class ControladorLoginTest {
   }
 
   @Test
-  public void loginConUsuarioYPasswordCorrectosDeberiaLLevarAHome() {
-    // preparacion
+  public void loginConMascotasDeberiaRedirigirAlDashboardDeLaPrimeraMascota() {
+    Usuario usuarioEncontrado = new Usuario();
+    usuarioEncontrado.setId(1L);
+    usuarioEncontrado.setRol("USER");
+
+    Mascota mascota = new Mascota();
+    mascota.setId(7L);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+
+    when(servicioLoginMock.consultarUsuario(anyString(), anyString()))
+      .thenReturn(usuarioEncontrado);
+
+    when(servicioLoginMock.buscarMascotasPorUsuario(1L)).thenReturn(java.util.List.of(mascota));
+
+    ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/analisis/dashboard/7"));
+  }
+
+  @Test
+  public void loginConUsuarioYPasswordCorrectosSinMascotasDeberiaRedirigirASinMascota() {
     Usuario usuarioEncontrado = new Usuario();
     usuarioEncontrado.setId(1L);
     usuarioEncontrado.setRol("USER");
@@ -62,33 +83,33 @@ public class ControladorLoginTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(servicioLoginMock.consultarUsuario(anyString(), anyString()))
       .thenReturn(usuarioEncontrado);
+
     when(servicioLoginMock.buscarMascotasPorUsuario(1L))
       .thenReturn(java.util.Collections.emptyList());
 
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
-    // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/analisis/dashboard/1"));
-    verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontrado.getRol());
-    verify(sessionMock, times(1)).setAttribute("ID_USUARIO", 1L);
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/sin-mascota"));
+
+    verify(sessionMock).setAttribute("ROL", "USER");
+    verify(sessionMock).setAttribute("ID_USUARIO", 1L);
   }
 
   @Test
-  public void registrameSiUsuarioNoExisteDeberiaCrearUsuarioYVolverAlLogin()
+  public void registrameSiUsuarioNoExisteDeberiaCrearUsuarioYRedirigirASinMascota()
     throws UsuarioExistente {
     when(requestMock.getSession()).thenReturn(sessionMock);
+
     usuario.setId(2L);
     usuario.setRol("USER");
 
-    // ejecucion
     ModelAndView modelAndView = controladorLogin.registrarme(usuario, requestMock);
 
-    // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/analisis/dashboard/1"));
-    verify(servicioLoginMock, times(1)).registrar(usuario);
-    verify(sessionMock, times(1)).setAttribute("ROL", "USER");
-    verify(sessionMock, times(1)).setAttribute("ID_USUARIO", 2L);
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/sin-mascota"));
+
+    verify(servicioLoginMock).registrar(usuario);
+    verify(sessionMock).setAttribute("ROL", "USER");
+    verify(sessionMock).setAttribute("ID_USUARIO", 2L);
   }
 
   @Test
