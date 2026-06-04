@@ -1,3 +1,5 @@
+/* global lucide */
+// eslint-disable-next-line no-unused-vars
 function inicializarAlertas(idMascota) {
     lucide.createIcons();
 
@@ -66,6 +68,21 @@ function inicializarAlertas(idMascota) {
         `;
             });
     }
+
+    window.marcarAlertaComoLeida = function(idAlerta) {
+        fetch(`/spring/simulacion/alertas/${idAlerta}/leer`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    cargarAlertasPantalla();
+                }
+            })
+            .catch(error => console.error("Error marcando alerta como leída:", error));
+    };
 
     cargarAlertasPantalla();
     setInterval(cargarAlertasPantalla, 5000);
