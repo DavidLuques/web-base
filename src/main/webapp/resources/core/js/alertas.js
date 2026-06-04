@@ -30,7 +30,7 @@ function inicializarAlertas(idMascota) {
                 contador.textContent = `${listaDeAlertas.length} Alertas`;
                 let htmlContent = "";
 
-                listaDeAlertas.forEach(alerta => {
+                listaDeAlertas.reverse().forEach(alerta => {
                     const esEmergencia = alerta.tipo === 'EMERGENCIA';
                     const bgClass = esEmergencia ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-200';
                     const textClass = esEmergencia ? 'text-rose-800' : 'text-amber-800';
