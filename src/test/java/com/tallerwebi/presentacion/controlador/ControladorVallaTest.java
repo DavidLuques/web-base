@@ -3,7 +3,11 @@ package com.tallerwebi.presentacion.controlador;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
+import com.tallerwebi.dominio.servicio.ServicioMascota;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +21,13 @@ public class ControladorVallaTest {
 
   private OrquestadorService orquestadorServiceMock;
   private ControladorValla controladorValla;
+  private ServicioMascota servicioMascotaMock;
 
   @BeforeEach
   public void inicializar() {
     orquestadorServiceMock = mock(OrquestadorService.class);
-    controladorValla = new ControladorValla(orquestadorServiceMock);
+    servicioMascotaMock = mock(ServicioMascota.class);
+    controladorValla = new ControladorValla(orquestadorServiceMock, servicioMascotaMock);
   }
 
   @Test
@@ -69,6 +75,10 @@ public class ControladorVallaTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(10L);
 
+    Mascota mascotaMock = new Mascota();
+    mascotaMock.setNombre("Poncho");
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(10L)).thenReturn(new ArrayList<>());
+    when(servicioMascotaMock.obtenerMascotaPorId(5L)).thenReturn(mascotaMock);
     ModelAndView resultado = controladorValla.verVallado(requestMock, 5L);
 
     assertEquals("valla-mascota", resultado.getViewName());
@@ -82,6 +92,10 @@ public class ControladorVallaTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(20L);
 
+    Mascota mascotaMock = new Mascota();
+    mascotaMock.setNombre("Poncho");
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(20L)).thenReturn(new ArrayList<>());
+    when(servicioMascotaMock.obtenerMascotaPorId(99L)).thenReturn(mascotaMock);
     ModelAndView resultado = controladorValla.verVallado(requestMock, 99L);
 
     assertEquals(99L, resultado.getModel().get("idMascota"));

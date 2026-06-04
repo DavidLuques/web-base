@@ -1,6 +1,8 @@
 package com.tallerwebi.presentacion.controlador;
 
+import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
+import com.tallerwebi.dominio.servicio.ServicioMascota;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorValla {
 
   private final OrquestadorService orquestadorService;
+  private final ServicioMascota servicioMascota;
 
   @Autowired
-  public ControladorValla(OrquestadorService orquestadorService) {
+  public ControladorValla(OrquestadorService orquestadorService, ServicioMascota servicioMascota) {
     this.orquestadorService = orquestadorService;
+    this.servicioMascota = servicioMascota;
   }
 
   @RequestMapping(path = "/analisis/valla/{idMascota}", method = RequestMethod.GET)
@@ -36,6 +40,12 @@ public class ControladorValla {
 
     ModelMap modelo = new ModelMap();
     modelo.put("idMascota", idMascota);
+    if (idUsuario != null) {
+      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    }
+    Mascota mascota = servicioMascota.obtenerMascotaPorId(idMascota);
+    modelo.put("mascotaNombre", mascota != null ? mascota.getNombre() : "Mascota");
+
     return new ModelAndView("valla-mascota", modelo);
   }
 
