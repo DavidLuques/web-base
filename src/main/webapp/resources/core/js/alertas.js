@@ -4,7 +4,7 @@ function inicializarAlertas(idMascota) {
   lucide.createIcons();
 
   function cargarAlertasPantalla() {
-    fetch("/spring/simulacion/alertas/datos/" + idMascota)
+    fetch("/spring/analisis/alertas/datos/" + idMascota)
       .then(response => {
         if (!response.ok) {
           throw new Error("Error en el servidor. Código HTTP: " + response.status);
