@@ -38,7 +38,6 @@ public class OrquestadorServiceImplTest {
   private RepositorioAnalisis repositorioAnalisis;
   private RangoVitalDao rangoVitalDao;
   private RangoVitalPorTamano rango;
-  private ValladoDao valladoDao;
 
   private Mascota mascota;
   private LecturaSensor lectura;
@@ -53,7 +52,6 @@ public class OrquestadorServiceImplTest {
     repositorioSueno = mock(RepositorioSueno.class);
     repositorioAnalisis = mock(RepositorioAnalisis.class);
     rangoVitalDao = mock(RangoVitalDao.class);
-    valladoDao = mock(ValladoDao.class);
 
     servicio =
       new OrquestadorServiceImpl(
@@ -64,8 +62,7 @@ public class OrquestadorServiceImplTest {
         repositorioActividad,
         repositorioSueno,
         repositorioAnalisis,
-        rangoVitalDao,
-        valladoDao
+        rangoVitalDao
       );
 
     mascota = new Mascota();
