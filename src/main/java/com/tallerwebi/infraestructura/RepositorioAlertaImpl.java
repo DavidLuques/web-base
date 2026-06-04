@@ -1,4 +1,4 @@
-package com.tallerwebi.dominio.servicio;
+package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Repository;
  * Servicio de lógica de negocio.
  */
 @Repository("repositorioAlerta")
-public class AlertaImpl implements RepositorioAlerta {
+public class RepositorioAlertaImpl implements RepositorioAlerta {
 
   private final SessionFactory sessionFactory;
 
   @Autowired
-  public AlertaImpl(SessionFactory sessionFactory) {
+  public RepositorioAlertaImpl(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
 
