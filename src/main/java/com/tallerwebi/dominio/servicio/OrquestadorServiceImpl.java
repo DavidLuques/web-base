@@ -72,43 +72,11 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   }
 
   @Override
-  public void refrescarTodasLasLecturas() {
+  public void procesarTodasLasMascotas() {
     List<Mascota> mascotas = mascotaDao.buscarTodas();
     for (Mascota mascota : mascotas) {
-      refrescarLectura(mascota.getId());
+      procesarMascota(mascota.getId());
     }
-  }
-
-  @Override
-  public RangosVitalesDto obtenerRangosVitales(Long idMascota) {
-    Mascota mascota = mascotaDao.buscarPorId(idMascota);
-    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
-    return new RangosVitalesDto(rango);
-  }
-
-  @Override
-  public ResultadoSimulacionDto refrescarLectura(Long idMascota) {
-    Mascota mascota = mascotaDao.buscarPorId(idMascota);
-    LecturaSensor lectura = lectorCollarService.obtenerLectura(idMascota);
-
-    persistirLectura(mascota, lectura);
-
-    return armarDto(mascota, lectura, mascota.getEstadoActual());
-  }
-
-  public double calcularDistanciaHaversine(double lat1, double lon1, double lat2, double lon2) {
-    double dLat = Math.toRadians(lat2 - lat1);
-    double dLon = Math.toRadians(lon2 - lon1);
-    double senoDLatMedio = Math.sin(dLat / 2);
-    double senoDLonMedio = Math.sin(dLon / 2);
-    double distanciaAngularMitad =
-      senoDLatMedio * senoDLatMedio +
-      Math.cos(Math.toRadians(lat1)) *
-        Math.cos(Math.toRadians(lat2)) *
-        senoDLonMedio *
-        senoDLonMedio;
-    double distanciaAngular = 2 * Math.asin(Math.sqrt(distanciaAngularMitad));
-    return RADIO_TIERRA * distanciaAngular;
   }
 
   @Override
@@ -126,10 +94,10 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     Vallado vallado = valladoDao.buscarPorMascota(idMascota);
     if (vallado != null) {
       double distanciaVallado = calcularDistanciaHaversine(
-        vallado.getLatitudCentro(),
-        vallado.getLongitudCentro(),
-        lectura.getLatitud(),
-        lectura.getLongitud()
+              vallado.getLatitudCentro(),
+              vallado.getLongitudCentro(),
+              lectura.getLatitud(),
+              lectura.getLongitud()
       );
       evaluadorAlertaService.evaluarVallado(mascota, lectura, vallado, distanciaVallado);
     }
@@ -142,11 +110,43 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   }
 
   @Override
-  public void procesarTodasLasMascotas() {
+  public void refrescarTodasLasLecturas() {
     List<Mascota> mascotas = mascotaDao.buscarTodas();
     for (Mascota mascota : mascotas) {
-      procesarMascota(mascota.getId());
+      refrescarLectura(mascota.getId());
     }
+  }
+
+  @Override
+  public ResultadoSimulacionDto refrescarLectura(Long idMascota) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    LecturaSensor lectura = lectorCollarService.obtenerLectura(idMascota);
+
+    persistirLectura(mascota, lectura);
+
+    return armarDto(mascota, lectura, mascota.getEstadoActual());
+  }
+
+  @Override
+  public RangosVitalesDto obtenerRangosVitales(Long idMascota) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
+    return new RangosVitalesDto(rango);
+  }
+
+  public double calcularDistanciaHaversine(double lat1, double lon1, double lat2, double lon2) {
+    double dLat = Math.toRadians(lat2 - lat1);
+    double dLon = Math.toRadians(lon2 - lon1);
+    double senoDLatMedio = Math.sin(dLat / 2);
+    double senoDLonMedio = Math.sin(dLon / 2);
+    double distanciaAngularMitad =
+      senoDLatMedio * senoDLatMedio +
+      Math.cos(Math.toRadians(lat1)) *
+        Math.cos(Math.toRadians(lat2)) *
+        senoDLonMedio *
+        senoDLonMedio;
+    double distanciaAngular = 2 * Math.asin(Math.sqrt(distanciaAngularMitad));
+    return RADIO_TIERRA * distanciaAngular;
   }
 
   @Override
