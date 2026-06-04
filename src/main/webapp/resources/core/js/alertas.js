@@ -1,4 +1,4 @@
-/* global lucide, marcarAlertaComoLeida */
+/* global lucide */
 /* eslint-disable-next-line no-unused-vars */
 function inicializarAlertas(idMascota) {
     lucide.createIcons();
