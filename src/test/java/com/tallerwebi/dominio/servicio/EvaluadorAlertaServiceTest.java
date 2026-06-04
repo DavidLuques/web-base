@@ -3,6 +3,7 @@ package com.tallerwebi.dominio.servicio;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 public class EvaluadorAlertaServiceTest {
 
   private AlertaService alertaServiceMock;
+  private ValladoDao valladoDaoMock;
   private EvaluadorAlertaService evaluadorAlertaService;
   private Mascota mascota;
   private RangoVitalPorTamano rango;
@@ -31,7 +33,8 @@ public class EvaluadorAlertaServiceTest {
   @BeforeEach
   public void init() {
     alertaServiceMock = mock(AlertaService.class);
-    evaluadorAlertaService = new EvaluadorAlertaService(alertaServiceMock);
+    valladoDaoMock = mock(ValladoDao.class);
+    evaluadorAlertaService = new EvaluadorAlertaService(alertaServiceMock, valladoDaoMock);
 
     mascota = new Mascota();
     mascota.setNombre("Firulais");

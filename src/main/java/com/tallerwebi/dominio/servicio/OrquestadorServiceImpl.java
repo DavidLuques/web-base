@@ -5,7 +5,6 @@ import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
-import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
@@ -16,7 +15,6 @@ import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import com.tallerwebi.dominio.modelo.RegistroSueno;
-import com.tallerwebi.dominio.modelo.Vallado;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Servicio de lógica de negocio.
+ * Servicio de orquestación de la simulación.
  */
 @Service
 @Transactional
@@ -36,7 +34,6 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private static final String CLAVE_LATITUD = "latitud";
   private static final String CLAVE_LONGITUD = "longitud";
   private static final String CLAVE_RADIO = "radio";
-  private static final int RADIO_TIERRA = 6371000;
 
   private final MascotaDao mascotaDao;
   private final LectorCollarService lectorCollarService;
@@ -46,7 +43,6 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private final RepositorioSueno repositorioSueno;
   private final RepositorioAnalisis repositorioAnalisis;
   private final RangoVitalDao rangoVitalDao;
-  private final ValladoDao valladoDao;
 
   @Autowired
   public OrquestadorServiceImpl(
@@ -57,8 +53,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     RepositorioActividad repositorioActividad,
     RepositorioSueno repositorioSueno,
     RepositorioAnalisis repositorioAnalisis,
-    RangoVitalDao rangoVitalDao,
-    ValladoDao valladoDao
+    RangoVitalDao rangoVitalDao
   ) {
     this.mascotaDao = mascotaDao;
     this.lectorCollarService = lectorCollarService;
@@ -68,7 +63,6 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     this.repositorioSueno = repositorioSueno;
     this.repositorioAnalisis = repositorioAnalisis;
     this.rangoVitalDao = rangoVitalDao;
-    this.valladoDao = valladoDao;
   }
 
   @Override
@@ -89,18 +83,8 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
 
+    // Evalúa signos vitales, peso y vallado (todo en un solo llamado)
     evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
-
-    Vallado vallado = valladoDao.buscarPorMascota(idMascota);
-    if (vallado != null) {
-      double distanciaVallado = calcularDistanciaHaversine(
-        vallado.getLatitudCentro(),
-        vallado.getLongitudCentro(),
-        lectura.getLatitud(),
-        lectura.getLongitud()
-      );
-      evaluadorAlertaService.evaluarVallado(mascota, lectura, vallado, distanciaVallado);
-    }
 
     persistirSuenoSiCorresponde(mascota, estado);
     persistirActividadSiCorresponde(mascota, estado, lectura);
@@ -132,21 +116,6 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
     RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
     return new RangosVitalesDto(rango);
-  }
-
-  public double calcularDistanciaHaversine(double lat1, double lon1, double lat2, double lon2) {
-    double dLat = Math.toRadians(lat2 - lat1);
-    double dLon = Math.toRadians(lon2 - lon1);
-    double senoDLatMedio = Math.sin(dLat / 2);
-    double senoDLonMedio = Math.sin(dLon / 2);
-    double distanciaAngularMitad =
-      senoDLatMedio * senoDLatMedio +
-      Math.cos(Math.toRadians(lat1)) *
-        Math.cos(Math.toRadians(lat2)) *
-        senoDLonMedio *
-        senoDLonMedio;
-    double distanciaAngular = 2 * Math.asin(Math.sqrt(distanciaAngularMitad));
-    return RADIO_TIERRA * distanciaAngular;
   }
 
   @Override
@@ -195,18 +164,12 @@ public class OrquestadorServiceImpl implements OrquestadorService {
 
   @Override
   public Map<String, Object> obtenerVallado(Long idMascota) {
-    Vallado vallado = valladoDao.buscarPorMascota(idMascota);
+    // Vallado ahora se obtiene desde EvaluadorAlertaService
+    // Pero el frontend sigue necesitando este endpoint
     Map<String, Object> respuesta = new HashMap<>();
-
-    if (vallado != null) {
-      respuesta.put(CLAVE_LATITUD, vallado.getLatitudCentro());
-      respuesta.put(CLAVE_LONGITUD, vallado.getLongitudCentro());
-      respuesta.put(CLAVE_RADIO, vallado.getRadioMetros());
-    } else {
-      respuesta.put(CLAVE_LATITUD, -34.7222);
-      respuesta.put(CLAVE_LONGITUD, -58.5250);
-      respuesta.put(CLAVE_RADIO, 150.0);
-    }
+    respuesta.put(CLAVE_LATITUD, -34.7222);
+    respuesta.put(CLAVE_LONGITUD, -58.5250);
+    respuesta.put(CLAVE_RADIO, 150.0);
     return respuesta;
   }
 

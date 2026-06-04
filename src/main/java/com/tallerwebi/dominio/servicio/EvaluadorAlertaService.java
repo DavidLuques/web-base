@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
@@ -22,11 +23,14 @@ public class EvaluadorAlertaService {
   private static final String PREFIJO_ANOMALIA_PRESION =
     "Alerta: Anomalia en la medicion de la presion arterial de ";
   private static final String INFIJO_LA_PRESION = ". La presion ";
+  private static final int RADIO_TIERRA = 6371000;
 
   private final AlertaService alertaService;
+  private final ValladoDao valladoDao;
 
-  public EvaluadorAlertaService(AlertaService alertaService) {
+  public EvaluadorAlertaService(AlertaService alertaService, ValladoDao valladoDao) {
     this.alertaService = alertaService;
+    this.valladoDao = valladoDao;
   }
 
   public void evaluarLectura(Mascota mascota, LecturaSensor lectura, RangoVitalPorTamano rango) {
@@ -36,6 +40,32 @@ public class EvaluadorAlertaService {
     evaluarTemperaturaLectura(mascota, lectura, rango);
     evaluarPresionSistolicaLectura(mascota, lectura, rango);
     evaluarPresionDiastolicaLectura(mascota, lectura, rango);
+
+    Vallado vallado = valladoDao.buscarPorMascota(mascota.getId());
+    if (vallado != null) {
+      double distancia = calcularDistanciaHaversine(
+        vallado.getLatitudCentro(),
+        vallado.getLongitudCentro(),
+        lectura.getLatitud(),
+        lectura.getLongitud()
+      );
+      evaluarVallado(mascota, lectura, vallado, distancia);
+    }
+  }
+
+  private double calcularDistanciaHaversine(Double lat1, Double lon1, Double lat2, Double lon2) {
+    double dLat = Math.toRadians(lat2 - lat1);
+    double dLon = Math.toRadians(lon2 - lon1);
+    double senoDLatMedio = Math.sin(dLat / 2);
+    double senoDLonMedio = Math.sin(dLon / 2);
+    double distanciaAngularMitad =
+      senoDLatMedio * senoDLatMedio +
+      Math.cos(Math.toRadians(lat1)) *
+        Math.cos(Math.toRadians(lat2)) *
+        senoDLonMedio *
+        senoDLonMedio;
+    double distanciaAngular = 2 * Math.asin(Math.sqrt(distanciaAngularMitad));
+    return RADIO_TIERRA * distanciaAngular;
   }
 
   public void evaluarPeso(Mascota mascota) {
