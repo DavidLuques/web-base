@@ -94,10 +94,10 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     Vallado vallado = valladoDao.buscarPorMascota(idMascota);
     if (vallado != null) {
       double distanciaVallado = calcularDistanciaHaversine(
-              vallado.getLatitudCentro(),
-              vallado.getLongitudCentro(),
-              lectura.getLatitud(),
-              lectura.getLongitud()
+        vallado.getLatitudCentro(),
+        vallado.getLongitudCentro(),
+        lectura.getLatitud(),
+        lectura.getLongitud()
       );
       evaluadorAlertaService.evaluarVallado(mascota, lectura, vallado, distanciaVallado);
     }
