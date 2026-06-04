@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActualizadorEstadoMascotaScheduler {
 
-  private static final long DOS_MINUTOS_EN_MS = 2 * 60 * 1000;
-  private static final long DIEZ_SEGUNDOS_EN_MS = 10 * 1000;
+  private static final long UN_MINUTO_EN_MS = 1 * 60 * 1000;
+  private static final long QUINCE_SEGUNDOS_EN_MS = 15 * 1000;
 
   private final OrquestadorService orquestadorService;
 
@@ -20,12 +20,12 @@ public class ActualizadorEstadoMascotaScheduler {
     this.orquestadorService = orquestadorService;
   }
 
-  @Scheduled(fixedRate = DOS_MINUTOS_EN_MS)
+  @Scheduled(fixedRate = UN_MINUTO_EN_MS)
   public void actualizarEstadosDeMascotas() {
     orquestadorService.procesarTodasLasMascotas();
   }
 
-  @Scheduled(fixedRate = DIEZ_SEGUNDOS_EN_MS)
+  @Scheduled(fixedRate = QUINCE_SEGUNDOS_EN_MS)
   public void refrescarLecturaDelCollar() {
     orquestadorService.refrescarTodasLasLecturas();
   }

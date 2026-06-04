@@ -1,35 +1,36 @@
-/* global ApexCharts, idMascota */
+/* global ApexCharts, idMascota, lucide */
+/* exported abrirModalSim, cerrarModalSim */
 /* ── simulacion.js ── */
 
-/* idMascota es inyectado desde el HTML con th:inline="javascript" antes de cargar este script */
+var ultimosDatosSimulacion = {};
 
-let historialDistancias = [0];
-let historialCalorias   = [0];
-let historialSueno      = [0];
-let historialPasos      = [0];
-let historialHoras = [new Date().toLocaleTimeString([], {
+var historialDistancias = [0];
+var historialCalorias   = [0];
+var historialSueno      = [0];
+var historialPasos      = [0];
+var historialHoras = [new Date().toLocaleTimeString([], {
   hour: "2-digit",
   minute: "2-digit"
 })];
 
-let nivelesHoras = {};
+var nivelesHoras = {};
 
 /* ─────────────────────────────────────────
    Persistencia en sessionStorage
 ───────────────────────────────────────── */
-const STORAGE_KEY = `analisis_${idMascota}`;
+var STORAGE_KEY = "analisis_" + idMascota;
 
 function cargarEstado() {
   try {
-    const guardado = sessionStorage.getItem(STORAGE_KEY);
-    if (!guardado) return;
-    const s = JSON.parse(guardado);
-    historialDistancias = s.historialDistancias ?? [0];
-    historialCalorias   = s.historialCalorias   ?? [0];
-    historialSueno      = s.historialSueno      ?? [0];
-    historialPasos      = s.historialPasos      ?? [0];
-    historialHoras      = s.historialHoras      ?? [new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })];
-    nivelesHoras        = s.nivelesHoras        ?? {};
+    var guardado = sessionStorage.getItem(STORAGE_KEY);
+    if (!guardado) { return; }
+    var s = JSON.parse(guardado);
+    historialDistancias = s.historialDistancias || [0];
+    historialCalorias   = s.historialCalorias   || [0];
+    historialSueno      = s.historialSueno      || [0];
+    historialPasos      = s.historialPasos      || [0];
+    historialHoras      = s.historialHoras      || [new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })];
+    nivelesHoras        = s.nivelesHoras        || {};
   } catch (e) {
     console.warn("No se pudo cargar el estado guardado:", e);
   }
@@ -38,31 +39,32 @@ function cargarEstado() {
 function guardarEstado() {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-      historialDistancias,
-      historialCalorias,
-      historialSueno,
-      historialPasos,
-      historialHoras,
-      nivelesHoras
+      historialDistancias: historialDistancias,
+      historialCalorias:   historialCalorias,
+      historialSueno:      historialSueno,
+      historialPasos:      historialPasos,
+      historialHoras:      historialHoras,
+      nivelesHoras:        nivelesHoras
     }));
   } catch (e) {
     console.warn("No se pudo guardar el estado:", e);
   }
 }
 
-/* ── Cargar antes de inicializar los charts ── */
 cargarEstado();
 
-/* ── Niveles de actividad cada 5 minutos ── */
+/* ─────────────────────────────────────────
+   Niveles de actividad cada 5 minutos
+───────────────────────────────────────── */
 function getHoraRedondeada() {
-  const ahora = new Date();
-  const hh = ahora.getHours().toString().padStart(2, "0");
-  const mm = (Math.floor(ahora.getMinutes() / 5) * 5).toString().padStart(2, "0");
+  var ahora = new Date();
+  var hh = ahora.getHours().toString().padStart(2, "0");
+  var mm = (Math.floor(ahora.getMinutes() / 5) * 5).toString().padStart(2, "0");
   return hh + ":" + mm;
 }
 
 function registrarNivel(estado) {
-  const hora = getHoraRedondeada();
+  var hora = getHoraRedondeada();
   if (!nivelesHoras[hora]) {
     nivelesHoras[hora] = { intenso: 0, moderado: 0, liviano: 0 };
   }
@@ -76,12 +78,12 @@ function registrarNivel(estado) {
 }
 
 function getNivelesSeriesYCategorias() {
-  const horas = Object.keys(nivelesHoras).sort();
+  var horas = Object.keys(nivelesHoras).sort();
   return {
     categorias: horas,
-    intenso:    horas.map(h => nivelesHoras[h].intenso),
-    moderado:   horas.map(h => nivelesHoras[h].moderado),
-    liviano:    horas.map(h => nivelesHoras[h].liviano),
+    intenso:    horas.map(function(h) { return nivelesHoras[h].intenso; }),
+    moderado:   horas.map(function(h) { return nivelesHoras[h].moderado; }),
+    liviano:    horas.map(function(h) { return nivelesHoras[h].liviano; })
   };
 }
 
@@ -92,7 +94,7 @@ function formatearEstado(estado) {
   return estado
     .toLowerCase()
     .replace("_", " ")
-    .replace(/\b\w/g, letra => letra.toUpperCase());
+    .replace(/\b\w/g, function(letra) { return letra.toUpperCase(); });
 }
 
 function getConfiguracionGrafico(colorPrincipal, etiqueta, valorMostrar, porcentajeLlenado) {
@@ -122,7 +124,7 @@ function getConfiguracionGrafico(colorPrincipal, etiqueta, valorMostrar, porcent
             fontSize: "22px",
             fontWeight: "600",
             offsetY: -10,
-            formatter: function () { return valorMostrar; }
+            formatter: function() { return valorMostrar; }
           }
         }
       }
@@ -166,19 +168,19 @@ function getOpcionesHistorial(nombreSerie, datos, horas, color, formatterFn) {
 /* ─────────────────────────────────────────
    Radial charts
 ───────────────────────────────────────── */
-let chartDistancia = new ApexCharts(
+var chartDistancia = new ApexCharts(
   document.querySelector("#chart-distancia"),
   getConfiguracionGrafico("#3b82f6", "km", "0", 0)
 );
-let chartCalorias = new ApexCharts(
+var chartCalorias = new ApexCharts(
   document.querySelector("#chart-calorias"),
   getConfiguracionGrafico("#10b981", "kcal", "0", 0)
 );
-let chartSueno = new ApexCharts(
+var chartSueno = new ApexCharts(
   document.querySelector("#chart-sueno"),
   getConfiguracionGrafico("#f59e0b", "horas", "0", 0)
 );
-let chartPasos = new ApexCharts(
+var chartPasos = new ApexCharts(
   document.querySelector("#chart-pasos"),
   getConfiguracionGrafico("#ec4899", "pasos", "0", 0)
 );
@@ -190,28 +192,27 @@ chartPasos.render();
 
 /* ─────────────────────────────────────────
    Historial line charts
-   — se inicializan con los datos ya cargados del sessionStorage
 ───────────────────────────────────────── */
-let chartHistorialDistancia = new ApexCharts(
+var chartHistorialDistancia = new ApexCharts(
   document.querySelector("#chart-historial-distancia"),
   getOpcionesHistorial("Distancia (km)", historialDistancias, historialHoras, "#3b82f6",
-    v => v.toFixed(2) + " km")
+    function(v) { return v.toFixed(2) + " km"; })
 );
 chartHistorialDistancia.render();
 
-let chartHistorialCalorias = new ApexCharts(
+var chartHistorialCalorias = new ApexCharts(
   document.querySelector("#chart-historial-calorias"),
-  getOpcionesHistorial("Calorías (kcal)", historialCalorias, historialHoras, "#10b981",
-    v => v.toFixed(1) + " kcal")
+  getOpcionesHistorial("Calor\u00edas (kcal)", historialCalorias, historialHoras, "#10b981",
+    function(v) { return v.toFixed(1) + " kcal"; })
 );
 chartHistorialCalorias.render();
 
-let chartHistorialSueno = new ApexCharts(
+var chartHistorialSueno = new ApexCharts(
   document.querySelector("#chart-historial-sueno"),
-  getOpcionesHistorial("Sueño (min)", historialSueno, historialHoras, "#f59e0b", v => {
+  getOpcionesHistorial("Sue\u00f1o (min)", historialSueno, historialHoras, "#f59e0b", function(v) {
     if (v >= 60) {
-      let h = Math.floor(v / 60);
-      let m = Math.round(v % 60);
+      var h = Math.floor(v / 60);
+      var m = Math.round(v % 60);
       return m > 0 ? h + "h " + m + "m" : h + "h";
     }
     return Math.round(v) + "m";
@@ -219,19 +220,19 @@ let chartHistorialSueno = new ApexCharts(
 );
 chartHistorialSueno.render();
 
-let chartHistorialPasos = new ApexCharts(
+var chartHistorialPasos = new ApexCharts(
   document.querySelector("#chart-historial-pasos"),
   getOpcionesHistorial("Pasos", historialPasos, historialHoras, "#ec4899",
-    v => Math.round(v).toLocaleString("es-AR") + " pasos")
+    function(v) { return Math.round(v).toLocaleString("es-AR") + " pasos"; })
 );
 chartHistorialPasos.render();
 
 /* ─────────────────────────────────────────
-   Chart niveles de actividad (barras apiladas)
+   Chart niveles de actividad
 ───────────────────────────────────────── */
-const nivelesIniciales = getNivelesSeriesYCategorias();
+var nivelesIniciales = getNivelesSeriesYCategorias();
 
-let chartNiveles = new ApexCharts(
+var chartNiveles = new ApexCharts(
   document.querySelector("#chart-niveles-actividad"),
   {
     series: [
@@ -272,12 +273,12 @@ let chartNiveles = new ApexCharts(
       min: 0,
       tickAmount: 4,
       labels: {
-        formatter: v => Math.round(v),
+        formatter: function(v) { return Math.round(v); },
         style: { colors: "#94a3b8" }
       }
     },
     tooltip: {
-      y: { formatter: v => Math.round(v) + "min" }
+      y: { formatter: function(v) { return Math.round(v) + "min"; } }
     },
     grid: {
       borderColor: "#f1f5f9",
@@ -292,7 +293,7 @@ chartNiveles.render();
 /* ─────────────────────────────────────────
    Badge helpers
 ───────────────────────────────────────── */
-const CONFIG_BADGE = {
+var CONFIG_BADGE = {
   CORRIENDO: {
     clase: "bg-red-100 text-red-600",
     dot:   "bg-red-500",
@@ -316,10 +317,10 @@ const CONFIG_BADGE = {
 };
 
 function actualizarBadge(estado) {
-  const cfg = CONFIG_BADGE[estado] || CONFIG_BADGE["_DEFAULT"];
-  const badge = document.getElementById("badge-actividad");
+  var cfg   = CONFIG_BADGE[estado] || CONFIG_BADGE["_DEFAULT"];
+  var badge = document.getElementById("badge-actividad");
   badge.className = cfg.clase + " px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2";
-  badge.innerHTML = `<div class="w-2 h-2 rounded-full ${cfg.dot}"></div> ${cfg.texto}`;
+  badge.innerHTML = "<div class=\"w-2 h-2 rounded-full " + cfg.dot + "\"></div> " + cfg.texto;
 }
 
 /* ─────────────────────────────────────────
@@ -327,8 +328,9 @@ function actualizarBadge(estado) {
 ───────────────────────────────────────── */
 function actualizarEstado() {
   fetch("/spring/analisis/estado/" + idMascota)
-    .then(response => response.json())
-    .then(data => {
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      ultimosDatosSimulacion = data;
 
       document.getElementById("estado").textContent = formatearEstado(data.estado);
       actualizarBadge(data.estado);
@@ -338,80 +340,164 @@ function actualizarEstado() {
         document.getElementById("nombre-mascota").textContent = data.nombreMascota;
       }
 
-      const horaActual = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      var horaActual = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-      /* Distancia */
       if (data.distanciaRecorrida != null) {
-        let pct = Math.min((data.distanciaRecorrida / 5.0) * 100, 100);
+        var pctDist = Math.min((data.distanciaRecorrida / 5.0) * 100, 100);
         chartDistancia.updateOptions({
-          series: [pct],
-          plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.distanciaRecorrida.toFixed(1) } } } }
+          series: [pctDist],
+          plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return data.distanciaRecorrida.toFixed(1); } } } } }
         });
         historialDistancias.push(Number(data.distanciaRecorrida.toFixed(2)));
-        if (historialDistancias.length > 20) historialDistancias.shift();
+        if (historialDistancias.length > 20) { historialDistancias.shift(); }
       }
 
-      /* Calorías */
       if (data.calorias != null) {
-        let pct = Math.min((data.calorias / 200.0) * 100, 100);
+        var pctCal = Math.min((data.calorias / 200.0) * 100, 100);
         chartCalorias.updateOptions({
-          series: [pct],
-          plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.calorias.toFixed(1) } } } }
+          series: [pctCal],
+          plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return data.calorias.toFixed(1); } } } } }
         });
         historialCalorias.push(Number(data.calorias.toFixed(1)));
-        if (historialCalorias.length > 20) historialCalorias.shift();
+        if (historialCalorias.length > 20) { historialCalorias.shift(); }
       }
 
-      /* Sueño */
       if (data.minutosDormidos != null) {
-        let pct = Math.min((data.minutosDormidos / 480) * 100, 100);
-        let etiqueta = data.minutosDormidos >= 60
+        var pctSueno = Math.min((data.minutosDormidos / 480) * 100, 100);
+        var etiquetaSueno = data.minutosDormidos >= 60
           ? (Math.floor(data.minutosDormidos / 60) + "h" + (data.minutosDormidos % 60 > 0 ? " " + (data.minutosDormidos % 60) + "m" : ""))
           : (data.minutosDormidos + "m");
         chartSueno.updateOptions({
-          series: [pct],
-          plotOptions: { radialBar: { dataLabels: { value: { formatter: () => etiqueta } } } }
+          series: [pctSueno],
+          plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return etiquetaSueno; } } } } }
         });
         historialSueno.push(data.minutosDormidos);
-        if (historialSueno.length > 20) historialSueno.shift();
+        if (historialSueno.length > 20) { historialSueno.shift(); }
       }
 
-      /* Pasos */
       if (data.pasos != null) {
-        let pct = Math.min((data.pasos / 10000) * 100, 100);
+        var pctPasos = Math.min((data.pasos / 10000) * 100, 100);
         chartPasos.updateOptions({
-          series: [pct],
-          plotOptions: { radialBar: { dataLabels: { value: { formatter: () => data.pasos.toLocaleString("es-AR") } } } }
+          series: [pctPasos],
+          plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return data.pasos.toLocaleString("es-AR"); } } } } }
         });
         historialPasos.push(data.pasos);
-        if (historialPasos.length > 20) historialPasos.shift();
+        if (historialPasos.length > 20) { historialPasos.shift(); }
       }
 
-      /* Horas eje X compartido */
       historialHoras.push(horaActual);
-      if (historialHoras.length > 20) historialHoras.shift();
+      if (historialHoras.length > 20) { historialHoras.shift(); }
 
-      /* Actualizar line charts */
       chartHistorialDistancia.updateOptions({ series: [{ data: historialDistancias }], xaxis: { categories: historialHoras } });
       chartHistorialCalorias.updateOptions({  series: [{ data: historialCalorias }],   xaxis: { categories: historialHoras } });
       chartHistorialSueno.updateOptions({     series: [{ data: historialSueno }],       xaxis: { categories: historialHoras } });
       chartHistorialPasos.updateOptions({     series: [{ data: historialPasos }],       xaxis: { categories: historialHoras } });
 
-      /* Actualizar chart de niveles */
-      const { categorias, intenso, moderado, liviano } = getNivelesSeriesYCategorias();
+      var niveles = getNivelesSeriesYCategorias();
       chartNiveles.updateOptions({
         series: [
-          { name: "Intenso",  data: intenso  },
-          { name: "Moderado", data: moderado },
-          { name: "Liviano",  data: liviano  }
+          { name: "Intenso",  data: niveles.intenso  },
+          { name: "Moderado", data: niveles.moderado },
+          { name: "Liviano",  data: niveles.liviano  }
         ],
-        xaxis: { categories: categorias }
+        xaxis: { categories: niveles.categorias }
       });
 
-      /* Guardar estado actualizado */
       guardarEstado();
-    });
+    })
+    .catch(function(error) { console.error("Error al actualizar estado:", error); });
 }
 
+/* ─────────────────────────────────────────
+   Modal Ver más
+───────────────────────────────────────── */
+function abrirModalSim(tipo) {
+  var modal     = document.getElementById("modal-sim-vermas");
+  var titulo    = document.getElementById("modal-sim-titulo");
+  var contenido = document.getElementById("modal-sim-contenido");
+  var html      = "";
+  var actual;
+
+  if (tipo === "distancia") {
+    titulo.textContent = "Distancia Recorrida";
+    actual = ultimosDatosSimulacion.distanciaRecorrida;
+    var pctDist2   = actual != null ? Math.min((actual / 5.0) * 100, 100).toFixed(0) : null;
+    var dentroDist = actual != null && actual >= 5.0 * 0.5;
+    html = simFila("Distancia hoy", actual != null ? actual.toFixed(2) + " km" : "Sin datos") +
+           simFila("Meta diaria",   "~5 km") +
+           simFila("Progreso",      pctDist2 != null ? pctDist2 + "%" : "Sin datos") +
+           simEstado(dentroDist, actual != null, "Buen avance", "Tu mascota puede caminar m\u00e1s") +
+           simDesc("La distancia recorrida refleja la actividad f\u00edsica acumulada del d\u00eda. " +
+             "Se recomienda que tu mascota recorra al menos 2\u20135 km diarios seg\u00fan su tama\u00f1o y raza.");
+
+  } else if (tipo === "calorias") {
+    titulo.textContent = "Calor\u00edas Quemadas";
+    actual = ultimosDatosSimulacion.calorias;
+    var dentroCal = actual != null && actual >= 200.0 * 0.6;
+    html = simFila("Calor\u00edas hoy", actual != null ? actual.toFixed(1) + " kcal" : "Sin datos") +
+           simFila("Meta diaria",       "~200 kcal") +
+           simEstado(dentroCal, actual != null, "Buen gasto energ\u00e9tico", "Actividad insuficiente") +
+           simDesc("Las calor\u00edas quemadas dependen del peso, estado y actividad de tu mascota. " +
+             "Un gasto energ\u00e9tico adecuado ayuda a mantener el peso ideal y la salud cardiovascular.");
+
+  } else if (tipo === "sueno") {
+    titulo.textContent = "Tiempo de Sue\u00f1o";
+    actual = ultimosDatosSimulacion.minutosDormidos;
+    var dentroSueno   = actual != null && actual >= 480 * 0.6;
+    var etiquetaModal = actual != null
+      ? (actual >= 60 ? Math.floor(actual / 60) + "h " + (actual % 60 > 0 ? actual % 60 + "m" : "") : actual + "m")
+      : "Sin datos";
+    html = simFila("Sue\u00f1o hoy", etiquetaModal) +
+           simFila("Meta diaria",    "~8 horas") +
+           simEstado(dentroSueno, actual != null, "Descanso adecuado", "Tu mascota descans\u00f3 poco") +
+           simDesc("El sue\u00f1o es esencial para la recuperaci\u00f3n y el bienestar de tu mascota. " +
+             "Los perros adultos necesitan entre 8 y 14 horas de sue\u00f1o por d\u00eda.");
+
+  } else if (tipo === "pasos") {
+    titulo.textContent = "Pasos Diarios";
+    actual = ultimosDatosSimulacion.pasos;
+    var dentroPasos   = actual != null && actual >= 10000 * 0.7;
+    var actualStr     = actual != null ? (actual > 1000 ? (actual / 1000).toFixed(1) + "k" : actual) + " pasos" : "Sin datos";
+    html = simFila("Pasos hoy",               actualStr) +
+           simFila("Meta diaria recomendada", "~10.000 pasos") +
+           simEstado(dentroPasos, actual != null, "Meta casi alcanzada", "Tu mascota necesita m\u00e1s actividad") +
+           simDesc("La actividad f\u00edsica diaria es fundamental para el peso y la salud articular de tu mascota. " +
+             "Se recomienda alcanzar la meta con caminatas y juego activo.");
+  }
+
+  contenido.innerHTML = html;
+  modal.classList.remove("hidden");
+}
+
+function cerrarModalSim() {
+  document.getElementById("modal-sim-vermas").classList.add("hidden");
+}
+
+document.getElementById("modal-sim-vermas").addEventListener("click", function(e) {
+  if (e.target === this) { cerrarModalSim(); }
+});
+
+function simFila(etiqueta, valor) {
+  return "<div class=\"flex justify-between items-center bg-slate-50 rounded-xl px-4 py-3\">" +
+           "<span class=\"text-slate-500 font-medium\">" + etiqueta + "</span>" +
+           "<span class=\"text-slate-800 font-bold\">" + valor + "</span>" +
+         "</div>";
+}
+
+function simEstado(dentro, hayDatos, textoOk, textoBad) {
+  if (!hayDatos) {
+    return "<div class=\"rounded-xl px-4 py-3 bg-slate-100 text-slate-500 text-center font-medium\">Sin datos suficientes para evaluar</div>";
+  }
+  if (dentro) {
+    return "<div class=\"rounded-xl px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-center font-semibold\">\u2713 " + textoOk + "</div>";
+  }
+  return "<div class=\"rounded-xl px-4 py-3 bg-rose-50 border border-rose-200 text-rose-700 text-center font-semibold\">\u26a0 " + textoBad + "</div>";
+}
+
+function simDesc(texto) {
+  return "<p class=\"text-slate-400 text-xs leading-relaxed px-1\">" + texto + "</p>";
+}
+
+lucide.createIcons();
 actualizarEstado();
 setInterval(actualizarEstado, 30000);

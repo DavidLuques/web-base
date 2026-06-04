@@ -146,12 +146,12 @@ function cargarEstado() {
 function guardarEstado() {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-      historialHoras: historialHoras,
-      historialFrecuencia: historialFrecuencia,
+      historialHoras:       historialHoras,
+      historialFrecuencia:  historialFrecuencia,
       historialTemperatura: historialTemperatura,
-      historialSistolica: historialSistolica,
-      historialDiastolica: historialDiastolica,
-      historialPasos: historialPasos
+      historialSistolica:   historialSistolica,
+      historialDiastolica:  historialDiastolica,
+      historialPasos:       historialPasos
     }));
   } catch (e) { console.warn("No se pudo guardar el estado:", e); }
 }
