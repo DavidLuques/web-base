@@ -27,6 +27,9 @@ CREATE TABLE IF NOT EXISTS registro_sueno (
                                               FOREIGN KEY (mascota_id) REFERENCES mascota(id)
 );
 
+INSERT INTO vallado (id_mascota, latitud_centro, longitud_centro, radio_metros)
+VALUES (1, -34.7222, -58.5250, 150.0);
+
 CREATE TABLE IF NOT EXISTS alerta (
                                       pk_id_alerta BIGINT AUTO_INCREMENT PRIMARY KEY,
                                       fk_id_mascota BIGINT NOT NULL,

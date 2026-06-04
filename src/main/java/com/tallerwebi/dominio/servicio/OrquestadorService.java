@@ -21,4 +21,6 @@ public interface OrquestadorService {
   Map<String, Object> obtenerUltimaUbicacion(Long idMascota);
 
   RangosVitalesDto obtenerRangosVitales(Long idMascota);
+
+  Map<String, Object> obtenerVallado(Long idMascota);
 }

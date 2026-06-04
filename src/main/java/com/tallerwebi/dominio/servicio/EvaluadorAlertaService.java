@@ -5,12 +5,10 @@ import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
+import com.tallerwebi.dominio.modelo.Vallado;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
-/**
- * Servicio de lógica de negocio.
- */
 @Service
 public class EvaluadorAlertaService {
 
@@ -260,6 +258,30 @@ public class EvaluadorAlertaService {
         presionDiastolicaMinima +
         SUFIJO_MMHG +
         "."
+      );
+    }
+  }
+
+  public void evaluarVallado(
+    Mascota mascota,
+    LecturaSensor lectura,
+    Vallado vallado,
+    double distanciaMetros
+  ) {
+    if (lectura == null || vallado == null) return;
+
+    if (distanciaMetros > vallado.getRadioMetros()) {
+      double distanciaExceso = distanciaMetros - vallado.getRadioMetros();
+      alertaService.crearAlerta(
+        mascota,
+        TipoAlerta.ALERTA,
+        "Alerta: " +
+        mascota.getNombre() +
+        " se alejo " +
+        Math.round(distanciaExceso) +
+        " metros del area permitida (Radio: " +
+        Math.round(vallado.getRadioMetros()) +
+        " metros)."
       );
     }
   }
