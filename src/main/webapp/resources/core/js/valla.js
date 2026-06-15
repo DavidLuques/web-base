@@ -6,6 +6,7 @@ function inicializarValla(idMascota) {
 
   let latHogar = -34.7222;
   let lonHogar = -58.5250;
+  let ultimoTimestamp = null;
 
   const inputRadio = document.getElementById("input-radio");
   const inputZoom = document.getElementById("input-zoom");
@@ -136,6 +137,12 @@ function inicializarValla(idMascota) {
       const response = await fetch(`/spring/api/mascotas/${idMascota}/ubicacion`);
       const datos = await response.json();
 
+      if (ultimoTimestamp && ultimoTimestamp === datos.timestamp) {
+        return;
+      }
+
+      ultimoTimestamp = datos.timestamp;
+
       const nuevaLat = datos.latitud;
       const nuevaLon = datos.longitud;
 
@@ -153,5 +160,5 @@ function inicializarValla(idMascota) {
 
   cargarVallado();
   actualizarPosicion();
-  setInterval(actualizarPosicion, 60000);
+  setInterval(actualizarPosicion, 30000);
 }
