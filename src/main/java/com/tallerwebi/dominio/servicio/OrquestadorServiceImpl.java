@@ -76,15 +76,11 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   @Override
   public ResultadoSimulacionDto procesarMascota(Long idMascota) {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
-    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
     LecturaSensor lectura = lectorCollarService.obtenerLectura(idMascota);
 
     EstadoMascota estado = analizadorDeDatosService.determinarEstado(mascota, lectura);
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
-
-    // Evalúa signos vitales, peso y vallado
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
 
     persistirSuenoSiCorresponde(mascota, estado);
     persistirActividadSiCorresponde(mascota, estado, lectura);
@@ -104,7 +100,10 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   @Override
   public ResultadoSimulacionDto refrescarLectura(Long idMascota) {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
     LecturaSensor lectura = lectorCollarService.obtenerLectura(idMascota);
+
+    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
 
     persistirLectura(mascota, lectura);
 
@@ -185,9 +184,11 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     if (ultimo != null) {
       respuesta.put(CLAVE_LATITUD, ultimo.getLatitud());
       respuesta.put(CLAVE_LONGITUD, ultimo.getLongitud());
+      respuesta.put("timestamp", ultimo.getFechaYHora().toString()); // Guardo momento exacto de la ultima generacion de posicion
     } else {
       respuesta.put(CLAVE_LATITUD, -34.7222);
       respuesta.put(CLAVE_LONGITUD, -58.5250);
+      respuesta.put("timestamp", LocalDateTime.now().toString());
     }
     return respuesta;
   }

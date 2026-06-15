@@ -10,7 +10,6 @@ import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
-import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
@@ -19,7 +18,7 @@ import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
-import com.tallerwebi.dominio.modelo.Vallado;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -151,13 +150,6 @@ public class OrquestadorServiceImplTest {
   }
 
   @Test
-  void procesarMascotaDeberiaEvaluarLaLecturaYElPeso() {
-    servicio.procesarMascota(1L);
-
-    verify(evaluadorAlertaService, times(1)).evaluarLectura(mascota, lectura, rango);
-  }
-
-  @Test
   void procesarMascotaDeberiaConsultarElLectorDeCollar() {
     servicio.procesarMascota(1L);
 
@@ -236,11 +228,14 @@ public class OrquestadorServiceImplTest {
   }
 
   @Test
-  public void deberiaDevolverLaUltimaUbicacionRegistrada() {
+  public void deberiaDevolverLaUltimaUbicacionRegistradaConTimestamp() {
     Long idMascota = 1L;
+    LocalDateTime fechaAnalisis = LocalDateTime.of(2026, 6, 15, 14, 30, 45);
+
     Analisis analisisMock = new Analisis();
     analisisMock.setLatitud(-34.5000);
     analisisMock.setLongitud(-58.4000);
+    analisisMock.setFechaYHora(fechaAnalisis);
 
     when(repositorioAnalisis.obtenerUltimoAnalisis(idMascota)).thenReturn(analisisMock);
 
@@ -248,6 +243,7 @@ public class OrquestadorServiceImplTest {
 
     assertEquals(-34.5000, resultado.get("latitud"));
     assertEquals(-58.4000, resultado.get("longitud"));
+    assertEquals(fechaAnalisis.toString(), resultado.get("timestamp"));
     verify(repositorioAnalisis, times(1)).obtenerUltimoAnalisis(idMascota);
   }
 
