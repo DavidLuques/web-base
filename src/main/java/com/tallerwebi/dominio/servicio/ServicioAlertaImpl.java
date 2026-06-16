@@ -11,21 +11,23 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 /**
- * Servicio de lógica de negocio.
+ * Implementación de servicio de alertas.
  */
 @Service
-public class AlertaService {
+public class ServicioAlertaImpl implements ServicioAlerta {
 
   private final RepositorioAlerta repositorioAlerta;
 
-  public AlertaService(RepositorioAlerta repositorioAlerta) {
+  public ServicioAlertaImpl(RepositorioAlerta repositorioAlerta) {
     this.repositorioAlerta = repositorioAlerta;
   }
 
+  @Override
   public Alerta buscarUltimaAlertaDePeso(Long idMascota) {
     return repositorioAlerta.buscarUltimaAlertaDePesoPorMascota(idMascota);
   }
 
+  @Override
   public void crearAlerta(Mascota mascota, TipoAlerta tipo, String mensaje) {
     Alerta alerta = new Alerta();
     alerta.setMascota(mascota);
@@ -36,13 +38,26 @@ public class AlertaService {
     repositorioAlerta.save(alerta);
   }
 
+  @Override
   @Transactional
   public List<AlertaDto> obtenerAlertasPorMascota(Long idMascota) {
-    if (idMascota == null) return java.util.Collections.emptyList(); //Evita la excepcion, devolviendo una lista vacia
+    if (idMascota == null) {
+      return java.util.Collections.emptyList();
+    }
     return repositorioAlerta
       .buscarPorMascota(idMascota)
       .stream()
       .map(a -> new AlertaDto(a.getId(), a.getTipo(), a.getMensaje()))
       .collect(java.util.stream.Collectors.toList());
+  }
+
+  @Override
+  @Transactional
+  public void marcarComoLeida(Long idAlerta) {
+    Alerta alerta = repositorioAlerta.buscarPorId(idAlerta);
+    if (alerta != null) {
+      alerta.setLeido(true);
+      repositorioAlerta.actualizar(alerta);
+    }
   }
 }

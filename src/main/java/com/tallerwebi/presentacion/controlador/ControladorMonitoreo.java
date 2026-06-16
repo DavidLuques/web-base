@@ -3,8 +3,8 @@ package com.tallerwebi.presentacion.controlador;
 import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
-import com.tallerwebi.dominio.servicio.AlertaService;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
+import com.tallerwebi.dominio.servicio.ServicioAlerta;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -24,17 +24,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ControladorMonitoreo {
 
   private final OrquestadorService orquestadorService;
-  private final AlertaService alertaService;
+  private final ServicioAlerta servicioAlerta;
   private final ServicioMascota servicioMascota;
 
   @Autowired
   public ControladorMonitoreo(
     OrquestadorService orquestadorService,
-    AlertaService alertaService,
+    ServicioAlerta servicioAlerta,
     ServicioMascota servicioMascota
   ) {
     this.orquestadorService = orquestadorService;
-    this.alertaService = alertaService;
+    this.servicioAlerta = servicioAlerta;
     this.servicioMascota = servicioMascota;
   }
 
@@ -61,7 +61,7 @@ public class ControladorMonitoreo {
   @GetMapping("/alertas/datos/{idMascota}")
   @ResponseBody
   public List<AlertaDto> obtenerAlertasDeMascota(@PathVariable Long idMascota) {
-    return alertaService.obtenerAlertasPorMascota(idMascota);
+    return servicioAlerta.obtenerAlertasPorMascota(idMascota);
   }
 
   @GetMapping("/vista/{idMascota}")

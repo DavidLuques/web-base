@@ -31,7 +31,7 @@ public class OrquestadorServiceImplTest {
   private MascotaDao mascotaDao;
   private LectorCollarService lectorCollarService;
   private AnalizadorDeDatosService analizadorDeDatosService;
-  private EvaluadorAlertaService evaluadorAlertaService;
+  private ServicioEvaluadorAlerta servicioEvaluadorAlerta;
   private RepositorioActividad repositorioActividad;
   private RepositorioSueno repositorioSueno;
   private RepositorioAnalisis repositorioAnalisis;
@@ -46,7 +46,7 @@ public class OrquestadorServiceImplTest {
     mascotaDao = mock(MascotaDao.class);
     lectorCollarService = mock(LectorCollarService.class);
     analizadorDeDatosService = mock(AnalizadorDeDatosService.class);
-    evaluadorAlertaService = mock(EvaluadorAlertaService.class);
+    servicioEvaluadorAlerta = mock(ServicioEvaluadorAlerta.class);
     repositorioActividad = mock(RepositorioActividad.class);
     repositorioSueno = mock(RepositorioSueno.class);
     repositorioAnalisis = mock(RepositorioAnalisis.class);
@@ -57,7 +57,7 @@ public class OrquestadorServiceImplTest {
         mascotaDao,
         lectorCollarService,
         analizadorDeDatosService,
-        evaluadorAlertaService,
+        servicioEvaluadorAlerta,
         repositorioActividad,
         repositorioSueno,
         repositorioAnalisis,
