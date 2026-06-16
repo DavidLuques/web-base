@@ -1,8 +1,8 @@
 package com.tallerwebi.dominio.modelo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,9 +16,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-/**
- * Entidad del sistema
- */
 @Entity
 @Table(name = "alerta")
 public class Alerta {
@@ -41,7 +38,6 @@ public class Alerta {
   private String mensaje;
 
   @Column(name = "fecha_y_hora")
-  @JsonIgnore
   private LocalDateTime fechaYHora;
 
   @Column(nullable = false)
@@ -103,5 +99,14 @@ public class Alerta {
 
   public void setLeido(Boolean leido) {
     this.leido = leido;
+  }
+
+  public String obtenerTipoFormato() {
+    if (tipo == null) return "";
+    Locale localeAR = new Locale("es", "AR");
+    return (
+      tipo.name().substring(0, 1).toUpperCase(localeAR) +
+      tipo.name().substring(1).toLowerCase(localeAR)
+    );
   }
 }

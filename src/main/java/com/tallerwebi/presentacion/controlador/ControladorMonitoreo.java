@@ -1,12 +1,9 @@
 package com.tallerwebi.presentacion.controlador;
 
-import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
-import com.tallerwebi.dominio.servicio.ServicioAlerta;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,17 +21,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ControladorMonitoreo {
 
   private final OrquestadorService orquestadorService;
-  private final ServicioAlerta servicioAlerta;
   private final ServicioMascota servicioMascota;
 
   @Autowired
   public ControladorMonitoreo(
     OrquestadorService orquestadorService,
-    ServicioAlerta servicioAlerta,
     ServicioMascota servicioMascota
   ) {
     this.orquestadorService = orquestadorService;
-    this.servicioAlerta = servicioAlerta;
     this.servicioMascota = servicioMascota;
   }
 
@@ -42,26 +36,6 @@ public class ControladorMonitoreo {
   @ResponseBody
   public ResultadoSimulacionDto procesarMascota(@PathVariable Long idMascota) {
     return orquestadorService.procesarMascota(idMascota);
-  }
-
-  @GetMapping("/alertas/{idMascota}")
-  public String verPantallaDeAlertas(
-    @PathVariable Long idMascota,
-    Model model,
-    HttpServletRequest request
-  ) {
-    model.addAttribute("idMascota", idMascota);
-    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
-    if (idUsuario != null) {
-      model.addAttribute("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
-    }
-    return "alertas";
-  }
-
-  @GetMapping("/alertas/datos/{idMascota}")
-  @ResponseBody
-  public List<AlertaDto> obtenerAlertasDeMascota(@PathVariable Long idMascota) {
-    return servicioAlerta.obtenerAlertasPorMascota(idMascota);
   }
 
   @GetMapping("/vista/{idMascota}")

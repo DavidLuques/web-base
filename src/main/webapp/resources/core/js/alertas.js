@@ -1,7 +1,25 @@
 /* global lucide */
-/* eslint-disable no-unused-vars */
+/* eslint-disable-next-line no-unused-vars */
 function inicializarAlertas(idMascota) {
   lucide.createIcons();
+
+  function formatearFecha(fechaStr) {
+    const fecha = new Date(fechaStr);
+    const hoy = new Date();
+    const ayer = new Date(hoy);
+    ayer.setDate(ayer.getDate() - 1);
+
+    const fechaFormato = fecha.toLocaleDateString("es-AR");
+    const horaFormato = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+
+    if (fechaFormato === hoy.toLocaleDateString("es-AR")) {
+      return `Hoy a las ${horaFormato}`;
+    } else if (fechaFormato === ayer.toLocaleDateString("es-AR")) {
+      return `Ayer a las ${horaFormato}`;
+    } else {
+      return `${fechaFormato} a las ${horaFormato}`;
+    }
+  }
 
   function cargarAlertasPantalla() {
     fetch("/spring/analisis/alertas/datos/" + idMascota)
@@ -38,6 +56,10 @@ function inicializarAlertas(idMascota) {
           const iconColor = esEmergencia ? "text-rose-500" : "text-amber-500";
           const iconName = esEmergencia ? "octagon-alert" : "triangle-alert";
           const opacidad = alerta.leido ? "opacity-60" : "";
+          const badge = alerta.leido
+            ? '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold">✓ Leído</span>'
+            : '<span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-blue-200">Click para marcar</span>';
+          const fechaFormato = formatearFecha(alerta.fechaYHora);
 
           htmlContent += `
             <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4 cursor-pointer ${opacidad}" onclick="marcarAlertaComoLeida(${alerta.id})">
@@ -45,12 +67,14 @@ function inicializarAlertas(idMascota) {
                 <i data-lucide="${iconName}" class="w-6 h-6"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between gap-2 mb-1">
+                <div class="flex items-center justify-between gap-2 mb-2">
                   <span class="text-xs font-bold uppercase tracking-wider ${textClass} ${bgClass} px-2 py-0.5 rounded-md">
-                    ${alerta.tipo} ${alerta.leido ? "- Leído" : ""}
+                    ${alerta.tipoFormato}
                   </span>
+                  ${badge}
                 </div>
-                <p class="text-slate-700 text-sm font-medium leading-relaxed">${alerta.mensaje}</p>
+                <p class="text-slate-700 text-sm font-medium leading-relaxed mb-2">${alerta.mensaje}</p>
+                <p class="text-slate-500 text-xs">${fechaFormato}</p>
               </div>
             </div>
           `;
@@ -70,7 +94,7 @@ function inicializarAlertas(idMascota) {
   }
 
   window.marcarAlertaComoLeida = function(idAlerta) {
-    fetch(`/spring/simulacion/alertas/${idAlerta}/leer`, {
+    fetch(`/spring/analisis/alertas/${idAlerta}/leer`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
