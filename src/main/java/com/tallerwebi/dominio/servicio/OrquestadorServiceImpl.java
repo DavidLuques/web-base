@@ -38,7 +38,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private final MascotaDao mascotaDao;
   private final LectorCollarService lectorCollarService;
   private final AnalizadorDeDatosService analizadorDeDatosService;
-  private final EvaluadorAlertaService evaluadorAlertaService;
+  private final ServicioEvaluadorAlerta servicioEvaluadorAlerta;
   private final RepositorioActividad repositorioActividad;
   private final RepositorioSueno repositorioSueno;
   private final RepositorioAnalisis repositorioAnalisis;
@@ -49,7 +49,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     MascotaDao mascotaDao,
     LectorCollarService lectorCollarService,
     AnalizadorDeDatosService analizadorDeDatosService,
-    EvaluadorAlertaService evaluadorAlertaService,
+    ServicioEvaluadorAlerta servicioEvaluadorAlerta,
     RepositorioActividad repositorioActividad,
     RepositorioSueno repositorioSueno,
     RepositorioAnalisis repositorioAnalisis,
@@ -58,7 +58,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     this.mascotaDao = mascotaDao;
     this.lectorCollarService = lectorCollarService;
     this.analizadorDeDatosService = analizadorDeDatosService;
-    this.evaluadorAlertaService = evaluadorAlertaService;
+    this.servicioEvaluadorAlerta = servicioEvaluadorAlerta;
     this.repositorioActividad = repositorioActividad;
     this.repositorioSueno = repositorioSueno;
     this.repositorioAnalisis = repositorioAnalisis;
@@ -103,7 +103,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
     LecturaSensor lectura = lectorCollarService.obtenerLectura(idMascota);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
     persistirLectura(mascota, lectura);
 

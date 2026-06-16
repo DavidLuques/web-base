@@ -10,8 +10,11 @@ import com.tallerwebi.dominio.modelo.Vallado;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementación de servicio evaluador de alertas.
+ */
 @Service
-public class EvaluadorAlertaService {
+public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
 
   private static final String SUFIJO_LPM = " lpm).";
   private static final String SUFIJO_GRADOS = "°C";
@@ -25,14 +28,15 @@ public class EvaluadorAlertaService {
   private static final String INFIJO_LA_PRESION = ". La presion ";
   private static final int RADIO_TIERRA = 6371000;
 
-  private final AlertaService alertaService;
+  private final ServicioAlerta servicioAlerta;
   private final ValladoDao valladoDao;
 
-  public EvaluadorAlertaService(AlertaService alertaService, ValladoDao valladoDao) {
-    this.alertaService = alertaService;
+  public ServicioEvaluadorAlertaImpl(ServicioAlerta servicioAlerta, ValladoDao valladoDao) {
+    this.servicioAlerta = servicioAlerta;
     this.valladoDao = valladoDao;
   }
 
+  @Override
   public void evaluarLectura(Mascota mascota, LecturaSensor lectura, RangoVitalPorTamano rango) {
     if (lectura == null) return;
     evaluarPeso(mascota);
@@ -68,6 +72,7 @@ public class EvaluadorAlertaService {
     return RADIO_TIERRA * distanciaAngular;
   }
 
+  @Override
   public void evaluarPeso(Mascota mascota) {
     if (mascota == null || mascota.getTamano() == null || mascota.getPeso() == null) return;
     Double peso = mascota.getPeso();
@@ -79,7 +84,7 @@ public class EvaluadorAlertaService {
     Double pesoMinimo = obtenerPesoMinimo(mascota);
     if (pesoMinimo == null || peso >= pesoMinimo) return false;
     if (pesoDistintoAlAnterior(mascota, peso)) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         "Atencion: El peso de " +
@@ -98,7 +103,7 @@ public class EvaluadorAlertaService {
     Double pesoMaximo = obtenerPesoMaximo(mascota);
     if (pesoMaximo == null || peso <= pesoMaximo) return;
     if (pesoDistintoAlAnterior(mascota, peso)) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         "Atencion: El peso de " +
@@ -113,8 +118,8 @@ public class EvaluadorAlertaService {
   }
 
   private boolean pesoDistintoAlAnterior(Mascota mascota, Double pesoActual) {
-    Alerta ultima = alertaService.buscarUltimaAlertaDePeso(mascota.getId());
-    if (ultima == null) return true; // primera vez, siempre dispara
+    Alerta ultima = servicioAlerta.buscarUltimaAlertaDePeso(mascota.getId());
+    if (ultima == null) return true;
     return !ultima.getMensaje().contains("" + pesoActual);
   }
 
@@ -127,7 +132,7 @@ public class EvaluadorAlertaService {
     if (frecuenciaCardiaca == null) return;
     Integer frecuenciaCardiacaMaxima = rango.getFrecuenciaMaxima();
     if (frecuenciaCardiaca > frecuenciaCardiacaMaxima) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.EMERGENCIA,
         "Emergencia: La frecuencia cardiaca de" +
@@ -145,7 +150,7 @@ public class EvaluadorAlertaService {
     }
     Integer frecuenciaCardiacaMinima = rango.getFrecuenciaMinima();
     if (frecuenciaCardiaca < frecuenciaCardiacaMinima) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         "Emergencia: La frecuencia cardiaca de" +
@@ -171,7 +176,7 @@ public class EvaluadorAlertaService {
     BigDecimal temp = BigDecimal.valueOf(lectura.getTemperatura());
     BigDecimal tempMax = BigDecimal.valueOf(rango.getTemperaturaMaxima());
     if (temp.compareTo(tempMax) > 0) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.EMERGENCIA,
         "Emergencia: La temperatura corporal de " +
@@ -189,7 +194,7 @@ public class EvaluadorAlertaService {
     }
     BigDecimal tempMin = BigDecimal.valueOf(rango.getTemperaturaMinima());
     if (temp.compareTo(tempMin) < 0) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         "Emergencia: La temperatura corporal de " +
@@ -214,7 +219,7 @@ public class EvaluadorAlertaService {
     Integer presionSistolica = lectura.getPresionSistolica();
     Integer presionSistolicaMaxima = rango.getSistolicaMaxima();
     if (presionSistolica != null && presionSistolica > presionSistolicaMaxima) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         PREFIJO_ANOMALIA_PRESION +
@@ -232,7 +237,7 @@ public class EvaluadorAlertaService {
     }
     Integer presionSistolicaMinima = rango.getSistolicaMinima();
     if (presionSistolica != null && presionSistolica < presionSistolicaMinima) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         PREFIJO_ANOMALIA_PRESION +
@@ -257,7 +262,7 @@ public class EvaluadorAlertaService {
     Integer presionDiastolica = lectura.getPresionDiastolica();
     Integer presionDiastolicaMaxima = rango.getDiastolicaMaxima();
     if (presionDiastolica != null && presionDiastolica > presionDiastolicaMaxima) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         PREFIJO_ANOMALIA_PRESION +
@@ -275,7 +280,7 @@ public class EvaluadorAlertaService {
     }
     Integer presionDiastolicaMinima = rango.getDiastolicaMinima();
     if (presionDiastolica != null && presionDiastolica < presionDiastolicaMinima) {
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         PREFIJO_ANOMALIA_PRESION +
@@ -292,6 +297,7 @@ public class EvaluadorAlertaService {
     }
   }
 
+  @Override
   public void evaluarVallado(
     Mascota mascota,
     LecturaSensor lectura,
@@ -302,7 +308,7 @@ public class EvaluadorAlertaService {
 
     if (distanciaMetros > vallado.getRadioMetros()) {
       double distanciaExceso = distanciaMetros - vallado.getRadioMetros();
-      alertaService.crearAlerta(
+      servicioAlerta.crearAlerta(
         mascota,
         TipoAlerta.ALERTA,
         "Alerta: " +

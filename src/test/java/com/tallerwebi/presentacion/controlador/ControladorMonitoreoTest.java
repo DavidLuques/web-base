@@ -8,8 +8,8 @@ import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
-import com.tallerwebi.dominio.servicio.AlertaService;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
+import com.tallerwebi.dominio.servicio.ServicioAlerta;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class ControladorMonitoreoTest {
 
   private ControladorMonitoreo controlador;
   private OrquestadorService orquestadorServiceMock;
-  private AlertaService alertaServiceMock;
+  private ServicioAlerta servicioAlertaMock;
   private ServicioMascota servicioMascotaMock;
   private Model modelMock;
   private HttpServletRequest requestMock;
@@ -32,7 +32,7 @@ public class ControladorMonitoreoTest {
   @BeforeEach
   public void init() {
     orquestadorServiceMock = mock(OrquestadorService.class);
-    alertaServiceMock = mock(AlertaService.class);
+    servicioAlertaMock = mock(ServicioAlerta.class);
     servicioMascotaMock = mock(ServicioMascota.class);
     modelMock = mock(Model.class);
     requestMock = mock(HttpServletRequest.class);
@@ -40,7 +40,7 @@ public class ControladorMonitoreoTest {
     when(requestMock.getSession()).thenReturn(sessionMock);
 
     controlador =
-      new ControladorMonitoreo(orquestadorServiceMock, alertaServiceMock, servicioMascotaMock);
+      new ControladorMonitoreo(orquestadorServiceMock, servicioAlertaMock, servicioMascotaMock);
   }
 
   @Test
@@ -69,7 +69,7 @@ public class ControladorMonitoreoTest {
 
     List<AlertaDto> alertasEsperadas = new ArrayList<>();
 
-    when(alertaServiceMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(alertasEsperadas);
+    when(servicioAlertaMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(alertasEsperadas);
 
     List<AlertaDto> resultado = controlador.obtenerAlertasDeMascota(mascotaId);
 
@@ -330,10 +330,10 @@ public class ControladorMonitoreoTest {
   public void cuandoObtengoAlertasSeLlamaAlServicioUnaVez() {
     Long mascotaId = 1L;
 
-    when(alertaServiceMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(new ArrayList<>());
+    when(servicioAlertaMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(new ArrayList<>());
 
     controlador.obtenerAlertasDeMascota(mascotaId);
 
-    verify(alertaServiceMock, times(1)).obtenerAlertasPorMascota(mascotaId);
+    verify(servicioAlertaMock, times(1)).obtenerAlertasPorMascota(mascotaId);
   }
 }

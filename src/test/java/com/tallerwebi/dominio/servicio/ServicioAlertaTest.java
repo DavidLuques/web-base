@@ -14,16 +14,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-public class AlertaServiceTest {
+public class ServicioAlertaTest {
 
   private RepositorioAlerta repositorioAlertaMock;
-  private AlertaService alertaService;
+  private ServicioAlerta servicioAlerta;
   private Mascota mascota;
 
   @BeforeEach
   public void init() {
     repositorioAlertaMock = mock(RepositorioAlerta.class);
-    alertaService = new AlertaService(repositorioAlertaMock);
+    servicioAlerta = new ServicioAlertaImpl(repositorioAlertaMock);
 
     mascota = new Mascota();
     mascota.setNombre("Firulais");
@@ -31,7 +31,7 @@ public class AlertaServiceTest {
 
   @Test
   void debeCrearAlertaConLosDatosCorrectos() {
-    alertaService.crearAlerta(mascota, TipoAlerta.EMERGENCIA, "Mensaje de prueba");
+    servicioAlerta.crearAlerta(mascota, TipoAlerta.EMERGENCIA, "Mensaje de prueba");
 
     ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
     verify(repositorioAlertaMock).save(captor.capture());
@@ -44,7 +44,7 @@ public class AlertaServiceTest {
 
   @Test
   void debeRetornarListaVaciaSiIdMascotaEsNull() {
-    List<AlertaDto> resultado = alertaService.obtenerAlertasPorMascota(null);
+    List<AlertaDto> resultado = servicioAlerta.obtenerAlertasPorMascota(null);
     assertEquals(0, resultado.size());
     verify(repositorioAlertaMock, never()).buscarPorMascota(any());
   }
@@ -61,7 +61,7 @@ public class AlertaServiceTest {
 
     when(repositorioAlertaMock.buscarPorMascota(1L)).thenReturn(Arrays.asList(alerta1, alerta2));
 
-    List<AlertaDto> resultado = alertaService.obtenerAlertasPorMascota(1L);
+    List<AlertaDto> resultado = servicioAlerta.obtenerAlertasPorMascota(1L);
 
     assertEquals(2, resultado.size());
     assertEquals(TipoAlerta.ALERTA, resultado.get(0).getTipo());

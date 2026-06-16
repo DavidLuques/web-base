@@ -52,4 +52,12 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
       .getResultList();
     return alertas.isEmpty() ? null : alertas.get(0);
   }
+
+  @Override
+  public void actualizar(Alerta alerta) {}
+
+  @Override
+  public Alerta buscarPorId(Long idAlerta) {
+    return null;
+  }
 }

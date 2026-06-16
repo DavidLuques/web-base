@@ -13,11 +13,11 @@ import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class EvaluadorAlertaServiceTest {
+public class EvaluadorServicioAlertaTest {
 
-  private AlertaService alertaServiceMock;
+  private ServicioAlerta servicioAlertaMock;
   private ValladoDao valladoDaoMock;
-  private EvaluadorAlertaService evaluadorAlertaService;
+  private ServicioEvaluadorAlerta servicioEvaluadorAlerta;
   private Mascota mascota;
   private RangoVitalPorTamano rango;
 
@@ -32,9 +32,9 @@ public class EvaluadorAlertaServiceTest {
 
   @BeforeEach
   public void init() {
-    alertaServiceMock = mock(AlertaService.class);
+    servicioAlertaMock = mock(ServicioAlerta.class);
     valladoDaoMock = mock(ValladoDao.class);
-    evaluadorAlertaService = new EvaluadorAlertaService(alertaServiceMock, valladoDaoMock);
+    servicioEvaluadorAlerta = new ServicioEvaluadorAlertaImpl(servicioAlertaMock, valladoDaoMock);
 
     mascota = new Mascota();
     mascota.setNombre("Firulais");
@@ -57,109 +57,110 @@ public class EvaluadorAlertaServiceTest {
   @Test
   void debeGenerarAlertaPorBajoPeso() {
     mascota.setPeso(8.0);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("debajo"));
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("debajo"));
   }
 
   @Test
   void debeGenerarAlertaPorAltoPeso() {
     mascota.setPeso(28.0);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("encima"));
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("encima"));
   }
 
   @Test
   void noDebeGenerarAlertaPorPesoNormal() {
     mascota.setPeso(15.0);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
   void noDebeGenerarAlertaSiMascotaEsNull() {
-    evaluadorAlertaService.evaluarPeso(null);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarPeso(null);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
   void noDebeGenerarAlertaSiPesoEsNull() {
     mascota.setPeso(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
   void noDebeGenerarAlertaSiTamanoEsNull() {
     mascota.setTamano(null);
     mascota.setPeso(15.0);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
   void debeGenerarAlertaPorBajoPesoMascotaPequena() {
     mascota.setTamano(TamanoMascota.PEQUENO);
     mascota.setPeso(1.0);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
 
   @Test
   void debeGenerarAlertaPorAltoPesoMascotaGrande() {
     mascota.setTamano(TamanoMascota.GRANDE);
     mascota.setPeso(50.0);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
 
   @Test
   void noDebeGenerarAlertaPorPesoExactamenteEnElMinimoPermitido() {
     mascota.setPeso(11.0);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
   void noDebeGenerarAlertaPorPesoExactamenteEnElMaximoPermitido() {
     mascota.setPeso(25.0);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
   void debeGenerarAlertaPorPesoExactamenteUnDecimalDebajoDeLimiteMinimo() {
     mascota.setPeso(10.9);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
 
   @Test
   void debeGenerarAlertaPorPesoExactamenteUnDecimalEncimaDeLimiteMaximo() {
     mascota.setPeso(25.1);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), anyString());
   }
 
   @Test
   void elMensajeDeAlertaPorBajoPesoContieneElNombreDeLaMascota() {
     mascota.setPeso(8.0);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("Firulais"));
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock)
+      .crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("Firulais"));
   }
 
   @Test
   void elMensajeDeAlertaPorAltoPesoContieneElPesoActual() {
     mascota.setPeso(28.0);
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("28.0"));
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(null);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("28.0"));
   }
 
   @Test
@@ -169,9 +170,9 @@ public class EvaluadorAlertaServiceTest {
     ultimaAlerta.setMensaje(
       "Atencion: El peso de Firulais es 8.0 kg y esta por debajo del minimo recomendado (11.0 kg)."
     );
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(ultimaAlerta);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(ultimaAlerta);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -181,17 +182,17 @@ public class EvaluadorAlertaServiceTest {
     ultimaAlerta.setMensaje(
       "Atencion: El peso de Firulais es 8.0 kg y esta por debajo del minimo recomendado (11.0 kg)."
     );
-    when(alertaServiceMock.buscarUltimaAlertaDePeso(any())).thenReturn(ultimaAlerta);
-    evaluadorAlertaService.evaluarPeso(mascota);
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("7.5"));
+    when(servicioAlertaMock.buscarUltimaAlertaDePeso(any())).thenReturn(ultimaAlerta);
+    servicioEvaluadorAlerta.evaluarPeso(mascota);
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("7.5"));
   }
 
   // LECTURA
 
   @Test
   void noDebeGenerarAlertaSiLecturaEsNull() {
-    evaluadorAlertaService.evaluarLectura(mascota, null, rango);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarLectura(mascota, null, rango);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -199,9 +200,10 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setFrecuenciaCardiaca(FRECUENCIA_MAXIMA + 1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.EMERGENCIA), contains("alta"));
+    verify(servicioAlertaMock)
+      .crearAlerta(eq(mascota), eq(TipoAlerta.EMERGENCIA), contains("alta"));
   }
 
   @Test
@@ -209,9 +211,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setFrecuenciaCardiaca(FRECUENCIA_MINIMA - 1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("baja"));
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("baja"));
   }
 
   @Test
@@ -219,9 +221,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setFrecuenciaCardiaca(FRECUENCIA_MAXIMA);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), eq(TipoAlerta.EMERGENCIA), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), eq(TipoAlerta.EMERGENCIA), any());
   }
 
   @Test
@@ -229,9 +231,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setFrecuenciaCardiaca(FRECUENCIA_MINIMA);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -239,9 +241,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setFrecuenciaCardiaca(null);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -249,9 +251,10 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setTemperatura(TEMP_MAXIMA + 0.1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.EMERGENCIA), contains("alta"));
+    verify(servicioAlertaMock)
+      .crearAlerta(eq(mascota), eq(TipoAlerta.EMERGENCIA), contains("alta"));
   }
 
   @Test
@@ -259,9 +262,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setTemperatura(TEMP_MINIMA - 0.1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("baja"));
+    verify(servicioAlertaMock).crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("baja"));
   }
 
   @Test
@@ -269,9 +272,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setTemperatura(TEMP_MAXIMA);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -279,9 +282,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setTemperatura(TEMP_MINIMA);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -289,9 +292,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setTemperatura(null);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -299,9 +302,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setPresionSistolica(SISTOLICA_MAXIMA + 1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock)
+    verify(servicioAlertaMock)
       .crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("sistolica"));
   }
 
@@ -310,9 +313,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setPresionSistolica(SISTOLICA_MINIMA - 1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock)
+    verify(servicioAlertaMock)
       .crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("sistolica"));
   }
 
@@ -321,9 +324,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setPresionSistolica(null);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -331,9 +334,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setPresionDiastolica(DIASTOLICA_MAXIMA + 1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock)
+    verify(servicioAlertaMock)
       .crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("diastolica"));
   }
 
@@ -342,9 +345,9 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setPresionDiastolica(DIASTOLICA_MINIMA - 1);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock)
+    verify(servicioAlertaMock)
       .crearAlerta(eq(mascota), eq(TipoAlerta.ALERTA), contains("diastolica"));
   }
 
@@ -353,15 +356,15 @@ public class EvaluadorAlertaServiceTest {
     LecturaSensor lectura = lecturaConSignosNormales();
     lectura.setPresionDiastolica(null);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
   void noDebeGenerarAlertaSiTodosLosSignosSonNormales() {
-    evaluadorAlertaService.evaluarLectura(mascota, lecturaConSignosNormales(), rango);
-    verify(alertaServiceMock, never()).crearAlerta(any(), any(), any());
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lecturaConSignosNormales(), rango);
+    verify(servicioAlertaMock, never()).crearAlerta(any(), any(), any());
   }
 
   @Test
@@ -372,9 +375,9 @@ public class EvaluadorAlertaServiceTest {
     lectura.setPresionSistolica(SISTOLICA_MAXIMA + 10);
     lectura.setPresionDiastolica(DIASTOLICA_MAXIMA + 10);
 
-    evaluadorAlertaService.evaluarLectura(mascota, lectura, rango);
+    servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
 
-    verify(alertaServiceMock, times(4)).crearAlerta(eq(mascota), any(), any());
+    verify(servicioAlertaMock, times(4)).crearAlerta(eq(mascota), any(), any());
   }
 
   // HELPER
