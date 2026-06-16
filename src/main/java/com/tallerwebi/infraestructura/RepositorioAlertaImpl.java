@@ -7,9 +7,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-/**
- * Servicio de lógica de negocio.
- */
 @Repository("repositorioAlerta")
 public class RepositorioAlertaImpl implements RepositorioAlerta {
 
@@ -54,10 +51,16 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
   }
 
   @Override
-  public void actualizar(Alerta alerta) {}
+  public void actualizar(Alerta alerta) {
+    sessionFactory.getCurrentSession().update(alerta);
+  }
 
   @Override
   public Alerta buscarPorId(Long idAlerta) {
-    return null;
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("SELECT a FROM Alerta a WHERE a.id = :id", Alerta.class)
+      .setParameter("id", idAlerta)
+      .uniqueResult();
   }
 }

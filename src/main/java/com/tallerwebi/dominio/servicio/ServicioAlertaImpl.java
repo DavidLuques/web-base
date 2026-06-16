@@ -10,9 +10,6 @@ import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-/**
- * Implementación de servicio de alertas.
- */
 @Service
 public class ServicioAlertaImpl implements ServicioAlerta {
 
@@ -47,7 +44,16 @@ public class ServicioAlertaImpl implements ServicioAlerta {
     return repositorioAlerta
       .buscarPorMascota(idMascota)
       .stream()
-      .map(a -> new AlertaDto(a.getId(), a.getTipo(), a.getMensaje()))
+      .map(a ->
+        new AlertaDto(
+          a.getId(),
+          a.getTipo(),
+          a.obtenerTipoFormato(),
+          a.getMensaje(),
+          a.getFechaYHora().toString(),
+          a.getLeido()
+        )
+      )
       .collect(java.util.stream.Collectors.toList());
   }
 

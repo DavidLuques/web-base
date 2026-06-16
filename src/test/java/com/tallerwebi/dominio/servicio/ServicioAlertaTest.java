@@ -8,6 +8,7 @@ import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.Mascota;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,12 +53,18 @@ public class ServicioAlertaTest {
   @Test
   void debeRetornarAlertasMapeadasComoDto() {
     Alerta alerta1 = new Alerta();
+    alerta1.setId(1L);
     alerta1.setTipo(TipoAlerta.ALERTA);
     alerta1.setMensaje("Mensaje 1");
+    alerta1.setFechaYHora(LocalDateTime.now()); // ← AGREGAR
+    alerta1.setLeido(false); // ← AGREGAR
 
     Alerta alerta2 = new Alerta();
+    alerta2.setId(2L);
     alerta2.setTipo(TipoAlerta.EMERGENCIA);
     alerta2.setMensaje("Mensaje 2");
+    alerta2.setFechaYHora(LocalDateTime.now()); // ← AGREGAR
+    alerta2.setLeido(true); // ← AGREGAR
 
     when(repositorioAlertaMock.buscarPorMascota(1L)).thenReturn(Arrays.asList(alerta1, alerta2));
 
@@ -66,7 +73,9 @@ public class ServicioAlertaTest {
     assertEquals(2, resultado.size());
     assertEquals(TipoAlerta.ALERTA, resultado.get(0).getTipo());
     assertEquals("Mensaje 1", resultado.get(0).getMensaje());
+    assertEquals(false, resultado.get(0).getLeido()); // ← AGREGAR
     assertEquals(TipoAlerta.EMERGENCIA, resultado.get(1).getTipo());
     assertEquals("Mensaje 2", resultado.get(1).getMensaje());
+    assertEquals(true, resultado.get(1).getLeido()); // ← AGREGAR
   }
 }
