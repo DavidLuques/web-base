@@ -28,9 +28,6 @@ public class Mascota {
 
   private String nombre;
 
-  @Column(name = "radio_valla")
-  private Integer radioValla;
-
   @Enumerated(EnumType.STRING)
   @Column(name = "estado_actual")
   private EstadoMascota estadoActual;
@@ -166,13 +163,5 @@ public class Mascota {
 
   public void setActivo(Boolean activo) {
     this.activo = activo;
-  }
-
-  public Integer getRadioValla() {
-    return radioValla;
-  }
-
-  public void setRadioValla(Integer radioValla) {
-    this.radioValla = radioValla;
   }
 }
