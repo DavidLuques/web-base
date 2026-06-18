@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
+import com.tallerwebi.dominio.servicio.ServicioVallado;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,12 +22,15 @@ public class ControladorVallaTest {
   private OrquestadorService orquestadorServiceMock;
   private ControladorValla controladorValla;
   private ServicioMascota servicioMascotaMock;
+  private ServicioVallado servicioValladoMock;
 
   @BeforeEach
   public void inicializar() {
     orquestadorServiceMock = mock(OrquestadorService.class);
     servicioMascotaMock = mock(ServicioMascota.class);
-    controladorValla = new ControladorValla(orquestadorServiceMock, servicioMascotaMock);
+    servicioValladoMock = mock(ServicioVallado.class);
+    controladorValla =
+      new ControladorValla(orquestadorServiceMock, servicioMascotaMock, servicioValladoMock);
   }
 
   @Test

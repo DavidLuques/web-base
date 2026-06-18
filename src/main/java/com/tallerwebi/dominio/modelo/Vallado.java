@@ -28,11 +28,16 @@ public class Vallado {
   private Double longitudCentro;
 
   @Column(name = "radio_metros", nullable = false)
-  private Double radioMetros;
+  private Integer radioMetros;
 
   public Vallado() {}
 
-  public Vallado(Mascota mascota, Double latitudCentro, Double longitudCentro, Double radioMetros) {
+  public Vallado(
+    Mascota mascota,
+    Double latitudCentro,
+    Double longitudCentro,
+    Integer radioMetros
+  ) {
     this.mascota = mascota;
     this.latitudCentro = latitudCentro;
     this.longitudCentro = longitudCentro;
@@ -71,11 +76,11 @@ public class Vallado {
     this.longitudCentro = longitudCentro;
   }
 
-  public Double getRadioMetros() {
+  public Integer getRadioMetros() {
     return radioMetros;
   }
 
-  public void setRadioMetros(Double radioMetros) {
+  public void setRadioMetros(Integer radioMetros) {
     this.radioMetros = radioMetros;
   }
 }

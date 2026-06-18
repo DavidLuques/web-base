@@ -14,5 +14,4 @@ public interface ServicioMascota {
   DatosAltaMascota obtenerDatosMascota(Long id);
   void actualizarMascota(Long idMascota, DatosAltaMascota datos);
   void eliminarMascota(Long id);
-  void actualizarRadioValla(Long idMascota, Integer radioValla);
 }

@@ -3,6 +3,8 @@ package com.tallerwebi.dominio.servicio;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioActividad;
@@ -10,6 +12,7 @@ import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
+import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
@@ -29,6 +32,7 @@ public class OrquestadorServiceImplTest {
   private OrquestadorServiceImpl servicio;
 
   private MascotaDao mascotaDao;
+  private ValladoDao valladoDao;
   private LectorCollarService lectorCollarService;
   private AnalizadorDeDatosService analizadorDeDatosService;
   private ServicioEvaluadorAlerta servicioEvaluadorAlerta;
@@ -51,6 +55,7 @@ public class OrquestadorServiceImplTest {
     repositorioSueno = mock(RepositorioSueno.class);
     repositorioAnalisis = mock(RepositorioAnalisis.class);
     rangoVitalDao = mock(RangoVitalDao.class);
+    valladoDao = mock(ValladoDao.class);
 
     servicio =
       new OrquestadorServiceImpl(
@@ -61,7 +66,8 @@ public class OrquestadorServiceImplTest {
         repositorioActividad,
         repositorioSueno,
         repositorioAnalisis,
-        rangoVitalDao
+        rangoVitalDao,
+        valladoDao
       );
 
     mascota = new Mascota();

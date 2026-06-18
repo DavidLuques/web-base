@@ -4,8 +4,6 @@
 function inicializarValla(idMascota) {
   lucide.createIcons();
 
-  let latHogar = -34.7222;
-  let lonHogar = -58.5250;
   let ultimoTimestamp = null;
 
   const inputRadio = document.getElementById("input-radio");
@@ -25,20 +23,6 @@ function inicializarValla(idMascota) {
   let ultimosMetrosX = 0;
   let ultimosMetrosY = 0;
   let ultimaDistanciaReal = 0;
-
-  function calcularDistancia(lat1, lon1, lat2, lon2) {
-    const R = 6371e3;
-    const phi1 = lat1 * Math.PI / 180;
-    const phi2 = lat2 * Math.PI / 180;
-    const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-    const deltaLambda = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-        Math.cos(phi1) * Math.cos(phi2) *
-        Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }
 
   function aplicarEscalaVisual() {
     zonaPermitida.style.width = `${radioValla * 2 * escalaVisual}px`;
@@ -86,17 +70,14 @@ function inicializarValla(idMascota) {
     try {
       const response = await fetch(`/spring/analisis/valla/${idMascota}/actualizar`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
       });
 
       if (response.ok) {
-        // Feedback visual temporal para que el usuario sepa que funcionó
         const textoOriginal = btnConfirmar.innerText;
         btnConfirmar.innerText = "Guardado";
-        btnConfirmar.classList.replace("bg-blue-600", "bg-emerald-600");
+        // btnConfirmar.classList.replace("bg-blue-600", "bg-emerald-600");
         btnConfirmar.classList.replace("hover:bg-blue-700", "hover:bg-emerald-700");
 
         setTimeout(() => {
@@ -121,10 +102,7 @@ function inicializarValla(idMascota) {
       const response = await fetch(`/spring/api/mascotas/${idMascota}/vallado`);
       const datos = await response.json();
 
-      latHogar = datos.latitud;
-      lonHogar = datos.longitud;
       radioValla = datos.radio;
-
       inputRadio.value = datos.radio;
       aplicarEscalaVisual();
     } catch (error) {
@@ -140,15 +118,12 @@ function inicializarValla(idMascota) {
       if (ultimoTimestamp && ultimoTimestamp === datos.timestamp) {
         return;
       }
-
       ultimoTimestamp = datos.timestamp;
 
-      const nuevaLat = datos.latitud;
-      const nuevaLon = datos.longitud;
-
-      ultimosMetrosY = -(nuevaLat - latHogar) * 111320;
-      ultimosMetrosX = (nuevaLon - lonHogar) * (111320 * Math.cos(latHogar * Math.PI / 180));
-      ultimaDistanciaReal = calcularDistancia(latHogar, lonHogar, nuevaLat, nuevaLon);
+      // El backend ahora nos entrega todo calculado
+      ultimosMetrosX = datos.metrosX;
+      ultimosMetrosY = datos.metrosY;
+      ultimaDistanciaReal = datos.distancia;
 
       aplicarEscalaVisual();
       evaluarAlerta();

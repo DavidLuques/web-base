@@ -18,7 +18,7 @@ public class ValladoTest {
     mascota.setNombre("Firulais");
     mascota.setTamano(TamanoMascota.MEDIANO);
 
-    vallado = new Vallado(mascota, -34.7222, -58.5250, 150.0);
+    vallado = new Vallado(mascota, -34.7222, -58.5250, 150);
   }
 
   @Test
@@ -27,7 +27,7 @@ public class ValladoTest {
     assertEquals(mascota, vallado.getMascota());
     assertEquals(-34.7222, vallado.getLatitudCentro());
     assertEquals(-58.5250, vallado.getLongitudCentro());
-    assertEquals(150.0, vallado.getRadioMetros());
+    assertEquals(150, vallado.getRadioMetros());
   }
 
   @Test
@@ -44,8 +44,8 @@ public class ValladoTest {
 
   @Test
   void debeSetearYObtenerRadioMetros() {
-    vallado.setRadioMetros(200.0);
-    assertEquals(200.0, vallado.getRadioMetros());
+    vallado.setRadioMetros(200);
+    assertEquals(200, vallado.getRadioMetros());
   }
 
   @Test

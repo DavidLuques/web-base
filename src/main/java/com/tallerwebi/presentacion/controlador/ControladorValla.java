@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion.controlador;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
+import com.tallerwebi.dominio.servicio.ServicioVallado;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,17 @@ public class ControladorValla {
 
   private final OrquestadorService orquestadorService;
   private final ServicioMascota servicioMascota;
+  private final ServicioVallado servicioVallado;
 
   @Autowired
-  public ControladorValla(OrquestadorService orquestadorService, ServicioMascota servicioMascota) {
+  public ControladorValla(
+    OrquestadorService orquestadorService,
+    ServicioMascota servicioMascota,
+    ServicioVallado servicioVallado
+  ) {
     this.orquestadorService = orquestadorService;
     this.servicioMascota = servicioMascota;
+    this.servicioVallado = servicioVallado;
   }
 
   @RequestMapping(path = "/analisis/valla/{idMascota}", method = RequestMethod.GET)
@@ -71,7 +78,7 @@ public class ControladorValla {
     @PathVariable Long idMascota,
     @RequestParam("radio") Integer radio
   ) {
-    servicioMascota.actualizarRadioValla(idMascota, radio);
+    servicioVallado.actualizarRadioValla(idMascota, radio);
 
     return ResponseEntity.ok("{\"status\":\"success\"}");
   }

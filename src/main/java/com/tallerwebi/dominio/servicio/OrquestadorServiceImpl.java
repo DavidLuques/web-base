@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
+import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
@@ -15,6 +16,7 @@ import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import com.tallerwebi.dominio.modelo.RegistroSueno;
+import com.tallerwebi.dominio.modelo.Vallado;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +36,11 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private static final String CLAVE_LATITUD = "latitud";
   private static final String CLAVE_LONGITUD = "longitud";
   private static final String CLAVE_RADIO = "radio";
+  private static final Double LAT_HOGAR = -34.7222;
+  private static final Double LON_HOGAR = -58.5250;
 
   private final MascotaDao mascotaDao;
+  private final ValladoDao valladoDao;
   private final LectorCollarService lectorCollarService;
   private final AnalizadorDeDatosService analizadorDeDatosService;
   private final ServicioEvaluadorAlerta servicioEvaluadorAlerta;
@@ -53,7 +58,8 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     RepositorioActividad repositorioActividad,
     RepositorioSueno repositorioSueno,
     RepositorioAnalisis repositorioAnalisis,
-    RangoVitalDao rangoVitalDao
+    RangoVitalDao rangoVitalDao,
+    ValladoDao valladoDao
   ) {
     this.mascotaDao = mascotaDao;
     this.lectorCollarService = lectorCollarService;
@@ -63,6 +69,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     this.repositorioSueno = repositorioSueno;
     this.repositorioAnalisis = repositorioAnalisis;
     this.rangoVitalDao = rangoVitalDao;
+    this.valladoDao = valladoDao;
   }
 
   @Override
@@ -163,13 +170,13 @@ public class OrquestadorServiceImpl implements OrquestadorService {
 
   @Override
   public Map<String, Object> obtenerVallado(Long idMascota) {
-    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    Vallado vallado = valladoDao.buscarPorMascota(idMascota);
 
     Map<String, Object> respuesta = new HashMap<>();
-    respuesta.put(CLAVE_LATITUD, -34.7222);
-    respuesta.put(CLAVE_LONGITUD, -58.5250);
-    if (mascota != null && mascota.getRadioValla() != null) {
-      respuesta.put(CLAVE_RADIO, mascota.getRadioValla().doubleValue());
+    respuesta.put(CLAVE_LATITUD, LAT_HOGAR);
+    respuesta.put(CLAVE_LONGITUD, LON_HOGAR);
+    if (vallado != null && vallado.getRadioMetros() != null) {
+      respuesta.put(CLAVE_RADIO, vallado.getRadioMetros().doubleValue());
     } else {
       respuesta.put(CLAVE_RADIO, 150.0);
     }
@@ -185,10 +192,30 @@ public class OrquestadorServiceImpl implements OrquestadorService {
       respuesta.put(CLAVE_LATITUD, ultimo.getLatitud());
       respuesta.put(CLAVE_LONGITUD, ultimo.getLongitud());
       respuesta.put("timestamp", ultimo.getFechaYHora().toString()); // Guardo momento exacto de la ultima generacion de posicion
+
+      // devuelve KM, multiplicamos por 1000 para Metros
+      double distanciaKm = analizadorDeDatosService.calcularDistanciaEntreUbicaciones(
+        LAT_HOGAR,
+        LON_HOGAR,
+        ultimo.getLatitud(),
+        ultimo.getLongitud()
+      );
+      respuesta.put("distancia", distanciaKm * 1000.0);
+
+      // Calculamos los ejes X e Y para la pantalla
+      double metrosY = -(ultimo.getLatitud() - LAT_HOGAR) * 111320.0;
+      double metrosX =
+        (ultimo.getLongitud() - LON_HOGAR) * (111320.0 * Math.cos(Math.toRadians(LAT_HOGAR)));
+
+      respuesta.put("metrosX", metrosX);
+      respuesta.put("metrosY", metrosY);
     } else {
-      respuesta.put(CLAVE_LATITUD, -34.7222);
-      respuesta.put(CLAVE_LONGITUD, -58.5250);
+      respuesta.put(CLAVE_LATITUD, LAT_HOGAR);
+      respuesta.put(CLAVE_LONGITUD, LON_HOGAR);
       respuesta.put("timestamp", LocalDateTime.now().toString());
+      respuesta.put("distancia", 0.0);
+      respuesta.put("metrosX", 0.0);
+      respuesta.put("metrosY", 0.0);
     }
     return respuesta;
   }
