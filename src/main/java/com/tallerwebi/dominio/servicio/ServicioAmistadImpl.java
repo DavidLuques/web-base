@@ -1,0 +1,113 @@
+package com.tallerwebi.dominio.servicio;
+
+import com.tallerwebi.dominio.RepositorioUsuario;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.dao.SolicitudAmistadDao;
+import com.tallerwebi.dominio.enums.EstadoAmistad;
+import com.tallerwebi.dominio.excepcion.AccionNoPermitidaEnEsteEstadoException;
+import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
+import com.tallerwebi.dominio.modelo.SolicitudAmistad;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class ServicioAmistadImpl implements ServicioAmistad {
+
+  private final SolicitudAmistadDao solicitudAmistadDao;
+  private final RepositorioUsuario repositorioUsuario;
+
+  @Autowired
+  public ServicioAmistadImpl(
+    SolicitudAmistadDao solicitudAmistadDao,
+    RepositorioUsuario repositorioUsuario
+  ) {
+    this.solicitudAmistadDao = solicitudAmistadDao;
+    this.repositorioUsuario = repositorioUsuario;
+  }
+
+  @Override
+  public SolicitudAmistad enviarSolicitud(Long idEmisor, Long idReceptor) {
+    SolicitudAmistad existente = solicitudAmistadDao.buscarEntreUsuarios(idEmisor, idReceptor);
+    if (existente != null) {
+      throw new AccionNoPermitidaEnEsteEstadoException(
+        "Ya existe una solicitud entre estos usuarios"
+      );
+    }
+
+    Usuario emisor = repositorioUsuario.buscarPorId(idEmisor);
+    Usuario receptor = repositorioUsuario.buscarPorId(idReceptor);
+
+    SolicitudAmistad solicitud = new SolicitudAmistad();
+    solicitud.setEmisor(emisor);
+    solicitud.setReceptor(receptor);
+    solicitudAmistadDao.guardar(solicitud);
+    return solicitud;
+  }
+
+  @Override
+  public void aceptarSolicitud(Long idSolicitud) {
+    SolicitudAmistad solicitud = solicitudAmistadDao.buscarPorId(idSolicitud);
+    if (!solicitud.getEstado().getComportamiento().puedeAceptar()) {
+      throw new AccionNoPermitidaEnEsteEstadoException(
+        "No se puede aceptar una solicitud en estado " +
+        solicitud.getEstado().getComportamiento().getNombre()
+      );
+    }
+    solicitud.setEstado(EstadoAmistad.ACEPTADA);
+    solicitudAmistadDao.modificar(solicitud);
+  }
+
+  @Override
+  public void rechazarSolicitud(Long idSolicitud) {
+    SolicitudAmistad solicitud = solicitudAmistadDao.buscarPorId(idSolicitud);
+    if (!solicitud.getEstado().getComportamiento().puedeRechazar()) {
+      throw new AccionNoPermitidaEnEsteEstadoException(
+        "No se puede rechazar una solicitud en estado " +
+        solicitud.getEstado().getComportamiento().getNombre()
+      );
+    }
+    solicitud.setEstado(EstadoAmistad.RECHAZADA);
+    solicitudAmistadDao.modificar(solicitud);
+  }
+
+  @Override
+  public boolean sonAmigos(Long idUsuario1, Long idUsuario2) {
+    SolicitudAmistad solicitud = solicitudAmistadDao.buscarEntreUsuarios(idUsuario1, idUsuario2);
+    return solicitud != null && solicitud.getEstado().getComportamiento().sonAmigos();
+  }
+
+  @Override
+  public List<Usuario> obtenerAmigos(Long idUsuario) {
+    List<SolicitudAmistad> aceptadas = solicitudAmistadDao.buscarAceptadasPorUsuario(idUsuario);
+    List<Usuario> amigos = new ArrayList<>();
+    for (SolicitudAmistad s : aceptadas) {
+      if (s.getEmisor().getId().equals(idUsuario)) {
+        amigos.add(s.getReceptor());
+      } else {
+        amigos.add(s.getEmisor());
+      }
+    }
+    return amigos;
+  }
+
+  @Override
+  public List<SolicitudAmistad> obtenerSolicitudesPendientes(Long idUsuario) {
+    return solicitudAmistadDao.buscarPendientesPorReceptor(idUsuario);
+  }
+
+  @Override
+  public SolicitudAmistad enviarSolicitudPorEmail(Long idEmisor, String emailReceptor) {
+    Usuario receptor = repositorioUsuario.buscar(emailReceptor);
+    if (receptor == null) {
+      throw new UsuarioNoEncontrado("No existe un usuario con ese email");
+    }
+    if (receptor.getId().equals(idEmisor)) {
+      throw new AccionNoPermitidaEnEsteEstadoException("No podés agregarte a vos mismo");
+    }
+    return enviarSolicitud(idEmisor, receptor.getId());
+  }
+}

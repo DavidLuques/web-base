@@ -6,7 +6,6 @@
     <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
   </div>
   <nav class="flex flex-col gap-6 w-full">
-    <!-- Si no hay mascota, los botones quedan deshabilitados visualmente -->
     <th:block th:if="${idMascota != null}">
       <a th:href="@{/analisis/dashboard/{id}(id=${idMascota})}"
          th:class="${paginaActiva == 'dashboard'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
@@ -24,8 +23,15 @@
          th:class="${paginaActiva == 'valla'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
         <i th:class="${paginaActiva == 'valla'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="map-pin"></i>
       </a>
+      <a th:href="@{/amigos(idMascota=${idMascota})}"
+         th:class="${paginaActiva == 'amigos'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+        <i th:class="${paginaActiva == 'amigos'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="users"></i>
+      </a>
+      <a th:href="@{/transferencias(idMascota=${idMascota})}"
+         th:class="${paginaActiva == 'transferencias'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+        <i th:class="${paginaActiva == 'transferencias'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="repeat"></i>
+      </a>
     </th:block>
-    <!-- Sin mascota: iconos deshabilitados -->
     <th:block th:if="${idMascota == null}">
       <span class="w-full flex justify-center py-3 text-slate-600 cursor-not-allowed opacity-40">
         <i data-lucide="home" class="w-6 h-6"></i>
@@ -38,6 +44,12 @@
       </span>
       <span class="w-full flex justify-center py-3 text-slate-600 cursor-not-allowed opacity-40">
         <i data-lucide="map-pin" class="w-6 h-6"></i>
+      </span>
+      <span class="w-full flex justify-center py-3 text-slate-600 cursor-not-allowed opacity-40">
+        <i data-lucide="users" class="w-6 h-6"></i>
+      </span>
+      <span class="w-full flex justify-center py-3 text-slate-600 cursor-not-allowed opacity-40">
+        <i data-lucide="repeat" class="w-6 h-6"></i>
       </span>
     </th:block>
   </nav>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transferencias</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+<div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'transferencias')"></div>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+  <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'transferencias', 'Transferencias')"></header>
+
+  <div class="flex-1 p-8 overflow-y-auto">
+    <div class="max-w-2xl mx-auto mt-8">
+
+      <div class="mb-8 flex items-center gap-4">
+        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-500 shadow-sm border border-slate-200">
+          <i data-lucide="repeat" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Transferencias</h1>
+          <p class="text-slate-500">Transferí tus mascotas a un amigo, manteniendo todo su historial</p>
+        </div>
+      </div>
+
+      <div th:if="${param.exito}" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3">
+        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+          <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+        </div>
+        <p class="font-medium">¡Listo!</p>
+      </div>
+
+      <div th:if="${param.error}" class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 px-6 py-4 rounded-2xl flex items-center gap-3">
+        <div class="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center shrink-0">
+          <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
+        </div>
+        <p class="font-medium" th:text="${param.error}">Error</p>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferir una mascota</h3>
+
+        <div th:if="${#lists.isEmpty(amigos)}" class="text-center py-6">
+          <p class="text-slate-400 text-sm">
+            Necesitás tener amigos agregados para poder transferir una mascota.
+            <a th:href="@{/amigos(idMascota=${idMascota})}" class="text-indigo-600 font-medium hover:underline">Agregar amigos</a>
+          </p>
+        </div>
+
+        <form th:unless="${#lists.isEmpty(amigos)}" th:action="@{/transferencias/iniciar}" method="POST" class="space-y-4">
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700">Mascota a transferir</label>
+            <select name="idMascota" required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+              <option th:each="mascota : ${misMascotas}" th:value="${mascota.id}" th:text="${mascota.nombre}"></option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700">Transferir a</label>
+            <select name="idDestino" required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+              <option th:each="amigo : ${amigos}" th:value="${amigo.id}" th:text="${amigo.nombre + ' (' + amigo.email + ')'}"></option>
+            </select>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+              <i data-lucide="send" class="w-5 h-5"></i>
+              Iniciar transferencia
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferencias pendientes</h3>
+
+        <div th:if="${#lists.isEmpty(transferenciasPendientes)}" class="text-center py-8">
+          <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-3">
+            <i data-lucide="repeat" class="w-6 h-6"></i>
+          </div>
+          <p class="text-slate-400">No tenés transferencias pendientes</p>
+        </div>
+
+        <ul class="divide-y divide-slate-100" th:unless="${#lists.isEmpty(transferenciasPendientes)}">
+          <li th:each="t : ${transferenciasPendientes}" class="py-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <i data-lucide="dog" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-800" th:text="${t.mascota.nombre}">Mascota</p>
+                <p class="text-sm text-slate-500">
+                  <span th:text="${t.usuarioOrigen.nombre}">Origen</span>
+                  →
+                  <span th:text="${t.usuarioDestino.nombre}">Destino</span>
+                </p>
+                <p class="text-xs text-slate-400 mt-1">
+                  <span th:if="${t.confirmadaPorOrigen}">✓ Confirmada por origen</span>
+                  <span th:unless="${t.confirmadaPorOrigen}">Pendiente de confirmación del origen</span>
+                  ·
+                  <span th:if="${t.confirmadaPorDestino}">✓ Confirmada por destino</span>
+                  <span th:unless="${t.confirmadaPorDestino}">Pendiente de confirmación del destino</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-2 shrink-0">
+              <form th:if="${t.usuarioOrigen.id == idUsuarioActual and !t.confirmadaPorOrigen}"
+                    th:action="@{/transferencias/confirmar-origen}" method="POST">
+                <input type="hidden" name="idSolicitud" th:value="${t.id}" />
+                <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                <button type="submit" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                  <i data-lucide="check" class="w-4 h-4"></i> Confirmar
+                </button>
+              </form>
+
+              <form th:if="${t.usuarioDestino.id == idUsuarioActual and !t.confirmadaPorDestino}"
+                    th:action="@{/transferencias/confirmar-destino}" method="POST">
+                <input type="hidden" name="idSolicitud" th:value="${t.id}" />
+                <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                <button type="submit" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                  <i data-lucide="check" class="w-4 h-4"></i> Confirmar
+                </button>
+              </form>
+
+              <form th:action="@{/transferencias/cancelar}" method="POST">
+                <input type="hidden" name="idSolicitud" th:value="${t.id}" />
+                <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                <button type="submit" class="bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                  <i data-lucide="x" class="w-4 h-4"></i> Cancelar
+                </button>
+              </form>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

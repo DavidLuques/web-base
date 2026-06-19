@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amigos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+<div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'amigos')"></div>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+  <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'amigos', 'Mis Amigos')"></header>
+
+  <div class="flex-1 p-8 overflow-y-auto">
+    <div class="max-w-2xl mx-auto mt-8">
+
+      <div class="mb-8 flex items-center gap-4">
+        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-500 shadow-sm border border-slate-200">
+          <i data-lucide="users" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Mis Amigos</h1>
+          <p class="text-slate-500">Agregá amigos para poder transferirles tus mascotas</p>
+        </div>
+      </div>
+
+      <!-- Alertas -->
+      <div th:if="${param.exito}" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3">
+        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+          <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+        </div>
+        <p class="font-medium">¡Listo!</p>
+      </div>
+
+      <div th:if="${param.error}" class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 px-6 py-4 rounded-2xl flex items-center gap-3">
+        <div class="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center shrink-0">
+          <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
+        </div>
+        <p class="font-medium" th:text="${param.error}">Error</p>
+      </div>
+
+      <!-- Agregar amigo por email -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Agregar un amigo</h3>
+        <form th:action="@{/amigos/enviar-solicitud}" method="POST" class="flex gap-3">
+          <input type="hidden" name="idMascota" th:value="${idMascota}" />
+          <input type="email" name="emailReceptor" required
+                 class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                 placeholder="email@ejemplo.com">
+          <button type="submit"
+                  class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+            <i data-lucide="user-plus" class="w-5 h-5"></i>
+            Enviar
+          </button>
+        </form>
+      </div>
+
+      <!-- Solicitudes pendientes -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8" th:if="${not #lists.isEmpty(solicitudesPendientes)}">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Solicitudes pendientes</h3>
+        <ul class="divide-y divide-slate-100">
+          <li th:each="solicitud : ${solicitudesPendientes}" class="py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <i data-lucide="user" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-800" th:text="${solicitud.emisor.nombre}">Nombre</p>
+                <p class="text-sm text-slate-500" th:text="${solicitud.emisor.email}">email@ejemplo.com</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <form th:action="@{/amigos/aceptar}" method="POST">
+                <input type="hidden" name="idSolicitud" th:value="${solicitud.id}" />
+                <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                <button type="submit" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                  <i data-lucide="check" class="w-4 h-4"></i> Aceptar
+                </button>
+              </form>
+              <form th:action="@{/amigos/rechazar}" method="POST">
+                <input type="hidden" name="idSolicitud" th:value="${solicitud.id}" />
+                <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                <button type="submit" class="bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                  <i data-lucide="x" class="w-4 h-4"></i> Rechazar
+                </button>
+              </form>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Lista de amigos -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Mis amigos</h3>
+
+        <div th:if="${#lists.isEmpty(amigos)}" class="text-center py-8">
+          <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-3">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+          <p class="text-slate-400">Todavía no tenés amigos agregados</p>
+        </div>
+
+        <ul class="divide-y divide-slate-100" th:unless="${#lists.isEmpty(amigos)}">
+          <li th:each="amigo : ${amigos}" class="py-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-800" th:text="${amigo.nombre}">Nombre</p>
+              <p class="text-sm text-slate-500" th:text="${amigo.email}">email@ejemplo.com</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>
