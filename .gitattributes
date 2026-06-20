@@ -1,0 +1,11 @@
+# Enforce LF in repo to avoid CRLF/line-ending noise on Windows builds
+* text=auto
+*.java text eol=lf
+*.xml text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.properties text eol=lf
+*.sql text eol=lf
