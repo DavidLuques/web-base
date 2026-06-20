@@ -1,8 +1,7 @@
 package com.tallerwebi.presentacion.controlador;
 
 import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
-import com.tallerwebi.dominio.servicio.ServicioMascota;
-import com.tallerwebi.dominio.servicio.ServicioUsuario;
+import com.tallerwebi.dominio.servicio.ServicioPerfil;
 import com.tallerwebi.presentacion.DatosPerfil;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +22,11 @@ public class ControladorPerfil {
   private static final String REDIRECT_LOGIN = "redirect:/login";
   private static final String ATRIBUTO_DATOS_PERFIL = "datosPerfil";
 
-  private ServicioUsuario servicioUsuario;
-  private ServicioMascota servicioMascota;
+  private ServicioPerfil servicioPerfil;
 
   @Autowired
-  public ControladorPerfil(ServicioUsuario servicioUsuario, ServicioMascota servicioMascota) {
-    this.servicioUsuario = servicioUsuario;
-    this.servicioMascota = servicioMascota;
+  public ControladorPerfil(ServicioPerfil servicioPerfil) {
+    this.servicioPerfil = servicioPerfil;
   }
 
   @RequestMapping(path = "/perfil", method = RequestMethod.GET)
@@ -43,11 +40,7 @@ public class ControladorPerfil {
     }
 
     try {
-      DatosPerfil datosPerfil = servicioUsuario.obtenerDatosPerfil(idUsuario);
-      ModelMap modelo = new ModelMap();
-      modelo.put(ATRIBUTO_DATOS_PERFIL, datosPerfil);
-      modelo.put("idMascota", idMascota);
-      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      ModelMap modelo = servicioPerfil.prepararVerPerfil(idUsuario, idMascota);
       return new ModelAndView("ver-perfil", modelo);
     } catch (UsuarioNoEncontrado e) {
       return new ModelAndView(REDIRECT_LOGIN);
@@ -65,11 +58,7 @@ public class ControladorPerfil {
     }
 
     try {
-      DatosPerfil datosPerfil = servicioUsuario.obtenerDatosPerfil(idUsuario);
-      ModelMap modelo = new ModelMap();
-      modelo.put(ATRIBUTO_DATOS_PERFIL, datosPerfil);
-      modelo.put("idMascota", idMascota);
-      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      ModelMap modelo = servicioPerfil.prepararEditarPerfil(idUsuario, idMascota);
       return new ModelAndView("perfil", modelo);
     } catch (UsuarioNoEncontrado e) {
       return new ModelAndView(REDIRECT_LOGIN);
@@ -88,17 +77,18 @@ public class ControladorPerfil {
     }
 
     try {
-      servicioUsuario.actualizarPerfil(idUsuario, datosPerfil);
+      servicioPerfil.actualizarPerfil(idUsuario, datosPerfil);
       String redirectUrl = idMascota != null
         ? "redirect:/perfil?exito=true&idMascota=" + idMascota
         : "redirect:/perfil?exito=true";
       return new ModelAndView(redirectUrl);
     } catch (UsuarioNoEncontrado e) {
-      ModelMap modelo = new ModelMap();
-      modelo.put(ATRIBUTO_DATOS_PERFIL, datosPerfil);
-      modelo.put("error", e.getMessage());
-      modelo.put("idMascota", idMascota);
-      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      ModelMap modelo = servicioPerfil.prepararModeloErrorActualizar(
+        idUsuario,
+        datosPerfil,
+        idMascota,
+        e.getMessage()
+      );
       return new ModelAndView("perfil", modelo);
     }
   }

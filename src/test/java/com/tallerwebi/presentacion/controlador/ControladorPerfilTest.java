@@ -27,10 +27,18 @@ public class ControladorPerfilTest {
   public void init() {
     servicioUsuarioMock = mock(ServicioUsuario.class);
     servicioMascotaMock = mock(ServicioMascota.class);
+    // por simplicidad el controlador del test usa la impl del servicio de perfil
+    // que delega a los mocks anteriores
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
     when(requestMock.getSession()).thenReturn(sessionMock);
-    controlador = new ControladorPerfil(servicioUsuarioMock, servicioMascotaMock);
+    controlador =
+      new ControladorPerfil(
+        new com.tallerwebi.dominio.servicio.impl.ServicioPerfilImpl(
+          servicioUsuarioMock,
+          servicioMascotaMock
+        )
+      );
     controladorConfiguracion =
       new ControladorConfiguracion(servicioUsuarioMock, servicioMascotaMock);
   }
