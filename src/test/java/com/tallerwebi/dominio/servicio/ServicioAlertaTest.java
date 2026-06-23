@@ -18,13 +18,15 @@ import org.mockito.ArgumentCaptor;
 public class ServicioAlertaTest {
 
   private RepositorioAlerta repositorioAlertaMock;
+  private ServicioNotificaciones servicioNotificacionesMock;
   private ServicioAlerta servicioAlerta;
   private Mascota mascota;
 
   @BeforeEach
   public void init() {
     repositorioAlertaMock = mock(RepositorioAlerta.class);
-    servicioAlerta = new ServicioAlertaImpl(repositorioAlertaMock);
+    servicioNotificacionesMock = mock(ServicioNotificaciones.class);
+    servicioAlerta = new ServicioAlertaImpl(repositorioAlertaMock, servicioNotificacionesMock);
 
     mascota = new Mascota();
     mascota.setNombre("Firulais");

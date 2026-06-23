@@ -7,16 +7,27 @@ import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.Mascota;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementación de servicio de alertas.
+ */
 @Service
 public class ServicioAlertaImpl implements ServicioAlerta {
 
-  private final RepositorioAlerta repositorioAlerta;
+  private static final Logger logger = Logger.getLogger(ServicioAlertaImpl.class.getName());
 
-  public ServicioAlertaImpl(RepositorioAlerta repositorioAlerta) {
+  private final RepositorioAlerta repositorioAlerta;
+  private final ServicioNotificaciones servicioNotificaciones;
+
+  public ServicioAlertaImpl(
+    RepositorioAlerta repositorioAlerta,
+    ServicioNotificaciones servicioNotificaciones
+  ) {
     this.repositorioAlerta = repositorioAlerta;
+    this.servicioNotificaciones = servicioNotificaciones;
   }
 
   @Override
@@ -33,6 +44,22 @@ public class ServicioAlertaImpl implements ServicioAlerta {
     alerta.setFechaYHora(LocalDateTime.now());
     alerta.setLeido(false);
     repositorioAlerta.save(alerta);
+
+    if (TipoAlerta.EMERGENCIA.equals(tipo)) {
+      if (logger.isLoggable(java.util.logging.Level.INFO)) {
+        logger.info(
+          "Intentando enviar email de emergencia para mascota: " +
+          (mascota != null ? mascota.getNombre() : "NULL")
+        );
+        logger.info(
+          "Email del usuario: " +
+          (mascota != null && mascota.getUsuario() != null
+              ? mascota.getUsuario().getEmail()
+              : "NULL")
+        );
+      }
+      servicioNotificaciones.enviarNotificacionEmergencia(alerta);
+    }
   }
 
   @Override

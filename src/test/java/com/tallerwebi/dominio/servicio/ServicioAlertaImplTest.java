@@ -17,12 +17,14 @@ import org.junit.jupiter.api.Test;
 public class ServicioAlertaImplTest {
 
   private RepositorioAlerta repositorioAlertaMock;
+  private ServicioNotificaciones servicioNotificacionesMock;
   private ServicioAlerta servicioAlerta;
 
   @BeforeEach
   public void init() {
     repositorioAlertaMock = mock(RepositorioAlerta.class);
-    servicioAlerta = new ServicioAlertaImpl(repositorioAlertaMock);
+    servicioNotificacionesMock = mock(ServicioNotificaciones.class);
+    servicioAlerta = new ServicioAlertaImpl(repositorioAlertaMock, servicioNotificacionesMock);
   }
 
   @Test
@@ -30,9 +32,21 @@ public class ServicioAlertaImplTest {
     Mascota mascota = new Mascota();
     mascota.setNombre("Firulais");
 
-    servicioAlerta.crearAlerta(mascota, TipoAlerta.EMERGENCIA, "Mensaje de prueba");
+    servicioAlerta.crearAlerta(mascota, TipoAlerta.ALERTA, "Mensaje de prueba");
 
     verify(repositorioAlertaMock, times(1)).save(any(Alerta.class));
+    verify(servicioNotificacionesMock, never()).enviarNotificacionEmergencia(any(Alerta.class));
+  }
+
+  @Test
+  void debeCrearAlertaDeEmergenciaYEnviarNotificacion() {
+    Mascota mascota = new Mascota();
+    mascota.setNombre("Firulais");
+
+    servicioAlerta.crearAlerta(mascota, TipoAlerta.EMERGENCIA, "Mensaje de emergencia");
+
+    verify(repositorioAlertaMock, times(1)).save(any(Alerta.class));
+    verify(servicioNotificacionesMock, times(1)).enviarNotificacionEmergencia(any(Alerta.class));
   }
 
   @Test

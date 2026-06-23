@@ -310,8 +310,8 @@ public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
       double distanciaExceso = distanciaMetros - vallado.getRadioMetros();
       servicioAlerta.crearAlerta(
         mascota,
-        TipoAlerta.ALERTA,
-        "Alerta: " +
+        TipoAlerta.EMERGENCIA,
+        "EMERGENCIA: " +
         mascota.getNombre() +
         " se alejo " +
         Math.round(distanciaExceso) +
