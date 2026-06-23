@@ -68,7 +68,7 @@ public class ControladorMonitoreoTest {
       null
     );
 
-    when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
+    when(orquestadorServiceMock.refrescarLectura(mascotaId)).thenReturn(dto);
 
     ResultadoSimulacionDto resultado = controlador.obtenerEstado(mascotaId);
 
@@ -212,7 +212,7 @@ public class ControladorMonitoreoTest {
       null
     );
 
-    when(orquestadorServiceMock.obtenerUltimoEstado(mascotaId)).thenReturn(dto);
+    when(orquestadorServiceMock.refrescarLectura(mascotaId)).thenReturn(dto);
 
     ResultadoSimulacionDto resultado = controlador.obtenerEstado(mascotaId);
 

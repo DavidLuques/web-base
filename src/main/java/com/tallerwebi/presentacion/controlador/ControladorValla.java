@@ -61,6 +61,7 @@ public class ControladorValla {
   @GetMapping("/api/mascotas/{id}/ubicacion")
   @ResponseBody
   public ResponseEntity<Map<String, Object>> obtenerUbicacionActual(@PathVariable Long id) {
+    orquestadorService.refrescarLectura(id);
     Map<String, Object> ubicacion = orquestadorService.obtenerUltimaUbicacion(id);
     return ResponseEntity.ok(ubicacion);
   }

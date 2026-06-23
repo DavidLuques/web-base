@@ -54,6 +54,7 @@ public class ControladorVallaTest {
     assertEquals(-34.7222, respuesta.getBody().get("latitud"));
     assertEquals(-58.5250, respuesta.getBody().get("longitud"));
 
+    verify(orquestadorServiceMock, times(1)).refrescarLectura(idMascota);
     verify(orquestadorServiceMock, times(1)).obtenerUltimaUbicacion(idMascota);
   }
 
@@ -114,6 +115,7 @@ public class ControladorVallaTest {
 
     controladorValla.obtenerUbicacionActual(7L);
 
+    verify(orquestadorServiceMock).refrescarLectura(7L);
     verify(orquestadorServiceMock).obtenerUltimaUbicacion(7L);
   }
 }

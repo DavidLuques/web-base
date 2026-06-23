@@ -51,7 +51,7 @@ public class ControladorMonitoreo {
   @GetMapping(value = "/estado/{idMascota}", produces = "application/json;charset=UTF-8")
   @ResponseBody
   public ResultadoSimulacionDto obtenerEstado(@PathVariable Long idMascota) {
-    return orquestadorService.obtenerUltimoEstado(idMascota);
+    return orquestadorService.refrescarLectura(idMascota);
   }
 
   @GetMapping(value = "/rangos/{idMascota}", produces = "application/json;charset=UTF-8")

@@ -3,6 +3,13 @@
 function inicializarAlertas(idMascota) {
   lucide.createIcons();
 
+  const alertasNotificadasKey = `alertas-emergencia-notificadas-${idMascota}`;
+  const alertasNotificadas = new Set(JSON.parse(sessionStorage.getItem(alertasNotificadasKey) || "[]"));
+
+  function guardarAlertasNotificadas() {
+    sessionStorage.setItem(alertasNotificadasKey, JSON.stringify(Array.from(alertasNotificadas)));
+  }
+
   function formatearFecha(fechaStr) {
     const fecha = new Date(fechaStr);
     const hoy = new Date();
@@ -50,9 +57,8 @@ function inicializarAlertas(idMascota) {
         let htmlContent = "";
 
         listaDeAlertas.reverse().forEach(alerta => {
-          // Notificar si es EMERGENCIA y no está leído
-          if (alerta.tipo === "EMERGENCIA" && !alerta.leido) {
-            notificarEmergencia(alerta.mensaje, alerta.tipo);
+          if (alerta.tipo === "EMERGENCIA" && !alerta.leido && !alertasNotificadas.has(alerta.id)) {
+            notificarEmergencia(alerta);
           }
 
           const esEmergencia = alerta.tipo === "EMERGENCIA";
@@ -63,7 +69,7 @@ function inicializarAlertas(idMascota) {
           const opacidad = alerta.leido ? "opacity-60" : "";
           const badge = alerta.leido
             ? "<span class=\"bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold\">✓ Leído</span>"
-            : "<span class=\"bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-blue-200\">Click para marcar</span>";
+            : "<span class=\"bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-blue-200\">Marcar como leída</span>";
           const fechaFormato = formatearFecha(alerta.fechaYHora);
 
           htmlContent += `
@@ -113,22 +119,30 @@ function inicializarAlertas(idMascota) {
       .catch(error => console.error("Error marcando alerta como leída:", error));
   };
 
-  function notificarEmergencia(mensaje, tipoAlerta) {
-    if ("Notification" in window && Notification.permission === "granted") {
-      const titulo = tipoAlerta === "EMERGENCIA" ? "EMERGENCIA" : "ALERTA";
-      new Notification(titulo, {
-        body: mensaje,
-        icon: "/spring/resources/core/img/icon-alert.png",
-        badge: "/spring/resources/core/img/badge.png",
-        tag: "alerta-mascota",
-        requireInteraction: tipoAlerta === "EMERGENCIA"
-      });
+  function notificarEmergencia(alerta) {
+    if (!("Notification" in window) || Notification.permission !== "granted") {
+      return;
     }
+
+    new Notification("EMERGENCIA", {
+      body: alerta.mensaje,
+      icon: "/spring/resources/core/img/icon-alert.png",
+      badge: "/spring/resources/core/img/badge.png",
+      tag: `alerta-mascota-${alerta.id}`,
+      requireInteraction: true
+    });
+
+    alertasNotificadas.add(alerta.id);
+    guardarAlertasNotificadas();
   }
 
   // Solicitar permiso para notificaciones al cargar
   if ("Notification" in window && Notification.permission === "default") {
-    Notification.requestPermission();
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        cargarAlertasPantalla();
+      }
+    });
   }
 
   cargarAlertasPantalla();

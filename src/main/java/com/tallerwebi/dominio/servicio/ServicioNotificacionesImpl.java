@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class ServicioNotificacionesImpl implements ServicioNotificaciones {
 
   private static final Logger logger = Logger.getLogger(ServicioNotificacionesImpl.class.getName());
+  private static final String REMITENTE = "pettrackertw1@gmail.com";
   private final JavaMailSender mailSender;
 
   public ServicioNotificacionesImpl(JavaMailSender mailSender) {
@@ -47,6 +48,7 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
     }
 
     SimpleMailMessage mensaje = new SimpleMailMessage();
+    mensaje.setFrom(REMITENTE);
     mensaje.setTo(correoUsuario);
     mensaje.setSubject("EMERGENCIA: Alerta de " + alerta.getMascota().getNombre());
     mensaje.setText(
