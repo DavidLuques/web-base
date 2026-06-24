@@ -16,7 +16,16 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EnableWebMvc
 @Configuration
 @ComponentScan(
-  { "com.tallerwebi.presentacion", "com.tallerwebi.dominio", "com.tallerwebi.infraestructura" }
+  basePackages = {
+    "com.tallerwebi.presentacion",
+    "com.tallerwebi.dominio",
+    "com.tallerwebi.infraestructura",
+    "com.tallerwebi.config",
+  },
+  excludeFilters = @ComponentScan.Filter(
+    type = org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE,
+    classes = com.tallerwebi.config.DatabaseInitializationConfig.class
+  )
 )
 public class SpringWebTestConfig implements WebMvcConfigurer {
 

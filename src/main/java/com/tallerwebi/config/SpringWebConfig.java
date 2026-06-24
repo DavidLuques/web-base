@@ -50,6 +50,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
       .addInterceptor(new com.tallerwebi.presentacion.interceptor.AuthInterceptor())
       .addPathPatterns("/**")
       .excludePathPatterns(
+        "/",
         "/login",
         "/validar-login",
         "/registrarme",
