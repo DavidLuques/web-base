@@ -51,7 +51,7 @@ public class ServicioAlertaImpl implements ServicioAlerta {
     alerta.setLeido(false);
     repositorioAlerta.save(alerta);
 
-    if (TipoAlerta.EMERGENCIA.equals(tipo) && servicioNotificaciones != null) {
+    if (TipoAlerta.EMERGENCIA.equals(tipo)) {
       servicioNotificaciones.enviarNotificacionEmergencia(alerta);
     }
   }
@@ -61,7 +61,7 @@ public class ServicioAlertaImpl implements ServicioAlerta {
     Alerta alerta = new Alerta(usuario, tipo, mensaje);
     repositorioAlerta.save(alerta);
 
-    if (TipoAlerta.EMERGENCIA.equals(tipo) && servicioNotificaciones != null) {
+    if (TipoAlerta.EMERGENCIA.equals(tipo)) {
       servicioNotificaciones.enviarNotificacionEmergencia(alerta);
     }
   }
