@@ -26,6 +26,12 @@ public class ServicioAlertaImpl implements ServicioAlerta {
     this.repositorioAlerta = repositorioAlerta;
   }
 
+  // Constructor compatible con tests existentes que inyectan mock de ServicioNotificaciones
+  public ServicioAlertaImpl(RepositorioAlerta repositorioAlerta, ServicioNotificaciones servicioNotificaciones) {
+    this.repositorioAlerta = repositorioAlerta;
+    this.servicioNotificaciones = servicioNotificaciones;
+  }
+
   @org.springframework.beans.factory.annotation.Autowired(required = false)
   public void setServicioNotificaciones(ServicioNotificaciones servicioNotificaciones) {
     this.servicioNotificaciones = servicioNotificaciones;
