@@ -133,6 +133,48 @@ function inicializarValla(idMascota) {
     }
   }
 
+  // Notificaciones de emergencia globales
+  const alertasGlobalesNotificadas = new Set();
+
+  async function consultarEmergenciasGlobales() {
+    if (Notification.permission !== "granted") return;
+    try {
+      const response = await fetch("/spring/analisis/alertas/emergencias-activas");
+      if (!response.ok) return;
+      const alertas = await response.json();
+      if (!alertas || !Array.isArray(alertas)) return;
+      alertas.forEach(alerta => {
+        if (!alertasGlobalesNotificadas.has(alerta.id)) {
+          alertasGlobalesNotificadas.add(alerta.id);
+          new Notification("EMERGENCIA - " + alerta.nombreMascota, {
+            body: alerta.mensaje,
+            tag: "emergencia-" + alerta.id,
+            requireInteraction: true
+          });
+        }
+      });
+    } catch (err) {
+      console.error("Error consultando emergencias:", err);
+    }
+  }
+
+// Pedir permiso y arrancar polling
+  if ("Notification" in window) {
+    if (Notification.permission === "granted") {
+      consultarEmergenciasGlobales();
+      setInterval(consultarEmergenciasGlobales, 10000);
+    } else if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          consultarEmergenciasGlobales();
+          setInterval(consultarEmergenciasGlobales, 10000);
+        }
+      });
+    }
+  }
+
+  console.log("Permiso notificaciones:", Notification.permission);
+
   cargarVallado();
   actualizarPosicion();
   setInterval(actualizarPosicion, 30000);

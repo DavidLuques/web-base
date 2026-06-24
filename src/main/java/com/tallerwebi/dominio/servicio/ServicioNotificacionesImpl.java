@@ -30,20 +30,14 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
     try {
       enviarEmailEmergencia(alerta);
     } catch (Exception e) {
-      if (logger.isLoggable(Level.WARNING)) {
-        logger.warning("Error al enviar notificación de emergencia: " + e.getMessage());
-      }
+      logger.log(Level.WARNING, "Error al enviar notificacion de emergencia", e);
     }
   }
 
   private void enviarEmailEmergencia(Alerta alerta) {
     String correoUsuario = obtenerCorreoUsuario(alerta);
     if (correoUsuario == null || correoUsuario.isEmpty()) {
-      if (logger.isLoggable(Level.WARNING)) {
-        logger.warning(
-          "No se pudo obtener el correo del usuario para la alerta ID: " + alerta.getId()
-        );
-      }
+      logger.log(Level.WARNING, "No se pudo obtener el correo del usuario para la alerta");
       return;
     }
 
@@ -69,9 +63,6 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
     );
 
     mailSender.send(mensaje);
-    if (logger.isLoggable(Level.INFO)) {
-      logger.info("Email de emergencia enviado a: " + correoUsuario);
-    }
   }
 
   private String obtenerCorreoUsuario(Alerta alerta) {

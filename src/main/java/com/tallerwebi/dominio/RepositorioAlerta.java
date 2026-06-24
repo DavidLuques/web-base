@@ -10,7 +10,11 @@ public interface RepositorioAlerta {
 
   Alerta buscarUltimaAlertaDePesoPorMascota(Long idMascota);
 
+  Alerta buscarUltimaAlertaDeValladoPorMascota(Long idMascota);
+
   void actualizar(Alerta alerta);
 
   Alerta buscarPorId(Long idAlerta);
+
+  List<Alerta> buscarEmergenciasActivasPorUsuario(Long idUsuario);
 }

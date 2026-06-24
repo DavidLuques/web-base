@@ -7,7 +7,7 @@ import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.Mascota;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ServicioAlertaImpl implements ServicioAlerta {
-
-  private static final Logger logger = Logger.getLogger(ServicioAlertaImpl.class.getName());
 
   private final RepositorioAlerta repositorioAlerta;
   private final ServicioNotificaciones servicioNotificaciones;
@@ -36,6 +34,11 @@ public class ServicioAlertaImpl implements ServicioAlerta {
   }
 
   @Override
+  public Alerta buscarUltimaAlertaDeVallado(Long idMascota) {
+    return repositorioAlerta.buscarUltimaAlertaDeValladoPorMascota(idMascota);
+  }
+
+  @Override
   public void crearAlerta(Mascota mascota, TipoAlerta tipo, String mensaje) {
     Alerta alerta = new Alerta();
     alerta.setMascota(mascota);
@@ -46,18 +49,6 @@ public class ServicioAlertaImpl implements ServicioAlerta {
     repositorioAlerta.save(alerta);
 
     if (TipoAlerta.EMERGENCIA.equals(tipo)) {
-      if (logger.isLoggable(java.util.logging.Level.INFO)) {
-        logger.info(
-          "Intentando enviar email de emergencia para mascota: " +
-          (mascota != null ? mascota.getNombre() : "NULL")
-        );
-        logger.info(
-          "Email del usuario: " +
-          (mascota != null && mascota.getUsuario() != null
-              ? mascota.getUsuario().getEmail()
-              : "NULL")
-        );
-      }
       servicioNotificaciones.enviarNotificacionEmergencia(alerta);
     }
   }
@@ -92,5 +83,21 @@ public class ServicioAlertaImpl implements ServicioAlerta {
       alerta.setLeido(true);
       repositorioAlerta.actualizar(alerta);
     }
+  }
+
+  @Override
+  @Transactional
+  public List<Map<String, Object>> obtenerEmergenciasActivasPorUsuario(Long idUsuario) {
+    return repositorioAlerta
+      .buscarEmergenciasActivasPorUsuario(idUsuario)
+      .stream()
+      .map(a -> {
+        Map<String, Object> map = new java.util.HashMap<>();
+        map.put("id", a.getId());
+        map.put("mensaje", a.getMensaje());
+        map.put("nombreMascota", a.getMascota().getNombre());
+        return map;
+      })
+      .collect(java.util.stream.Collectors.toList());
   }
 }
