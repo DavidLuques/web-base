@@ -133,8 +133,23 @@ function inicializarValla(idMascota) {
     }
   }
 
-  // Notificaciones de emergencia globales
-  const alertasGlobalesNotificadas = new Set();
+  // Notificaciones de emergencia globales (persisten en localStorage para evitar duplicados)
+  const GLOBAL_NOTIFICADAS_KEY = 'alertas-emergencia-notificadas-global';
+  function cargarNotificadasGlobales() {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(GLOBAL_NOTIFICADAS_KEY) || '[]'));
+    } catch (e) {
+      return new Set();
+    }
+  }
+  function guardarNotificadasGlobales(set) {
+    try {
+      localStorage.setItem(GLOBAL_NOTIFICADAS_KEY, JSON.stringify(Array.from(set)));
+    } catch (e) {
+      // noop
+    }
+  }
+  const alertasGlobalesNotificadas = cargarNotificadasGlobales();
 
   async function consultarEmergenciasGlobales() {
     if (Notification.permission !== "granted") return;
@@ -144,11 +159,13 @@ function inicializarValla(idMascota) {
       const alertas = await response.json();
       if (!alertas || !Array.isArray(alertas)) return;
       alertas.forEach(alerta => {
-        if (!alertasGlobalesNotificadas.has(alerta.id)) {
-          alertasGlobalesNotificadas.add(alerta.id);
-          new Notification("EMERGENCIA - " + alerta.nombreMascota, {
+        const id = String(alerta.id);
+        if (!alertasGlobalesNotificadas.has(id)) {
+          alertasGlobalesNotificadas.add(id);
+          guardarNotificadasGlobales(alertasGlobalesNotificadas);
+          new Notification("EMERGENCIA - " + (alerta.nombreMascota || ''), {
             body: alerta.mensaje,
-            tag: "emergencia-" + alerta.id,
+            tag: "emergencia-" + id,
             requireInteraction: true
           });
         }

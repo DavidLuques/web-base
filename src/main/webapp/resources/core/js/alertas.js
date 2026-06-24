@@ -4,12 +4,13 @@ function inicializarAlertas(idMascota) {
   lucide.createIcons();
 
   const alertasNotificadasKey = "alertas-emergencia-notificadas-" + idMascota;
+  // Persistir en localStorage para recordar notificaciones entre sesiones
   const alertasNotificadas = new Set(
-      JSON.parse(sessionStorage.getItem(alertasNotificadasKey) || "[]")
+      JSON.parse(localStorage.getItem(alertasNotificadasKey) || "[]")
   );
 
   function guardarAlertasNotificadas() {
-    sessionStorage.setItem(
+    localStorage.setItem(
         alertasNotificadasKey,
         JSON.stringify(Array.from(alertasNotificadas))
     );
