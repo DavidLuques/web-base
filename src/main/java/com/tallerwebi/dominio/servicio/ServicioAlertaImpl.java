@@ -22,16 +22,12 @@ public class ServicioAlertaImpl implements ServicioAlerta {
   // Servicio de notificaciones es opcional (en tests puede no existir JavaMailSender)
   private ServicioNotificaciones servicioNotificaciones;
 
-  @org.springframework.beans.factory.annotation.Autowired
   public ServicioAlertaImpl(RepositorioAlerta repositorioAlerta) {
     this.repositorioAlerta = repositorioAlerta;
   }
 
   // Constructor compatible con tests existentes que inyectan mock de ServicioNotificaciones
-  public ServicioAlertaImpl(
-    RepositorioAlerta repositorioAlerta,
-    ServicioNotificaciones servicioNotificaciones
-  ) {
+  public ServicioAlertaImpl(RepositorioAlerta repositorioAlerta, ServicioNotificaciones servicioNotificaciones) {
     this.repositorioAlerta = repositorioAlerta;
     this.servicioNotificaciones = servicioNotificaciones;
   }
