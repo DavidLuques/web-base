@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
@@ -36,6 +37,12 @@ public class ServicioAlertaImpl implements ServicioAlerta {
   }
 
   @Override
+  public void crearAlertaUsuario(Usuario usuario, TipoAlerta tipo, String mensaje) {
+    Alerta alerta = new Alerta(usuario, tipo, mensaje);
+    repositorioAlerta.save(alerta);
+  }
+
+  @Override
   @Transactional
   public List<AlertaDto> obtenerAlertasPorMascota(Long idMascota) {
     if (idMascota == null) {
@@ -44,16 +51,20 @@ public class ServicioAlertaImpl implements ServicioAlerta {
     return repositorioAlerta
       .buscarPorMascota(idMascota)
       .stream()
-      .map(a ->
-        new AlertaDto(
-          a.getId(),
-          a.getTipo(),
-          a.obtenerTipoFormato(),
-          a.getMensaje(),
-          a.getFechaYHora().toString(),
-          a.getLeido()
-        )
-      )
+      .map(this::mapearADto)
+      .collect(java.util.stream.Collectors.toList());
+  }
+
+  @Override
+  @Transactional
+  public List<AlertaDto> obtenerAlertasPorUsuario(Long idUsuario) {
+    if (idUsuario == null) {
+      return java.util.Collections.emptyList();
+    }
+    return repositorioAlerta
+      .buscarPorUsuario(idUsuario)
+      .stream()
+      .map(this::mapearADto)
       .collect(java.util.stream.Collectors.toList());
   }
 
@@ -65,5 +76,16 @@ public class ServicioAlertaImpl implements ServicioAlerta {
       alerta.setLeido(true);
       repositorioAlerta.actualizar(alerta);
     }
+  }
+
+  private AlertaDto mapearADto(Alerta alerta) {
+    return new AlertaDto(
+      alerta.getId(),
+      alerta.getTipo(),
+      alerta.obtenerTipoFormato(),
+      alerta.getMensaje(),
+      alerta.getFechaYHora().toString(),
+      alerta.getLeido()
+    );
   }
 }

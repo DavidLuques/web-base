@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.SolicitudTransferenciaDao;
 import com.tallerwebi.dominio.enums.EstadoTransferencia;
+import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.excepcion.AccionNoPermitidaEnEsteEstadoException;
 import com.tallerwebi.dominio.excepcion.NoSonAmigosException;
 import com.tallerwebi.dominio.modelo.Mascota;
@@ -22,18 +23,21 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
   private final MascotaDao mascotaDao;
   private final RepositorioUsuario repositorioUsuario;
   private final ServicioAmistad servicioAmistad;
+  private final ServicioAlerta servicioAlerta;
 
   @Autowired
   public ServicioTransferenciaMascotaImpl(
     SolicitudTransferenciaDao solicitudTransferenciaDao,
     MascotaDao mascotaDao,
     RepositorioUsuario repositorioUsuario,
-    ServicioAmistad servicioAmistad
+    ServicioAmistad servicioAmistad,
+    ServicioAlerta servicioAlerta
   ) {
     this.solicitudTransferenciaDao = solicitudTransferenciaDao;
     this.mascotaDao = mascotaDao;
     this.repositorioUsuario = repositorioUsuario;
     this.servicioAmistad = servicioAmistad;
+    this.servicioAlerta = servicioAlerta;
   }
 
   @Override
@@ -55,6 +59,16 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     solicitud.setUsuarioOrigen(origen);
     solicitud.setUsuarioDestino(destino);
     solicitudTransferenciaDao.guardar(solicitud);
+
+    servicioAlerta.crearAlertaUsuario(
+      destino,
+      TipoAlerta.INFO,
+      origen.getNombre() +
+      " quiere transferirte a " +
+      mascota.getNombre() +
+      ". Revisá tus transferencias pendientes."
+    );
+
     return solicitud;
   }
 
@@ -65,6 +79,20 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     solicitud.setConfirmadaPorOrigen(true);
     completarSiCorresponde(solicitud);
     solicitudTransferenciaDao.modificar(solicitud);
+
+    if (solicitud.getEstado() == EstadoTransferencia.COMPLETADA) {
+      notificarTransferenciaCompletada(solicitud);
+    } else {
+      servicioAlerta.crearAlertaUsuario(
+        solicitud.getUsuarioDestino(),
+        TipoAlerta.INFO,
+        solicitud.getUsuarioOrigen().getNombre() +
+        " confirmó la transferencia de " +
+        solicitud.getMascota().getNombre() +
+        ". Ahora falta tu confirmación."
+      );
+    }
+
     return solicitud;
   }
 
@@ -75,6 +103,20 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     solicitud.setConfirmadaPorDestino(true);
     completarSiCorresponde(solicitud);
     solicitudTransferenciaDao.modificar(solicitud);
+
+    if (solicitud.getEstado() == EstadoTransferencia.COMPLETADA) {
+      notificarTransferenciaCompletada(solicitud);
+    } else {
+      servicioAlerta.crearAlertaUsuario(
+        solicitud.getUsuarioOrigen(),
+        TipoAlerta.INFO,
+        solicitud.getUsuarioDestino().getNombre() +
+        " confirmó la transferencia de " +
+        solicitud.getMascota().getNombre() +
+        ". Ahora falta tu confirmación."
+      );
+    }
+
     return solicitud;
   }
 
@@ -89,6 +131,19 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     }
     solicitud.setEstado(EstadoTransferencia.CANCELADA);
     solicitudTransferenciaDao.modificar(solicitud);
+
+    String mensajeCancelacion =
+      "La transferencia de " + solicitud.getMascota().getNombre() + " fue cancelada.";
+    servicioAlerta.crearAlertaUsuario(
+      solicitud.getUsuarioOrigen(),
+      TipoAlerta.INFO,
+      mensajeCancelacion
+    );
+    servicioAlerta.crearAlertaUsuario(
+      solicitud.getUsuarioDestino(),
+      TipoAlerta.INFO,
+      mensajeCancelacion
+    );
   }
 
   @Override
@@ -120,5 +175,27 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
       mascotaDao.modificar(mascota);
       solicitud.setEstado(EstadoTransferencia.COMPLETADA);
     }
+  }
+
+  private void notificarTransferenciaCompletada(SolicitudTransferencia solicitud) {
+    String nombreMascota = solicitud.getMascota().getNombre();
+    servicioAlerta.crearAlertaUsuario(
+      solicitud.getUsuarioOrigen(),
+      TipoAlerta.INFO,
+      "La transferencia de " +
+      nombreMascota +
+      " a " +
+      solicitud.getUsuarioDestino().getNombre() +
+      " se completó exitosamente."
+    );
+    servicioAlerta.crearAlertaUsuario(
+      solicitud.getUsuarioDestino(),
+      TipoAlerta.INFO,
+      "¡" +
+      nombreMascota +
+      " ahora es tuyo/a! La transferencia de " +
+      solicitud.getUsuarioOrigen().getNombre() +
+      " se completó exitosamente."
+    );
   }
 }

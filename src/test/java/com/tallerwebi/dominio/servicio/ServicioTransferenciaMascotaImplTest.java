@@ -30,6 +30,7 @@ public class ServicioTransferenciaMascotaImplTest {
   private MascotaDao mascotaDaoMock;
   private RepositorioUsuario repositorioUsuarioMock;
   private ServicioAmistad servicioAmistadMock;
+  private ServicioAlerta servicioAlertaMock;
 
   @BeforeEach
   public void init() {
@@ -37,23 +38,49 @@ public class ServicioTransferenciaMascotaImplTest {
     mascotaDaoMock = mock(MascotaDao.class);
     repositorioUsuarioMock = mock(RepositorioUsuario.class);
     servicioAmistadMock = mock(ServicioAmistad.class);
+    servicioAlertaMock = mock(ServicioAlerta.class);
+
     servicio =
       new ServicioTransferenciaMascotaImpl(
         solicitudTransferenciaDaoMock,
         mascotaDaoMock,
         repositorioUsuarioMock,
-        servicioAmistadMock
+        servicioAmistadMock,
+        servicioAlertaMock
       );
+  }
+
+  // ── helpers ──────────────────────────────────────────────────────
+
+  private Mascota mascotaConNombre(String nombre) {
+    Mascota m = new Mascota();
+    m.setNombre(nombre);
+    return m;
+  }
+
+  private SolicitudTransferencia solicitudPendienteCompleta() {
+    Usuario origen = mock(Usuario.class);
+    when(origen.getNombre()).thenReturn("Carlos");
+    Usuario destino = mock(Usuario.class);
+    when(destino.getNombre()).thenReturn("Ana");
+
+    SolicitudTransferencia s = new SolicitudTransferencia();
+    s.setMascota(mascotaConNombre("Firulais"));
+    s.setUsuarioOrigen(origen);
+    s.setUsuarioDestino(destino);
+    return s;
   }
 
   // ── iniciarTransferencia ─────────────────────────────────────────
 
   @Test
   public void dadosDosAmigosDebeIniciarLaTransferenciaEnEstadoPendiente() {
-    Mascota mascota = new Mascota();
+    Mascota mascota = mascotaConNombre("Firulais");
     mascota.setId(5L);
     Usuario origen = mock(Usuario.class);
+    when(origen.getNombre()).thenReturn("Carlos");
     Usuario destino = mock(Usuario.class);
+    when(destino.getNombre()).thenReturn("Ana");
 
     when(servicioAmistadMock.sonAmigos(1L, 2L)).thenReturn(true);
     when(mascotaDaoMock.buscarPorId(5L)).thenReturn(mascota);
@@ -81,7 +108,7 @@ public class ServicioTransferenciaMascotaImplTest {
 
   @Test
   public void dadaUnaSolicitudPendienteAlConfirmarPorOrigenDebeQuedarMarcadaSinCompletarse() {
-    SolicitudTransferencia solicitud = new SolicitudTransferencia();
+    SolicitudTransferencia solicitud = solicitudPendienteCompleta();
     when(solicitudTransferenciaDaoMock.buscarPorId(20L)).thenReturn(solicitud);
 
     servicio.confirmarPorOrigen(20L);
@@ -94,20 +121,15 @@ public class ServicioTransferenciaMascotaImplTest {
 
   @Test
   public void siElDestinoYaHabiaConfirmadoAlConfirmarPorOrigenDebeCompletarLaTransferencia() {
-    Mascota mascota = new Mascota();
-    Usuario destino = mock(Usuario.class);
-
-    SolicitudTransferencia solicitud = new SolicitudTransferencia();
-    solicitud.setMascota(mascota);
-    solicitud.setUsuarioDestino(destino);
+    SolicitudTransferencia solicitud = solicitudPendienteCompleta();
     solicitud.setConfirmadaPorDestino(true);
     when(solicitudTransferenciaDaoMock.buscarPorId(20L)).thenReturn(solicitud);
 
     servicio.confirmarPorOrigen(20L);
 
     assertThat(solicitud.getEstado(), equalTo(EstadoTransferencia.COMPLETADA));
-    assertThat(mascota.getUsuario(), equalTo(destino));
-    verify(mascotaDaoMock, times(1)).modificar(mascota);
+    assertThat(solicitud.getMascota().getUsuario(), equalTo(solicitud.getUsuarioDestino()));
+    verify(mascotaDaoMock, times(1)).modificar(solicitud.getMascota());
     verify(solicitudTransferenciaDaoMock, times(1)).modificar(solicitud);
   }
 
@@ -127,7 +149,7 @@ public class ServicioTransferenciaMascotaImplTest {
 
   @Test
   public void dadaUnaSolicitudPendienteAlConfirmarPorDestinoDebeQuedarMarcadaSinCompletarse() {
-    SolicitudTransferencia solicitud = new SolicitudTransferencia();
+    SolicitudTransferencia solicitud = solicitudPendienteCompleta();
     when(solicitudTransferenciaDaoMock.buscarPorId(21L)).thenReturn(solicitud);
 
     servicio.confirmarPorDestino(21L);
@@ -140,20 +162,15 @@ public class ServicioTransferenciaMascotaImplTest {
 
   @Test
   public void siElOrigenYaHabiaConfirmadoAlConfirmarPorDestinoDebeCompletarLaTransferencia() {
-    Mascota mascota = new Mascota();
-    Usuario destino = mock(Usuario.class);
-
-    SolicitudTransferencia solicitud = new SolicitudTransferencia();
-    solicitud.setMascota(mascota);
-    solicitud.setUsuarioDestino(destino);
+    SolicitudTransferencia solicitud = solicitudPendienteCompleta();
     solicitud.setConfirmadaPorOrigen(true);
     when(solicitudTransferenciaDaoMock.buscarPorId(21L)).thenReturn(solicitud);
 
     servicio.confirmarPorDestino(21L);
 
     assertThat(solicitud.getEstado(), equalTo(EstadoTransferencia.COMPLETADA));
-    assertThat(mascota.getUsuario(), equalTo(destino));
-    verify(mascotaDaoMock, times(1)).modificar(mascota);
+    assertThat(solicitud.getMascota().getUsuario(), equalTo(solicitud.getUsuarioDestino()));
+    verify(mascotaDaoMock, times(1)).modificar(solicitud.getMascota());
     verify(solicitudTransferenciaDaoMock, times(1)).modificar(solicitud);
   }
 
@@ -173,7 +190,7 @@ public class ServicioTransferenciaMascotaImplTest {
 
   @Test
   public void dadaUnaSolicitudPendienteAlCancelarDebeQuedarCancelada() {
-    SolicitudTransferencia solicitud = new SolicitudTransferencia();
+    SolicitudTransferencia solicitud = solicitudPendienteCompleta();
     when(solicitudTransferenciaDaoMock.buscarPorId(30L)).thenReturn(solicitud);
 
     servicio.cancelarTransferencia(30L);

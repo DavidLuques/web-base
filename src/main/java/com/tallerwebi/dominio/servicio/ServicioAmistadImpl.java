@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dao.SolicitudAmistadDao;
 import com.tallerwebi.dominio.enums.EstadoAmistad;
+import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.excepcion.AccionNoPermitidaEnEsteEstadoException;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.dominio.modelo.SolicitudAmistad;
@@ -19,14 +20,17 @@ public class ServicioAmistadImpl implements ServicioAmistad {
 
   private final SolicitudAmistadDao solicitudAmistadDao;
   private final RepositorioUsuario repositorioUsuario;
+  private final ServicioAlerta servicioAlerta;
 
   @Autowired
   public ServicioAmistadImpl(
     SolicitudAmistadDao solicitudAmistadDao,
-    RepositorioUsuario repositorioUsuario
+    RepositorioUsuario repositorioUsuario,
+    ServicioAlerta servicioAlerta
   ) {
     this.solicitudAmistadDao = solicitudAmistadDao;
     this.repositorioUsuario = repositorioUsuario;
+    this.servicioAlerta = servicioAlerta;
   }
 
   @Override
@@ -45,6 +49,13 @@ public class ServicioAmistadImpl implements ServicioAmistad {
     solicitud.setEmisor(emisor);
     solicitud.setReceptor(receptor);
     solicitudAmistadDao.guardar(solicitud);
+
+    servicioAlerta.crearAlertaUsuario(
+      receptor,
+      TipoAlerta.INFO,
+      emisor.getNombre() + " te envió una solicitud de amistad."
+    );
+
     return solicitud;
   }
 
@@ -59,6 +70,12 @@ public class ServicioAmistadImpl implements ServicioAmistad {
     }
     solicitud.setEstado(EstadoAmistad.ACEPTADA);
     solicitudAmistadDao.modificar(solicitud);
+
+    servicioAlerta.crearAlertaUsuario(
+      solicitud.getEmisor(),
+      TipoAlerta.INFO,
+      solicitud.getReceptor().getNombre() + " aceptó tu solicitud de amistad."
+    );
   }
 
   @Override
@@ -72,6 +89,12 @@ public class ServicioAmistadImpl implements ServicioAmistad {
     }
     solicitud.setEstado(EstadoAmistad.RECHAZADA);
     solicitudAmistadDao.modificar(solicitud);
+
+    servicioAlerta.crearAlertaUsuario(
+      solicitud.getEmisor(),
+      TipoAlerta.INFO,
+      solicitud.getReceptor().getNombre() + " rechazó tu solicitud de amistad."
+    );
   }
 
   @Override
@@ -84,11 +107,11 @@ public class ServicioAmistadImpl implements ServicioAmistad {
   public List<Usuario> obtenerAmigos(Long idUsuario) {
     List<SolicitudAmistad> aceptadas = solicitudAmistadDao.buscarAceptadasPorUsuario(idUsuario);
     List<Usuario> amigos = new ArrayList<>();
-    for (SolicitudAmistad s : aceptadas) {
-      if (s.getEmisor().getId().equals(idUsuario)) {
-        amigos.add(s.getReceptor());
+    for (SolicitudAmistad solicitud : aceptadas) {
+      if (solicitud.getEmisor().getId().equals(idUsuario)) {
+        amigos.add(solicitud.getReceptor());
       } else {
-        amigos.add(s.getEmisor());
+        amigos.add(solicitud.getEmisor());
       }
     }
     return amigos;
