@@ -15,7 +15,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
     } catch (e) {
-      // noop
+
     }
   }
 

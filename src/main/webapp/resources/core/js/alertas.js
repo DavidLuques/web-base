@@ -62,7 +62,7 @@ function inicializarAlertas(idMascota) {
     const opacidad = alerta.leido ? "opacity-60" : "";
     const badge = alerta.leido
         ? "<span class=\"bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold\">&#10003; Le\u00eddo</span>"
-        : "<span class=\"bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-blue-200\">Click para marcar</span>";
+        : "<span class=\"bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-blue-200\">Marcar como leída</span>";
     const fechaFormato = formatearFecha(alerta.fechaYHora);
 
     return (

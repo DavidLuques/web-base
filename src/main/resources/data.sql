@@ -19,13 +19,5 @@ VALUES ('GRANDE', 60, 100, 120, 150, 80, 95, 37.5, 38.9);
 INSERT INTO mascota(nombre, estado_actual, tamano, raza, genero, tipo, peso, esteril, usuario_id, activo)
 VALUES ('Firulais', 'CAMINANDO', 'MEDIANO', 'Labrador', 'Macho', 'Perro', 10.5, true, 1, true);
 
-CREATE TABLE IF NOT EXISTS registro_sueno (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        minutos_dormido INTEGER NOT NULL,
-        fecha_y_hora DATETIME NOT NULL,
-        mascota_id BIGINT NOT NULL,
-        FOREIGN KEY (mascota_id) REFERENCES mascota(id)
-);
-
 INSERT INTO vallado (id_mascota, latitud_centro, longitud_centro, radio_metros)
 VALUES (1, -34.7222, -58.5250, 150.0);
