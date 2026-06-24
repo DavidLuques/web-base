@@ -19,13 +19,15 @@ import org.springframework.stereotype.Service;
 public class ServicioAlertaImpl implements ServicioAlerta {
 
   private final RepositorioAlerta repositorioAlerta;
-  private final ServicioNotificaciones servicioNotificaciones;
+  // Servicio de notificaciones es opcional (en tests puede no existir JavaMailSender)
+  private ServicioNotificaciones servicioNotificaciones;
 
-  public ServicioAlertaImpl(
-    RepositorioAlerta repositorioAlerta,
-    ServicioNotificaciones servicioNotificaciones
-  ) {
+  public ServicioAlertaImpl(RepositorioAlerta repositorioAlerta) {
     this.repositorioAlerta = repositorioAlerta;
+  }
+
+  @org.springframework.beans.factory.annotation.Autowired(required = false)
+  public void setServicioNotificaciones(ServicioNotificaciones servicioNotificaciones) {
     this.servicioNotificaciones = servicioNotificaciones;
   }
 
