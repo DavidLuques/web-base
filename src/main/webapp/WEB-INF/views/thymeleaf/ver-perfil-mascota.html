@@ -105,10 +105,16 @@
               </button>
             </form>
             
-            <a th:href="@{/configuraciones/mascota/editar(idMascota=${idMascota})}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
-              <i data-lucide="edit-2" class="w-5 h-5"></i>
-              Editar Mascota
-            </a>
+            <div class="flex items-center gap-4">
+              <a th:href="@{/mascota/exportar/pdf(idMascota=${idMascota})}" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-6 rounded-xl transition-colors flex items-center gap-2 border border-slate-200">
+                <i data-lucide="file-down" class="w-5 h-5"></i>
+                Exportar PDF
+              </a>
+              <a th:href="@{/configuraciones/mascota/editar(idMascota=${idMascota})}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+                <i data-lucide="edit-2" class="w-5 h-5"></i>
+                Editar Mascota
+              </a>
+            </div>
           </div>
 
         </div>
