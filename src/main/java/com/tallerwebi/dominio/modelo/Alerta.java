@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.modelo;
 
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -26,8 +27,12 @@ public class Alerta {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "fk_id_mascota", nullable = false)
+  @JoinColumn(name = "fk_id_mascota", nullable = true)
   private Mascota mascota;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_id_usuario", nullable = true)
+  private Usuario usuario;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -53,6 +58,14 @@ public class Alerta {
     this.leido = false;
   }
 
+  public Alerta(Usuario usuario, TipoAlerta tipo, String mensaje) {
+    this.usuario = usuario;
+    this.tipo = tipo;
+    this.mensaje = mensaje;
+    this.fechaYHora = LocalDateTime.now();
+    this.leido = false;
+  }
+
   public Long getId() {
     return id;
   }
@@ -67,6 +80,14 @@ public class Alerta {
 
   public void setMascota(Mascota mascota) {
     this.mascota = mascota;
+  }
+
+  public Usuario getUsuario() {
+    return usuario;
+  }
+
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
   }
 
   public TipoAlerta getTipo() {

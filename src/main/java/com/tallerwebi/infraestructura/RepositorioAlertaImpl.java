@@ -36,6 +36,18 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
   }
 
   @Override
+  public List<Alerta> buscarPorUsuario(Long idUsuario) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT a FROM Alerta a WHERE a.usuario.id = :idUsuario ORDER BY a.fechaYHora DESC",
+        Alerta.class
+      )
+      .setParameter("idUsuario", idUsuario)
+      .getResultList();
+  }
+
+  @Override
   public Alerta buscarUltimaAlertaDePesoPorMascota(Long idMascota) {
     List<Alerta> alertas = sessionFactory
       .getCurrentSession()

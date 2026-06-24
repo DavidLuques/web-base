@@ -8,6 +8,7 @@ import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.servicio.ServicioAlerta;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -37,18 +38,30 @@ public class ControladorAlertaTest {
     controlador = new ControladorAlerta(servicioAlertaMock, servicioMascotaMock);
   }
 
+  // ── obtenerAlertasDeMascota ──────────────────────────────────────
+
   @Test
   public void cuandoObtengoAlertasDevuelveLaListaCorrespondiente() {
     Long mascotaId = 1L;
-
     List<AlertaDto> alertasEsperadas = new ArrayList<>();
-
     when(servicioAlertaMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(alertasEsperadas);
 
     List<AlertaDto> resultado = controlador.obtenerAlertasDeMascota(mascotaId);
 
     assertThat(resultado, equalTo(alertasEsperadas));
   }
+
+  @Test
+  public void cuandoObtengoAlertasSeLlamaAlServicioUnaVez() {
+    Long mascotaId = 1L;
+    when(servicioAlertaMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(new ArrayList<>());
+
+    controlador.obtenerAlertasDeMascota(mascotaId);
+
+    verify(servicioAlertaMock, times(1)).obtenerAlertasPorMascota(mascotaId);
+  }
+
+  // ── verPantallaDeAlertas ─────────────────────────────────────────
 
   @Test
   public void cuandoIngresoALaVistaDeAlertasRetornaLaVistaCorrecta() {
@@ -61,10 +74,18 @@ public class ControladorAlertaTest {
   }
 
   @Test
+  public void cuandoIngresoALaVistaDeAlertasAgregaElIdAlModelo() {
+    Long mascotaId = 7L;
+
+    controlador.verPantallaDeAlertas(mascotaId, modelMock, requestMock);
+
+    verify(modelMock).addAttribute("idMascota", 7L);
+  }
+
+  @Test
   public void cuandoIngresoALaVistaDeAlertasConUsuarioLogueadoAgregaMisMascotas() {
     Long mascotaId = 1L;
     Long idUsuario = 10L;
-
     List<?> mascotas = new ArrayList<>();
 
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
@@ -80,7 +101,6 @@ public class ControladorAlertaTest {
   @Test
   public void cuandoNoHayUsuarioEnSesionNoBuscaMascotas() {
     Long mascotaId = 1L;
-
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
 
     controlador.verPantallaDeAlertas(mascotaId, modelMock, requestMock);
@@ -88,25 +108,74 @@ public class ControladorAlertaTest {
     verify(servicioMascotaMock, never()).obtenerMascotasPorUsuario(anyLong());
   }
 
+  // ── verPantallaDeAlertasSinMascota ──────────────────────────────
+
   @Test
-  public void cuandoIngresoALaVistaDeAlertasAgregaElIdAlModelo() {
-    Long mascotaId = 7L;
+  public void cuandoIngresoASinMascotaRetornaLaVistaAlertas() {
+    String vista = controlador.verPantallaDeAlertasSinMascota(modelMock, requestMock);
 
-    controlador.verPantallaDeAlertas(mascotaId, modelMock, requestMock);
-
-    verify(modelMock).addAttribute("idMascota", 7L);
+    assertThat(vista, equalTo("alertas"));
   }
 
   @Test
-  public void cuandoObtengoAlertasSeLlamaAlServicioUnaVez() {
-    Long mascotaId = 1L;
+  public void cuandoIngresoASinMascotaConUsuarioLogueadoAgregaMisMascotas() {
+    Long idUsuario = 10L;
+    List<?> mascotas = new ArrayList<>();
 
-    when(servicioAlertaMock.obtenerAlertasPorMascota(mascotaId)).thenReturn(new ArrayList<>());
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(idUsuario)).thenReturn((List) mascotas);
 
-    controlador.obtenerAlertasDeMascota(mascotaId);
+    controlador.verPantallaDeAlertasSinMascota(modelMock, requestMock);
 
-    verify(servicioAlertaMock, times(1)).obtenerAlertasPorMascota(mascotaId);
+    verify(modelMock).addAttribute("misMascotas", mascotas);
+    verify(servicioMascotaMock).obtenerMascotasPorUsuario(idUsuario);
   }
+
+  @Test
+  public void cuandoIngresoASinMascotaNoAgregaIdMascotaAlModelo() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
+
+    controlador.verPantallaDeAlertasSinMascota(modelMock, requestMock);
+
+    verify(modelMock, never()).addAttribute(eq("idMascota"), any());
+  }
+
+  @Test
+  public void cuandoIngresoASinMascotaSinUsuarioEnSesionNoBuscaMascotas() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
+
+    controlador.verPantallaDeAlertasSinMascota(modelMock, requestMock);
+
+    verify(servicioMascotaMock, never()).obtenerMascotasPorUsuario(anyLong());
+  }
+
+  // ── obtenerAlertasDeUsuario ──────────────────────────────────────
+
+  @Test
+  public void cuandoObtengoAlertasDeUsuarioConSesionActivaDevuelveLista() {
+    Long idUsuario = 5L;
+    List<AlertaDto> alertasEsperadas = new ArrayList<>();
+
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    when(servicioAlertaMock.obtenerAlertasPorUsuario(idUsuario)).thenReturn(alertasEsperadas);
+
+    List<AlertaDto> resultado = controlador.obtenerAlertasDeUsuario(requestMock);
+
+    assertThat(resultado, equalTo(alertasEsperadas));
+    verify(servicioAlertaMock, times(1)).obtenerAlertasPorUsuario(idUsuario);
+  }
+
+  @Test
+  public void cuandoObtengoAlertasDeUsuarioSinSesionDevuelveListaVacia() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(null);
+
+    List<AlertaDto> resultado = controlador.obtenerAlertasDeUsuario(requestMock);
+
+    assertThat(resultado, equalTo(Collections.emptyList()));
+    verify(servicioAlertaMock, never()).obtenerAlertasPorUsuario(anyLong());
+  }
+
+  // ── marcarAlertaComoLeida ────────────────────────────────────────
 
   @Test
   public void cuandoMarcoAlertaComoLeidaSeLlamaAlServicio() {

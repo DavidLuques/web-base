@@ -16,12 +16,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controlador de alertas.
- */
 @Controller
 @RequestMapping("/analisis/alertas")
 public class ControladorAlerta {
+
+  private static final String ATRIBUTO_ID_USUARIO = "ID_USUARIO";
 
   private final ServicioAlerta servicioAlerta;
   private final ServicioMascota servicioMascota;
@@ -39,10 +38,20 @@ public class ControladorAlerta {
     HttpServletRequest request
   ) {
     model.addAttribute("idMascota", idMascota);
-    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
     if (idUsuario != null) {
       model.addAttribute("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
     }
+    return "alertas";
+  }
+
+  @GetMapping("/sin-mascota")
+  public String verPantallaDeAlertasSinMascota(Model model, HttpServletRequest request) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    if (idUsuario != null) {
+      model.addAttribute("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    }
+    // idMascota no se agrega al modelo, queda null en la vista
     return "alertas";
   }
 
@@ -50,6 +59,16 @@ public class ControladorAlerta {
   @ResponseBody
   public List<AlertaDto> obtenerAlertasDeMascota(@PathVariable Long idMascota) {
     return servicioAlerta.obtenerAlertasPorMascota(idMascota);
+  }
+
+  @GetMapping("/usuario")
+  @ResponseBody
+  public List<AlertaDto> obtenerAlertasDeUsuario(HttpServletRequest request) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    if (idUsuario == null) {
+      return java.util.Collections.emptyList();
+    }
+    return servicioAlerta.obtenerAlertasPorUsuario(idUsuario);
   }
 
   @PutMapping("/{idAlerta}/leer")

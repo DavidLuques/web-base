@@ -8,6 +8,8 @@ public interface RepositorioAlerta {
 
   List<Alerta> buscarPorMascota(Long idMascota);
 
+  List<Alerta> buscarPorUsuario(Long idUsuario);
+
   Alerta buscarUltimaAlertaDePesoPorMascota(Long idMascota);
 
   Alerta buscarUltimaAlertaDeValladoPorMascota(Long idMascota);

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 public class ServicioAlertaImplTest {
 
@@ -26,6 +28,8 @@ public class ServicioAlertaImplTest {
     servicioNotificacionesMock = mock(ServicioNotificaciones.class);
     servicioAlerta = new ServicioAlertaImpl(repositorioAlertaMock, servicioNotificacionesMock);
   }
+
+  // ── crearAlerta ──────────────────────────────────────────────────
 
   @Test
   void debeCrearAlertaCorrectamente() {
@@ -50,6 +54,44 @@ public class ServicioAlertaImplTest {
   }
 
   @Test
+  void debeCrearAlertaConLosDatosCorrectos() {
+    Mascota mascota = new Mascota();
+    mascota.setNombre("Firulais");
+
+    servicioAlerta.crearAlerta(mascota, TipoAlerta.EMERGENCIA, "Mensaje de prueba");
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+
+    Alerta guardada = captor.getValue();
+    assertEquals(TipoAlerta.EMERGENCIA, guardada.getTipo());
+    assertEquals("Mensaje de prueba", guardada.getMensaje());
+    assertEquals(mascota, guardada.getMascota());
+    assertEquals(false, guardada.getLeido());
+    assertNotNull(guardada.getFechaYHora());
+  }
+
+  // ── crearAlertaUsuario ───────────────────────────────────────────
+
+  @Test
+  void debeCrearAlertaDeUsuarioCorrectamente() {
+    Usuario usuario = mock(Usuario.class);
+
+    servicioAlerta.crearAlertaUsuario(usuario, TipoAlerta.INFO, "Notificación de prueba");
+
+    ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
+    verify(repositorioAlertaMock).save(captor.capture());
+
+    Alerta guardada = captor.getValue();
+    assertEquals(TipoAlerta.INFO, guardada.getTipo());
+    assertEquals("Notificación de prueba", guardada.getMensaje());
+    assertEquals(usuario, guardada.getUsuario());
+    assertEquals(false, guardada.getLeido());
+  }
+
+  // ── marcarComoLeida ──────────────────────────────────────────────
+
+  @Test
   void debeMarcarAlertaComoLeida() {
     Long idAlerta = 1L;
     Alerta alerta = new Alerta();
@@ -63,6 +105,17 @@ public class ServicioAlertaImplTest {
     assertTrue(alerta.getLeido());
     verify(repositorioAlertaMock).actualizar(alerta);
   }
+
+  @Test
+  void cuandoLaAlertaNoExisteMarcarComoLeidaNoActualiza() {
+    when(repositorioAlertaMock.buscarPorId(99L)).thenReturn(null);
+
+    servicioAlerta.marcarComoLeida(99L);
+
+    verify(repositorioAlertaMock, never()).actualizar(any());
+  }
+
+  // ── obtenerAlertasPorMascota ─────────────────────────────────────
 
   @Test
   void debeRetornarAlertasMapeadasComoDto() {
@@ -79,6 +132,8 @@ public class ServicioAlertaImplTest {
 
     assertEquals(1, resultado.size());
     assertEquals("Mensaje 1", resultado.get(0).getMensaje());
+    assertEquals(TipoAlerta.ALERTA, resultado.get(0).getTipo());
+    assertEquals(false, resultado.get(0).getLeido());
   }
 
   @Test
@@ -88,6 +143,36 @@ public class ServicioAlertaImplTest {
     assertTrue(resultado.isEmpty());
     verify(repositorioAlertaMock, never()).buscarPorMascota(any());
   }
+
+  // ── obtenerAlertasPorUsuario ─────────────────────────────────────
+
+  @Test
+  void debeRetornarAlertasDeUsuarioMapeadasComoDto() {
+    Alerta alerta = new Alerta();
+    alerta.setId(3L);
+    alerta.setTipo(TipoAlerta.INFO);
+    alerta.setMensaje("Alerta de usuario");
+    alerta.setFechaYHora(LocalDateTime.now());
+    alerta.setLeido(false);
+
+    when(repositorioAlertaMock.buscarPorUsuario(2L)).thenReturn(Arrays.asList(alerta));
+
+    List<AlertaDto> resultado = servicioAlerta.obtenerAlertasPorUsuario(2L);
+
+    assertEquals(1, resultado.size());
+    assertEquals("Alerta de usuario", resultado.get(0).getMensaje());
+    assertEquals(TipoAlerta.INFO, resultado.get(0).getTipo());
+  }
+
+  @Test
+  void debeRetornarListaVaciaSiIdUsuarioEsNull() {
+    List<AlertaDto> resultado = servicioAlerta.obtenerAlertasPorUsuario(null);
+
+    assertTrue(resultado.isEmpty());
+    verify(repositorioAlertaMock, never()).buscarPorUsuario(any());
+  }
+
+  // ── buscarUltimaAlertaDePeso ─────────────────────────────────────
 
   @Test
   void debeObtenerUltimaAlertaDePeso() {
@@ -100,5 +185,14 @@ public class ServicioAlertaImplTest {
 
     assertNotNull(resultado);
     assertEquals("Atencion: El peso", resultado.getMensaje());
+  }
+
+  @Test
+  void cuandoNoHayAlertaDePesoDebeRetornarNull() {
+    when(repositorioAlertaMock.buscarUltimaAlertaDePesoPorMascota(1L)).thenReturn(null);
+
+    Alerta resultado = servicioAlerta.buscarUltimaAlertaDePeso(1L);
+
+    assertNull(resultado);
   }
 }

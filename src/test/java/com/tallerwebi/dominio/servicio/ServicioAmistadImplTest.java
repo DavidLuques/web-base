@@ -27,12 +27,16 @@ public class ServicioAmistadImplTest {
   private ServicioAmistadImpl servicio;
   private SolicitudAmistadDao solicitudAmistadDaoMock;
   private RepositorioUsuario repositorioUsuarioMock;
+  private ServicioAlerta servicioAlertaMock;
 
   @BeforeEach
   public void init() {
     solicitudAmistadDaoMock = mock(SolicitudAmistadDao.class);
     repositorioUsuarioMock = mock(RepositorioUsuario.class);
-    servicio = new ServicioAmistadImpl(solicitudAmistadDaoMock, repositorioUsuarioMock);
+    servicioAlertaMock = mock(ServicioAlerta.class);
+
+    servicio =
+      new ServicioAmistadImpl(solicitudAmistadDaoMock, repositorioUsuarioMock, servicioAlertaMock);
   }
 
   // ── enviarSolicitud ──────────────────────────────────────────────
@@ -68,7 +72,13 @@ public class ServicioAmistadImplTest {
 
   @Test
   public void dadaUnaSolicitudPendienteAlAceptarDebeQuedarAceptada() {
+    Usuario emisor = mock(Usuario.class);
+    Usuario receptor = mock(Usuario.class);
+    when(receptor.getNombre()).thenReturn("Ana");
+
     SolicitudAmistad solicitud = new SolicitudAmistad();
+    solicitud.setEmisor(emisor);
+    solicitud.setReceptor(receptor);
     when(solicitudAmistadDaoMock.buscarPorId(10L)).thenReturn(solicitud);
 
     servicio.aceptarSolicitud(10L);
@@ -93,7 +103,13 @@ public class ServicioAmistadImplTest {
 
   @Test
   public void dadaUnaSolicitudPendienteAlRechazarDebeQuedarRechazada() {
+    Usuario emisor = mock(Usuario.class);
+    Usuario receptor = mock(Usuario.class);
+    when(receptor.getNombre()).thenReturn("Ana");
+
     SolicitudAmistad solicitud = new SolicitudAmistad();
+    solicitud.setEmisor(emisor);
+    solicitud.setReceptor(receptor);
     when(solicitudAmistadDaoMock.buscarPorId(11L)).thenReturn(solicitud);
 
     servicio.rechazarSolicitud(11L);
