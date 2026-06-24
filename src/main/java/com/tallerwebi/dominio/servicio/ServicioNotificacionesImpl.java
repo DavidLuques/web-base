@@ -16,14 +16,9 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
 
   private static final Logger logger = Logger.getLogger(ServicioNotificacionesImpl.class.getName());
   private static final String REMITENTE = "pettrackertw1@gmail.com";
-  private JavaMailSender mailSender;
+  private final JavaMailSender mailSender;
 
-  public ServicioNotificacionesImpl() {
-    // constructor por defecto para contextos de prueba donde no se provee JavaMailSender
-  }
-
-  @org.springframework.beans.factory.annotation.Autowired(required = false)
-  public void setMailSender(JavaMailSender mailSender) {
+  public ServicioNotificacionesImpl(JavaMailSender mailSender) {
     this.mailSender = mailSender;
   }
 
@@ -40,11 +35,6 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
   }
 
   private void enviarEmailEmergencia(Alerta alerta) {
-    if (mailSender == null) {
-      logger.log(Level.WARNING, "JavaMailSender no disponible: omitiendo envio de email de emergencia");
-      return;
-    }
-
     String correoUsuario = obtenerCorreoUsuario(alerta);
     if (correoUsuario == null || correoUsuario.isEmpty()) {
       logger.log(Level.WARNING, "No se pudo obtener el correo del usuario para la alerta");
