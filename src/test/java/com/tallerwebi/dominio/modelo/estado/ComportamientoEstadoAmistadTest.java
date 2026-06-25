@@ -70,34 +70,34 @@ public class ComportamientoEstadoAmistadTest {
   void rechazadaDebeRetornarElNombreCorrecto() {
     assertEquals("RECHAZADA", new EstadoAmistadRechazada().getNombre());
   }
-  
+
   @Test
   void pendienteDebePermitirCancelar() {
-      assertTrue(new EstadoAmistadPendiente().puedeCancelar());
+    assertTrue(new EstadoAmistadPendiente().puedeCancelar());
   }
 
   @Test
   void aceptadaNoDebePermitirCancelar() {
-      assertFalse(new EstadoAmistadAceptada().puedeCancelar());
+    assertFalse(new EstadoAmistadAceptada().puedeCancelar());
   }
 
   @Test
   void rechazadaNoDebePermitirCancelar() {
-      assertFalse(new EstadoAmistadRechazada().puedeCancelar());
+    assertFalse(new EstadoAmistadRechazada().puedeCancelar());
   }
-  
+
   @Test
   void pendienteNoDebePermitirEliminar() {
-      assertFalse(new EstadoAmistadPendiente().puedeEliminar());
+    assertFalse(new EstadoAmistadPendiente().puedeEliminar());
   }
 
   @Test
   void aceptadaDebePermitirEliminar() {
-      assertTrue(new EstadoAmistadAceptada().puedeEliminar());
+    assertTrue(new EstadoAmistadAceptada().puedeEliminar());
   }
 
   @Test
   void rechazadaNoDebePermitirEliminar() {
-      assertFalse(new EstadoAmistadRechazada().puedeEliminar());
+    assertFalse(new EstadoAmistadRechazada().puedeEliminar());
   }
 }
