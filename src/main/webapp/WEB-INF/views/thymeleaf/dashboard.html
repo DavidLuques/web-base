@@ -24,7 +24,14 @@
       <div class="lg:col-span-2 flex flex-col gap-8">
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <h3 class="text-slate-800 font-bold mb-6">Resumen</h3>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-slate-800 font-bold">Resumen</h3>
+            <a th:href="@{/mascota/exportar/pdf(idMascota=${idMascota})}"
+               class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors">
+              <i data-lucide="file-down" class="w-4 h-4"></i>
+              Exportar PDF
+            </a>
+          </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
             <div class="flex flex-col items-center">
