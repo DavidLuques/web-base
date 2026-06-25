@@ -41,59 +41,53 @@
         <p class="font-medium" th:text="${param.error}">Error</p>
       </div>
 
-	<div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8">
-	  <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferir una mascota</h3>
-	
-	  <!-- Sin mascotas registradas -->
-	  <div th:if="${sinMascotas}"
-	       class="bg-white border border-slate-200 rounded-2xl p-10 text-center">
-	    <i data-lucide="paw-print" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-	    <p class="text-sm text-slate-500">
-	      No ten&eacute;s ninguna mascota registrada.
-	      &iexcl;Registr&aacute; la primera para poder transferirla!
-	    </p>
-	    <a href="/spring/configuraciones/mascota/nueva"
-	       class="inline-flex items-center gap-2 mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-xl transition-all text-sm shadow-md">
-	      <i data-lucide="plus" class="w-4 h-4"></i>
-	      Registrar mascota
-	    </a>
-	  </div>
-	
-	  <!-- Con mascotas pero sin amigos -->
-	  <div th:if="${!sinMascotas and #lists.isEmpty(amigos)}" class="text-center py-6">
-	    <p class="text-slate-400 text-sm">
-	      Necesit&aacute;s tener amigos agregados para poder transferir una mascota.
-	      <a th:href="@{/amigos(idMascota=${idMascota})}" class="text-indigo-600 font-medium hover:underline">Agregar amigos</a>
-	    </p>
-	  </div>
-	
-	  <!-- Con mascotas y con amigos -->
-	  <form th:if="${!sinMascotas and !#lists.isEmpty(amigos)}" th:action="@{/transferencias/iniciar}" method="POST" class="space-y-4">
-	    <div class="space-y-2">
-	      <label class="text-sm font-semibold text-slate-700">Mascota a transferir</label>
-	      <select name="idMascota" required
-	              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-	        <option th:each="mascota : ${misMascotas}" th:value="${mascota.id}" th:text="${mascota.nombre}"></option>
-	      </select>
-	    </div>
-	
-	    <div class="space-y-2">
-	      <label class="text-sm font-semibold text-slate-700">Transferir a</label>
-	      <select name="idDestino" required
-	              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-	        <option th:each="amigo : ${amigos}" th:value="${amigo.id}" th:text="${amigo.nombre + ' (' + amigo.email + ')'}"></option>
-	      </select>
-	    </div>
-	
-	    <div class="pt-2 flex justify-end">
-	      <button type="submit"
-	              class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
-	        <i data-lucide="send" class="w-5 h-5"></i>
-	        Iniciar transferencia
-	      </button>
-	    </div>
-	  </form>
-	</div>
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferir una mascota</h3>
+
+        <!-- Sin mascotas registradas -->
+        <div th:if="${misMascotas == null or #lists.isEmpty(misMascotas)}"
+             class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
+          <i data-lucide="paw-print" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+          <p class="text-sm text-slate-500">No ten&eacute;s ninguna mascota registrada. &iexcl;Registr&aacute; la primera para empezar!</p>
+        </div>
+
+        <!-- Con mascotas pero sin amigos -->
+        <div th:if="${(misMascotas != null and !#lists.isEmpty(misMascotas)) and (amigos == null or #lists.isEmpty(amigos))}"
+             class="text-center py-6">
+          <p class="text-slate-400 text-sm">
+            Necesit&aacute;s tener amigos agregados para poder transferir una mascota.
+            <a th:href="@{/amigos(idMascota=${idMascota})}" class="text-indigo-600 font-medium hover:underline">Agregar amigos</a>
+          </p>
+        </div>
+
+        <!-- Con mascotas y con amigos -->
+        <form th:if="${misMascotas != null and !#lists.isEmpty(misMascotas) and amigos != null and !#lists.isEmpty(amigos)}"
+              th:action="@{/transferencias/iniciar}" method="POST" class="space-y-4">
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700">Mascota a transferir</label>
+            <select name="idMascota" required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+              <option th:each="mascota : ${misMascotas}" th:value="${mascota.id}" th:text="${mascota.nombre}"></option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700">Transferir a</label>
+            <select name="idDestino" required
+                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+              <option th:each="amigo : ${amigos}" th:value="${amigo.id}" th:text="${amigo.nombre + ' (' + amigo.email + ')'}"></option>
+            </select>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+              <i data-lucide="send" class="w-5 h-5"></i>
+              Iniciar transferencia
+            </button>
+          </div>
+        </form>
+      </div>
 
       <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferencias pendientes</h3>
@@ -163,6 +157,37 @@
   </div>
 </main>
 
-    <script>lucide.createIcons();</script>
+<script>
+  (function () {
+    let hashInicial = null;
+
+    async function obtenerHash() {
+      try {
+        const res = await fetch('/spring/transferencias/estado');
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (data.error) return null;
+        return data.hash;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function iniciarPolling() {
+      hashInicial = await obtenerHash();
+      if (hashInicial === null) return;
+
+      setInterval(async () => {
+        const hashActual = await obtenerHash();
+        if (hashActual !== null && hashActual !== hashInicial) {
+          window.location.href = '/spring/transferencias';
+        }
+      }, 3000);
+    }
+
+    iniciarPolling();
+  })();
+</script>
+<script>lucide.createIcons();</script>
 </body>
 </html>

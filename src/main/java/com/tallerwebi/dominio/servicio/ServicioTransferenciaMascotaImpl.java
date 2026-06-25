@@ -47,7 +47,7 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     Long idDestino
   ) {
     if (!servicioAmistad.sonAmigos(idOrigen, idDestino)) {
-      throw new NoSonAmigosException("Solo pod\u00e9s transferir mascotas a tus amigos");
+      throw new NoSonAmigosException("Solo podes transferir mascotas a tus amigos");
     }
 
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
@@ -66,7 +66,7 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
       origen.getNombre() +
       " quiere transferirte a " +
       mascota.getNombre() +
-      ". Revis\u00e1 tus transferencias pendientes."
+      ". Revisa tus transferencias pendientes."
     );
 
     return solicitud;
@@ -87,9 +87,9 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
         solicitud.getUsuarioDestino(),
         TipoAlerta.INFO,
         solicitud.getUsuarioOrigen().getNombre() +
-        " confirm\u00f3 la transferencia de " +
+        " confirmo la transferencia de " +
         solicitud.getMascota().getNombre() +
-        ". Ahora falta tu confirmaci\u00f3n."
+        ". Ahora falta tu confirmacion."
       );
     }
 
@@ -111,9 +111,9 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
         solicitud.getUsuarioOrigen(),
         TipoAlerta.INFO,
         solicitud.getUsuarioDestino().getNombre() +
-        " confirm\u00f3 la transferencia de " +
+        " confirmo la transferencia de " +
         solicitud.getMascota().getNombre() +
-        ". Ahora falta tu confirmaci\u00f3n."
+        ". Ahora falta tu confirmacion."
       );
     }
 
@@ -186,16 +186,16 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
       nombreMascota +
       " a " +
       solicitud.getUsuarioDestino().getNombre() +
-      " se complet\u00f3 exitosamente."
+      " se completo exitosamente."
     );
     servicioAlerta.crearAlertaUsuario(
       solicitud.getUsuarioDestino(),
       TipoAlerta.INFO,
-      "\u00a1" +
+      "¡" +
       nombreMascota +
       " ahora es tuyo/a! La transferencia de " +
       solicitud.getUsuarioOrigen().getNombre() +
-      " se complet\u00f3 exitosamente."
+      " se completo exitosamente."
     );
   }
 }

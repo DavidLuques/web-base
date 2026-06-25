@@ -53,7 +53,7 @@ public class ServicioAmistadImpl implements ServicioAmistad {
     servicioAlerta.crearAlertaUsuario(
       receptor,
       TipoAlerta.INFO,
-      emisor.getNombre() + " te envió una solicitud de amistad."
+      emisor.getNombre() + " te envio una solicitud de amistad."
     );
 
     return solicitud;
@@ -74,7 +74,7 @@ public class ServicioAmistadImpl implements ServicioAmistad {
     servicioAlerta.crearAlertaUsuario(
       solicitud.getEmisor(),
       TipoAlerta.INFO,
-      solicitud.getReceptor().getNombre() + " aceptó tu solicitud de amistad."
+      solicitud.getReceptor().getNombre() + " acepto tu solicitud de amistad."
     );
   }
 
@@ -93,7 +93,7 @@ public class ServicioAmistadImpl implements ServicioAmistad {
     servicioAlerta.crearAlertaUsuario(
       solicitud.getEmisor(),
       TipoAlerta.INFO,
-      solicitud.getReceptor().getNombre() + " rechazó tu solicitud de amistad."
+      solicitud.getReceptor().getNombre() + " rechazo tu solicitud de amistad."
     );
   }
 
@@ -129,7 +129,7 @@ public class ServicioAmistadImpl implements ServicioAmistad {
       throw new UsuarioNoEncontrado("No existe un usuario con ese email");
     }
     if (receptor.getId().equals(idEmisor)) {
-      throw new AccionNoPermitidaEnEsteEstadoException("No podés agregarte a vos mismo");
+      throw new AccionNoPermitidaEnEsteEstadoException("No podes agregarte a vos mismo");
     }
     return enviarSolicitud(idEmisor, receptor.getId());
   }

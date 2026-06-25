@@ -48,19 +48,15 @@ public class ControladorTransferencia {
     return idMascota != null ? PARAMETRO_ID_MASCOTA + idMascota : "";
   }
 
-  private boolean quedoSinMascotasPorEstaTransferencia(
+  private boolean elUsuarioEraElOrigenDeTransferenciaCompletada(
     SolicitudTransferencia solicitud,
     Long idUsuario
   ) {
-    boolean fueCompletada = solicitud.getEstado() == EstadoTransferencia.COMPLETADA;
-    boolean elUsuarioLogueadoEraElOrigen =
+    return (
+      solicitud.getEstado() == EstadoTransferencia.COMPLETADA &&
       solicitud.getUsuarioOrigen() != null &&
-      solicitud.getUsuarioOrigen().getId().equals(idUsuario);
-    if (!fueCompletada || !elUsuarioLogueadoEraElOrigen) {
-      return false;
-    }
-    List<Mascota> mascotasRestantes = servicioMascota.obtenerMascotasPorUsuario(idUsuario);
-    return mascotasRestantes == null || mascotasRestantes.isEmpty();
+      solicitud.getUsuarioOrigen().getId().equals(idUsuario)
+    );
   }
 
   private boolean elUsuarioEsElDestinoDeTransferenciaCompletada(
@@ -72,6 +68,22 @@ public class ControladorTransferencia {
       solicitud.getUsuarioDestino() != null &&
       solicitud.getUsuarioDestino().getId().equals(idUsuario)
     );
+  }
+
+  // Devuelve el redirect correcto para el origen tras completarse la transferencia,
+  // o null si el usuario logueado no era el origen.
+  private ModelAndView redirigirTrasCompletarSiEraOrigen(
+    SolicitudTransferencia solicitud,
+    Long idUsuario
+  ) {
+    if (!elUsuarioEraElOrigenDeTransferenciaCompletada(solicitud, idUsuario)) {
+      return null;
+    }
+    List<Mascota> restantes = servicioMascota.obtenerMascotasPorUsuario(idUsuario);
+    if (restantes == null || restantes.isEmpty()) {
+      return new ModelAndView(REDIRECT_SIN_MASCOTA);
+    }
+    return new ModelAndView(REDIRECT_DASHBOARD + restantes.get(0).getId());
   }
 
   @RequestMapping(path = "/transferencias", method = RequestMethod.GET)
@@ -91,16 +103,20 @@ public class ControladorTransferencia {
       return new ModelAndView(REDIRECT_DASHBOARD + misMascotas.get(0).getId());
     }
 
+    List<SolicitudTransferencia> pendientes =
+      servicioTransferenciaMascota.obtenerPendientesPorUsuario(idUsuario);
+    boolean tienePendientes = pendientes != null && !pendientes.isEmpty();
+
+    if (!tieneMascotas && !tienePendientes) {
+      return new ModelAndView(REDIRECT_SIN_MASCOTA);
+    }
+
     ModelMap modelo = new ModelMap();
-    modelo.put(
-      "transferenciasPendientes",
-      servicioTransferenciaMascota.obtenerPendientesPorUsuario(idUsuario)
-    );
+    modelo.put("transferenciasPendientes", pendientes);
     modelo.put("amigos", servicioAmistad.obtenerAmigos(idUsuario));
     modelo.put("idUsuarioActual", idUsuario);
     modelo.put("idMascota", idMascota);
     modelo.put("misMascotas", misMascotas);
-    modelo.put("sinMascotas", !tieneMascotas);
     return new ModelAndView("transferencias", modelo);
   }
 
@@ -144,8 +160,9 @@ public class ControladorTransferencia {
       if (elUsuarioEsElDestinoDeTransferenciaCompletada(solicitud, idUsuario)) {
         return new ModelAndView(REDIRECT_DASHBOARD + solicitud.getMascota().getId());
       }
-      if (quedoSinMascotasPorEstaTransferencia(solicitud, idUsuario)) {
-        return new ModelAndView(REDIRECT_SIN_MASCOTA);
+      ModelAndView mavOrigen = redirigirTrasCompletarSiEraOrigen(solicitud, idUsuario);
+      if (mavOrigen != null) {
+        return mavOrigen;
       }
       return new ModelAndView(REDIRECT_TRANSFERENCIAS_EXITO + armarSufijoMascota(idMascota));
     } catch (AccionNoPermitidaEnEsteEstadoException e) {
@@ -174,8 +191,9 @@ public class ControladorTransferencia {
       if (elUsuarioEsElDestinoDeTransferenciaCompletada(solicitud, idUsuario)) {
         return new ModelAndView(REDIRECT_DASHBOARD + solicitud.getMascota().getId());
       }
-      if (quedoSinMascotasPorEstaTransferencia(solicitud, idUsuario)) {
-        return new ModelAndView(REDIRECT_SIN_MASCOTA);
+      ModelAndView mavOrigen = redirigirTrasCompletarSiEraOrigen(solicitud, idUsuario);
+      if (mavOrigen != null) {
+        return mavOrigen;
       }
       return new ModelAndView(REDIRECT_TRANSFERENCIAS_EXITO + armarSufijoMascota(idMascota));
     } catch (AccionNoPermitidaEnEsteEstadoException e) {
@@ -183,6 +201,38 @@ public class ControladorTransferencia {
         REDIRECT_TRANSFERENCIAS_ERROR + e.getMessage() + armarSufijoMascota(idMascota)
       );
     }
+  }
+
+  @RequestMapping(path = "/transferencias/estado", method = RequestMethod.GET)
+  @org.springframework.web.bind.annotation.ResponseBody
+  public java.util.Map<String, Object> estadoTransferencias(HttpServletRequest request) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    java.util.Map<String, Object> respuesta = new java.util.HashMap<>();
+    if (idUsuario == null) {
+      respuesta.put("error", "no-session");
+      return respuesta;
+    }
+    List<SolicitudTransferencia> pendientes =
+      servicioTransferenciaMascota.obtenerPendientesPorUsuario(idUsuario);
+    List<Mascota> mascotas = servicioMascota.obtenerMascotasPorUsuario(idUsuario);
+
+    String hashPendientes = pendientes != null
+      ? pendientes
+        .stream()
+        .map(s -> s.getId() + ":" + s.getEstado())
+        .sorted()
+        .collect(java.util.stream.Collectors.joining(","))
+      : "";
+    String hashMascotas = mascotas != null
+      ? mascotas
+        .stream()
+        .map(m -> String.valueOf(m.getId()))
+        .sorted()
+        .collect(java.util.stream.Collectors.joining(","))
+      : "";
+
+    respuesta.put("hash", hashPendientes + "|" + hashMascotas);
+    return respuesta;
   }
 
   @RequestMapping(path = "/transferencias/cancelar", method = RequestMethod.POST)
