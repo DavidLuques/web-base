@@ -77,7 +77,6 @@ function inicializarValla(idMascota) {
       if (response.ok) {
         const textoOriginal = btnConfirmar.innerText;
         btnConfirmar.innerText = "Guardado";
-        // btnConfirmar.classList.replace("bg-blue-600", "bg-emerald-600");
         btnConfirmar.classList.replace("hover:bg-blue-700", "hover:bg-emerald-700");
 
         setTimeout(() => {
@@ -120,26 +119,23 @@ function inicializarValla(idMascota) {
       }
       ultimoTimestamp = datos.timestamp;
 
-      // El backend ahora nos entrega todo calculado
       ultimosMetrosX = datos.metrosX;
       ultimosMetrosY = datos.metrosY;
       ultimaDistanciaReal = datos.distancia;
 
       aplicarEscalaVisual();
       evaluarAlerta();
-
     } catch (error) {
       console.error("Error conectando con la API:", error);
     }
   }
 
-  // Notificaciones de emergencia globales
   const GLOBAL_NOTIFICADAS_KEY = "alertas-emergencia-notificadas-global";
 
   function cargarNotificadasGlobales() {
     try {
       return new Set(JSON.parse(localStorage.getItem(GLOBAL_NOTIFICADAS_KEY) || "[]"));
-    } catch (_err) {
+    } catch {
       return new Set();
     }
   }
@@ -169,8 +165,8 @@ function inicializarValla(idMascota) {
           });
         }
       });
-    } catch (err) {
-      console.error("Error consultando emergencias:", err);
+    } catch (error) {
+      console.error("Error consultando emergencias:", error);
     }
   }
 
