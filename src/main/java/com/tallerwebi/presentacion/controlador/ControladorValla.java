@@ -83,4 +83,15 @@ public class ControladorValla {
 
     return ResponseEntity.ok("{\"status\":\"success\"}");
   }
+
+  @PostMapping(path = "/analisis/valla/{idMascota}/centro")
+  @ResponseBody
+  public ResponseEntity<String> actualizarCentro(
+    @PathVariable Long idMascota,
+    @RequestParam("latitud") Double latitud,
+    @RequestParam("longitud") Double longitud
+  ) {
+    servicioVallado.actualizarCentroVallado(idMascota, latitud, longitud);
+    return ResponseEntity.ok("{\"status\":\"success\"}");
+  }
 }

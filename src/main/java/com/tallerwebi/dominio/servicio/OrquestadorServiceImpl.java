@@ -36,8 +36,6 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private static final String CLAVE_LATITUD = "latitud";
   private static final String CLAVE_LONGITUD = "longitud";
   private static final String CLAVE_RADIO = "radio";
-  private static final Double LAT_HOGAR = -34.7222;
-  private static final Double LON_HOGAR = -58.5250;
 
   private final MascotaDao mascotaDao;
   private final ValladoDao valladoDao;
@@ -172,9 +170,17 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   public Map<String, Object> obtenerVallado(Long idMascota) {
     Vallado vallado = valladoDao.buscarPorMascota(idMascota);
 
+    Double latHogar = (vallado != null && vallado.getLatitudCentro() != null)
+      ? vallado.getLatitudCentro()
+      : -34.7222;
+    Double lonHogar = (vallado != null && vallado.getLongitudCentro() != null)
+      ? vallado.getLongitudCentro()
+      : -58.5250;
+
     Map<String, Object> respuesta = new HashMap<>();
-    respuesta.put(CLAVE_LATITUD, LAT_HOGAR);
-    respuesta.put(CLAVE_LONGITUD, LON_HOGAR);
+    respuesta.put(CLAVE_LATITUD, latHogar);
+    respuesta.put(CLAVE_LONGITUD, lonHogar);
+
     if (vallado != null && vallado.getRadioMetros() != null) {
       respuesta.put(CLAVE_RADIO, vallado.getRadioMetros().doubleValue());
     } else {
@@ -186,32 +192,39 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   @Override
   public Map<String, Object> obtenerUltimaUbicacion(Long idMascota) {
     Analisis ultimo = repositorioAnalisis.obtenerUltimoAnalisis(idMascota);
+    Vallado vallado = valladoDao.buscarPorMascota(idMascota);
+
+    Double latHogar = (vallado != null && vallado.getLatitudCentro() != null)
+      ? vallado.getLatitudCentro()
+      : -34.7222;
+    Double lonHogar = (vallado != null && vallado.getLongitudCentro() != null)
+      ? vallado.getLongitudCentro()
+      : -58.5250;
+
     Map<String, Object> respuesta = new HashMap<>();
 
     if (ultimo != null) {
       respuesta.put(CLAVE_LATITUD, ultimo.getLatitud());
       respuesta.put(CLAVE_LONGITUD, ultimo.getLongitud());
-      respuesta.put("timestamp", ultimo.getFechaYHora().toString()); // Guardo momento exacto de la ultima generacion de posicion
+      respuesta.put("timestamp", ultimo.getFechaYHora().toString());
 
-      // devuelve KM, multiplicamos por 1000 para Metros
       double distanciaKm = analizadorDeDatosService.calcularDistanciaEntreUbicaciones(
-        LAT_HOGAR,
-        LON_HOGAR,
+        latHogar,
+        lonHogar,
         ultimo.getLatitud(),
         ultimo.getLongitud()
       );
       respuesta.put("distancia", distanciaKm * 1000.0);
 
-      // Calculamos los ejes X e Y para la pantalla
-      double metrosY = -(ultimo.getLatitud() - LAT_HOGAR) * 111320.0;
+      double metrosY = -(ultimo.getLatitud() - latHogar) * 111320.0;
       double metrosX =
-        (ultimo.getLongitud() - LON_HOGAR) * (111320.0 * Math.cos(Math.toRadians(LAT_HOGAR)));
+        (ultimo.getLongitud() - lonHogar) * (111320.0 * Math.cos(Math.toRadians(latHogar)));
 
       respuesta.put("metrosX", metrosX);
       respuesta.put("metrosY", metrosY);
     } else {
-      respuesta.put(CLAVE_LATITUD, LAT_HOGAR);
-      respuesta.put(CLAVE_LONGITUD, LON_HOGAR);
+      respuesta.put(CLAVE_LATITUD, latHogar);
+      respuesta.put(CLAVE_LONGITUD, lonHogar);
       respuesta.put("timestamp", LocalDateTime.now().toString());
       respuesta.put("distancia", 0.0);
       respuesta.put("metrosX", 0.0);
