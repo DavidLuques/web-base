@@ -2,9 +2,11 @@ package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dao.MascotaDao;
+import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.DatosMascota;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.Vallado;
 import com.tallerwebi.presentacion.DatosAltaMascota;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,11 +23,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioMascotaImpl implements ServicioMascota {
 
   private final MascotaDao mascotaDao;
+  private final ValladoDao valladoDao;
   private final ServicioUsuario servicioUsuario;
 
   @Autowired
-  public ServicioMascotaImpl(MascotaDao mascotaDao, ServicioUsuario servicioUsuario) {
+  public ServicioMascotaImpl(
+    MascotaDao mascotaDao,
+    ValladoDao valladoDao,
+    ServicioUsuario servicioUsuario
+  ) {
     this.mascotaDao = mascotaDao;
+    this.valladoDao = valladoDao;
     this.servicioUsuario = servicioUsuario;
   }
 
@@ -57,6 +65,10 @@ public class ServicioMascotaImpl implements ServicioMascota {
     mascota.setDatos(datosMascota);
 
     mascotaDao.guardar(mascota);
+
+    Vallado valladoPorDefecto = new Vallado(mascota, -34.7222, -58.5250, 150);
+    valladoDao.guardar(valladoPorDefecto);
+
     return mascota.getId();
   }
 

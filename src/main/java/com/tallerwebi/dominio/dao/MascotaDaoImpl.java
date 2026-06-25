@@ -21,7 +21,12 @@ public class MascotaDaoImpl implements MascotaDao {
 
   @Override
   public Mascota buscarPorId(Long id) {
-    return sessionFactory.getCurrentSession().get(Mascota.class, id);
+    List<Mascota> resultado = sessionFactory
+      .getCurrentSession()
+      .createQuery("SELECT m FROM Mascota m JOIN FETCH m.usuario WHERE m.id = :id", Mascota.class)
+      .setParameter("id", id)
+      .getResultList();
+    return resultado.isEmpty() ? null : resultado.get(0);
   }
 
   @Override
