@@ -116,7 +116,7 @@ public class ServicioTransferenciaMascotaImplTest {
     assertThat(solicitud.getConfirmadaPorOrigen(), equalTo(true));
     assertThat(solicitud.getEstado(), equalTo(EstadoTransferencia.PENDIENTE));
     verify(solicitudTransferenciaDaoMock, times(1)).modificar(solicitud);
-    verify(mascotaDaoMock, never()).modificar(org.mockito.ArgumentMatchers.any());
+    verify(mascotaDaoMock, never()).modificarYRefrescar(org.mockito.ArgumentMatchers.any());
   }
 
   @Test
@@ -129,7 +129,7 @@ public class ServicioTransferenciaMascotaImplTest {
 
     assertThat(solicitud.getEstado(), equalTo(EstadoTransferencia.COMPLETADA));
     assertThat(solicitud.getMascota().getUsuario(), equalTo(solicitud.getUsuarioDestino()));
-    verify(mascotaDaoMock, times(1)).modificar(solicitud.getMascota());
+    verify(mascotaDaoMock, times(1)).modificarYRefrescar(solicitud.getMascota()); // <-- corregido
     verify(solicitudTransferenciaDaoMock, times(1)).modificar(solicitud);
   }
 
@@ -157,7 +157,7 @@ public class ServicioTransferenciaMascotaImplTest {
     assertThat(solicitud.getConfirmadaPorDestino(), equalTo(true));
     assertThat(solicitud.getEstado(), equalTo(EstadoTransferencia.PENDIENTE));
     verify(solicitudTransferenciaDaoMock, times(1)).modificar(solicitud);
-    verify(mascotaDaoMock, never()).modificar(org.mockito.ArgumentMatchers.any());
+    verify(mascotaDaoMock, never()).modificarYRefrescar(org.mockito.ArgumentMatchers.any());
   }
 
   @Test
@@ -170,7 +170,7 @@ public class ServicioTransferenciaMascotaImplTest {
 
     assertThat(solicitud.getEstado(), equalTo(EstadoTransferencia.COMPLETADA));
     assertThat(solicitud.getMascota().getUsuario(), equalTo(solicitud.getUsuarioDestino()));
-    verify(mascotaDaoMock, times(1)).modificar(solicitud.getMascota());
+    verify(mascotaDaoMock, times(1)).modificarYRefrescar(solicitud.getMascota()); // <-- corregido
     verify(solicitudTransferenciaDaoMock, times(1)).modificar(solicitud);
   }
 

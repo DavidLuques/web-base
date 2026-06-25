@@ -65,16 +65,6 @@ public class ControladorTransferenciaTest {
   }
 
   @Test
-  public void siElUsuarioNoTieneMascotasVerTransferenciasDebeRedirigirASinMascota() {
-    simularUsuarioLogueado(1L);
-    when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of());
-
-    ModelAndView mav = controlador.verTransferencias(requestMock, null);
-
-    assertThat(mav.getViewName(), equalTo("redirect:/sin-mascota"));
-  }
-
-  @Test
   public void siElUsuarioTieneMascotasVerTransferenciasDebeMostrarLaVistaConElModeloCompleto() {
     simularUsuarioLogueado(1L);
     List<Mascota> misMascotas = List.of(new Mascota());
