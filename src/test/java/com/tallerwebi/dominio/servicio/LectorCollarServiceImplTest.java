@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.servicio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioAnalisis;
@@ -26,6 +27,7 @@ public class LectorCollarServiceImplTest {
   void setUp() {
     mascotaDao = mock(MascotaDao.class);
     rangoVitalDao = mock(RangoVitalDao.class);
+    repositorioAnalisis = mock(RepositorioAnalisis.class);
     servicio = new LectorCollarServiceImpl(mascotaDao, rangoVitalDao, repositorioAnalisis);
 
     rango = new RangoVitalPorTamano();
@@ -44,6 +46,7 @@ public class LectorCollarServiceImplTest {
 
     when(mascotaDao.buscarPorId(1L)).thenReturn(mascota);
     when(rangoVitalDao.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(repositorioAnalisis.obtenerUltimoAnalisis(anyLong())).thenReturn(null);
   }
 
   // ── obtenerLectura ──────────────────────────────────────────────
