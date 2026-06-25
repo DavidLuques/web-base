@@ -139,7 +139,7 @@ function inicializarValla(idMascota) {
   function cargarNotificadasGlobales() {
     try {
       return new Set(JSON.parse(localStorage.getItem(GLOBAL_NOTIFICADAS_KEY) || "[]"));
-    } catch (err) {
+    } catch (_err) {
       return new Set();
     }
   }
