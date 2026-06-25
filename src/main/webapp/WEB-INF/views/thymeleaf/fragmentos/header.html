@@ -4,12 +4,12 @@
 <header th:fragment="header(mascotaNombre, idMascota, vistaActual, titulo)" class="bg-white px-4 sm:px-8 py-4 sm:py-0 sm:h-20 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 border-b border-slate-200 shrink-0">
   <th:block th:with="mascotaAct=${idMascota != null ? @servicioMascotaImpl.obtenerMascotaPorId(idMascota) : null}">
   <h1 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2 text-center sm:text-left">
-    <span th:text="${titulo}">Título</span> - 
+    <span th:text="${titulo}">Título</span> -
     <span id="nombre-mascota" th:text="${mascotaNombre != null and mascotaNombre != 'Mascota' ? mascotaNombre : (mascotaAct != null ? mascotaAct.nombre : 'Mascota')}">Mascota</span>
   </h1>
 <div class="flex gap-4">
   <th:block th:if="${idMascota != null}">
-    <!-- Pet Switcher Dropdown — igual que antes -->
+    <!-- Pet Switcher Dropdown -->
     <div class="relative group cursor-pointer z-50">
       <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 transition-colors group-hover:bg-amber-100">
         <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
@@ -24,7 +24,14 @@
       <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden z-50">
         <div class="py-1">
           <a th:each="mascota : ${misMascotas}"
-             th:href="@{${vistaActual == 'configuraciones' || vistaActual == 'perfil' || vistaActual == 'nueva-mascota' ? '/' + vistaActual + '?idMascota=' + mascota.id : '/analisis/' + vistaActual + '/' + mascota.id}}"
+             th:with="esVistaPlana=${vistaActual == 'configuraciones'
+                                  || vistaActual == 'perfil'
+                                  || vistaActual == 'nueva-mascota'
+                                  || vistaActual == 'transferencias'
+                                  || vistaActual == 'amigos'}"
+             th:href="@{${esVistaPlana
+               ? '/' + vistaActual + '?idMascota=' + mascota.id
+               : '/analisis/' + vistaActual + '/' + mascota.id}}"
              class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
              th:classappend="${mascota.id == idMascota} ? 'bg-amber-50/50' : ''">
             <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"
@@ -48,6 +55,7 @@
     </div>
   </th:block>
 </div>
+</th:block>
 </header>
 </body>
 </html>

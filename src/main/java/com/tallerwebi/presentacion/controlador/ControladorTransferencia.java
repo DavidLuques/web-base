@@ -25,6 +25,7 @@ public class ControladorTransferencia {
   private static final String REDIRECT_SIN_MASCOTA = "redirect:/sin-mascota";
   private static final String REDIRECT_TRANSFERENCIAS_EXITO = "redirect:/transferencias?exito=true";
   private static final String REDIRECT_TRANSFERENCIAS_ERROR = "redirect:/transferencias?error=";
+  private static final String REDIRECT_DASHBOARD = "redirect:/analisis/dashboard/";
   private static final String PARAMETRO_ID_MASCOTA = "&idMascota=";
   private static final String ATRIBUTO_ID_USUARIO = "ID_USUARIO";
 
@@ -55,7 +56,22 @@ public class ControladorTransferencia {
     boolean elUsuarioLogueadoEraElOrigen =
       solicitud.getUsuarioOrigen() != null &&
       solicitud.getUsuarioOrigen().getId().equals(idUsuario);
-    return fueCompletada && elUsuarioLogueadoEraElOrigen;
+    if (!fueCompletada || !elUsuarioLogueadoEraElOrigen) {
+      return false;
+    }
+    List<Mascota> mascotasRestantes = servicioMascota.obtenerMascotasPorUsuario(idUsuario);
+    return mascotasRestantes == null || mascotasRestantes.isEmpty();
+  }
+
+  private boolean elUsuarioEsElDestinoDeTransferenciaCompletada(
+    SolicitudTransferencia solicitud,
+    Long idUsuario
+  ) {
+    return (
+      solicitud.getEstado() == EstadoTransferencia.COMPLETADA &&
+      solicitud.getUsuarioDestino() != null &&
+      solicitud.getUsuarioDestino().getId().equals(idUsuario)
+    );
   }
 
   @RequestMapping(path = "/transferencias", method = RequestMethod.GET)
@@ -69,8 +85,10 @@ public class ControladorTransferencia {
     }
 
     List<Mascota> misMascotas = servicioMascota.obtenerMascotasPorUsuario(idUsuario);
-    if (misMascotas == null || misMascotas.isEmpty()) {
-      return new ModelAndView(REDIRECT_SIN_MASCOTA);
+    boolean tieneMascotas = misMascotas != null && !misMascotas.isEmpty();
+
+    if (tieneMascotas && idMascota == null) {
+      return new ModelAndView(REDIRECT_DASHBOARD + misMascotas.get(0).getId());
     }
 
     ModelMap modelo = new ModelMap();
@@ -82,6 +100,7 @@ public class ControladorTransferencia {
     modelo.put("idUsuarioActual", idUsuario);
     modelo.put("idMascota", idMascota);
     modelo.put("misMascotas", misMascotas);
+    modelo.put("sinMascotas", !tieneMascotas);
     return new ModelAndView("transferencias", modelo);
   }
 
@@ -121,6 +140,10 @@ public class ControladorTransferencia {
       SolicitudTransferencia solicitud = servicioTransferenciaMascota.confirmarPorOrigen(
         idSolicitud
       );
+
+      if (elUsuarioEsElDestinoDeTransferenciaCompletada(solicitud, idUsuario)) {
+        return new ModelAndView(REDIRECT_DASHBOARD + solicitud.getMascota().getId());
+      }
       if (quedoSinMascotasPorEstaTransferencia(solicitud, idUsuario)) {
         return new ModelAndView(REDIRECT_SIN_MASCOTA);
       }
@@ -147,6 +170,10 @@ public class ControladorTransferencia {
       SolicitudTransferencia solicitud = servicioTransferenciaMascota.confirmarPorDestino(
         idSolicitud
       );
+
+      if (elUsuarioEsElDestinoDeTransferenciaCompletada(solicitud, idUsuario)) {
+        return new ModelAndView(REDIRECT_DASHBOARD + solicitud.getMascota().getId());
+      }
       if (quedoSinMascotasPorEstaTransferencia(solicitud, idUsuario)) {
         return new ModelAndView(REDIRECT_SIN_MASCOTA);
       }
