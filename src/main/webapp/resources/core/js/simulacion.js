@@ -130,7 +130,22 @@ function getConfiguracionGrafico(colorPrincipal, etiqueta, valorMostrar, porcent
       }
     },
     stroke: { lineCap: "round" },
-    labels: [etiqueta]
+    labels: [etiqueta],
+    responsive: [{
+      breakpoint: 640,
+      options: {
+        chart: { height: 170 },
+        plotOptions: {
+          radialBar: {
+            hollow: { size: "55%" },
+            dataLabels: {
+              name: { fontSize: "10px", offsetY: 15 },
+              value: { fontSize: "18px", offsetY: -5 }
+            }
+          }
+        }
+      }
+    }]
   };
 }
 

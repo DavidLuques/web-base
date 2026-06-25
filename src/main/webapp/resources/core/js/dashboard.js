@@ -178,7 +178,22 @@ function getRadialConfig(color, label, formatFunction) {
       }
     },
     stroke: { lineCap: "round" },
-    labels: [label]
+    labels: [label],
+    responsive: [{
+      breakpoint: 640,
+      options: {
+        chart: { height: 170 },
+        plotOptions: {
+          radialBar: {
+            hollow: { size: "55%" },
+            dataLabels: {
+              name: { fontSize: "9px", offsetY: 15 },
+              value: { fontSize: "18px", offsetY: -5 }
+            }
+          }
+        }
+      }
+    }]
   };
 }
 
