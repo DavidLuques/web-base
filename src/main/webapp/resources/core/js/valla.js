@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line no-unused-vars
 function inicializarValla(idMascota) {
-  if (typeof lucide !== 'undefined') {
+  if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
 
@@ -131,7 +131,7 @@ function inicializarValla(idMascota) {
         const resultados = await response.json();
 
         if (resultados.length === 0) {
-          listaResultados.innerHTML = `<li class="p-3 text-sm text-gray-500">No se encontraron resultados.</li>`;
+          listaResultados.innerHTML = '<li class="p-3 text-sm text-gray-500">No se encontraron resultados.</li>';
         } else {
           // Armamos la lista de opciones clickeables
           resultados.forEach(lugar => {
@@ -164,7 +164,7 @@ function inicializarValla(idMascota) {
         }
       } catch (error) {
         console.error("Error buscando dirección:", error);
-        listaResultados.innerHTML = `<li class="p-3 text-sm text-red-500">Error en la búsqueda.</li>`;
+        listaResultados.innerHTML = '<li class="p-3 text-sm text-red-500">Error en la búsqueda.</li>';
       } finally {
         btnBuscarDireccion.innerText = "Buscar";
       }

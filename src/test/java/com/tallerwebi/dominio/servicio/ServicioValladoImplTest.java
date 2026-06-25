@@ -69,7 +69,6 @@ public class ServicioValladoImplTest {
     when(valladoDao.buscarPorMascota(ID_MASCOTA)).thenReturn(valladoExistente);
     when(mascotaDao.buscarPorId(ID_MASCOTA)).thenReturn(mascotaMock);
 
-    
     when(repositorioAnalisis.obtenerUltimoAnalisis(ID_MASCOTA)).thenReturn(null);
 
     servicio.actualizarCentroVallado(ID_MASCOTA, LATITUD, LONGITUD);
