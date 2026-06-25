@@ -89,14 +89,14 @@
         </div>
 
         <ul class="divide-y divide-slate-100" th:unless="${#lists.isEmpty(transferenciasPendientes)}">
-          <li th:each="t : ${transferenciasPendientes}" class="py-4 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
+          <li th:each="t : ${transferenciasPendientes}" class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
               <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
                 <i data-lucide="dog" class="w-5 h-5"></i>
               </div>
-              <div>
-                <p class="font-semibold text-slate-800" th:text="${t.mascota.nombre}">Mascota</p>
-                <p class="text-sm text-slate-500">
+              <div class="min-w-0 flex-1">
+                <p class="font-semibold text-slate-800 truncate" th:text="${t.mascota.nombre}">Mascota</p>
+                <p class="text-sm text-slate-500 truncate">
                   <span th:text="${t.usuarioOrigen.nombre}">Origen</span>
                   →
                   <span th:text="${t.usuarioDestino.nombre}">Destino</span>
@@ -111,29 +111,29 @@
               </div>
             </div>
 
-            <div class="flex gap-2 shrink-0">
+            <div class="flex flex-col sm:flex-row gap-2 shrink-0 w-full sm:w-auto">
               <form th:if="${t.usuarioOrigen.id == idUsuarioActual and !t.confirmadaPorOrigen}"
-                    th:action="@{/transferencias/confirmar-origen}" method="POST">
+                    th:action="@{/transferencias/confirmar-origen}" method="POST" class="w-full sm:w-auto">
                 <input type="hidden" name="idSolicitud" th:value="${t.id}" />
                 <input type="hidden" name="idMascota" th:value="${idMascota}" />
-                <button type="submit" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                <button type="submit" class="w-full sm:w-auto bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
                   <i data-lucide="check" class="w-4 h-4"></i> Confirmar
                 </button>
               </form>
 
               <form th:if="${t.usuarioDestino.id == idUsuarioActual and !t.confirmadaPorDestino}"
-                    th:action="@{/transferencias/confirmar-destino}" method="POST">
+                    th:action="@{/transferencias/confirmar-destino}" method="POST" class="w-full sm:w-auto">
                 <input type="hidden" name="idSolicitud" th:value="${t.id}" />
                 <input type="hidden" name="idMascota" th:value="${idMascota}" />
-                <button type="submit" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                <button type="submit" class="w-full sm:w-auto bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
                   <i data-lucide="check" class="w-4 h-4"></i> Confirmar
                 </button>
               </form>
 
-              <form th:action="@{/transferencias/cancelar}" method="POST">
+              <form th:action="@{/transferencias/cancelar}" method="POST" class="w-full sm:w-auto">
                 <input type="hidden" name="idSolicitud" th:value="${t.id}" />
                 <input type="hidden" name="idMascota" th:value="${idMascota}" />
-                <button type="submit" class="bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                <button type="submit" class="w-full sm:w-auto bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
                   <i data-lucide="x" class="w-4 h-4"></i> Cancelar
                 </button>
               </form>
