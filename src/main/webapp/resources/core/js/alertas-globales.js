@@ -6,7 +6,7 @@
   function cargarNotificadas() {
     try {
       return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
-    } catch (err) {
+    } catch (_err) {
       return new Set();
     }
   }
