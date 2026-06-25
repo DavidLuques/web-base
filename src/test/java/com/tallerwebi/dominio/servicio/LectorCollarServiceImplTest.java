@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.enums.TamanoMascota;
@@ -19,12 +20,13 @@ public class LectorCollarServiceImplTest {
   private MascotaDao mascotaDao;
   private RangoVitalDao rangoVitalDao;
   private RangoVitalPorTamano rango;
+  private RepositorioAnalisis repositorioAnalisis;
 
   @BeforeEach
   void setUp() {
     mascotaDao = mock(MascotaDao.class);
     rangoVitalDao = mock(RangoVitalDao.class);
-    servicio = new LectorCollarServiceImpl(mascotaDao, rangoVitalDao);
+    servicio = new LectorCollarServiceImpl(mascotaDao, rangoVitalDao, repositorioAnalisis);
 
     rango = new RangoVitalPorTamano();
     rango.setTamano(TamanoMascota.MEDIANO);

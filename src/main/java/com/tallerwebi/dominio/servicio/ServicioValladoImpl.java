@@ -87,7 +87,6 @@ public class ServicioValladoImpl implements ServicioVallado {
     }
   }
 
- 
   private Analisis crearAnalisisConTelemetria(
     Mascota mascota,
     Double latitud,

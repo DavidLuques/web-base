@@ -1,7 +1,9 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
+import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -22,9 +24,8 @@ public class LectorCollarServiceImpl implements LectorCollarService {
   private static final double VARIACION_TEMPERATURA = 0.15;
   private static final double VARIACION_GPS_LEVE = 0.001;
   private static final double VARIACION_GPS_NORMAL = 0.0005;
+  private final RepositorioAnalisis repositorioAnalisis;
 
-  private Double latitudActual = -34.7222;
-  private Double longitudActual = -58.5250;
   private Double temperaturaActual = 38.5;
   private Double sistolicaActual = null;
   private Double diastolicaActual = null;
@@ -35,9 +36,14 @@ public class LectorCollarServiceImpl implements LectorCollarService {
   private final RangoVitalDao rangoVitalDao;
 
   @Autowired
-  public LectorCollarServiceImpl(MascotaDao mascotaDao, RangoVitalDao rangoVitalDao) {
+  public LectorCollarServiceImpl(
+    MascotaDao mascotaDao,
+    RangoVitalDao rangoVitalDao,
+    RepositorioAnalisis repositorioAnalisis
+  ) {
     this.mascotaDao = mascotaDao;
     this.rangoVitalDao = rangoVitalDao;
+    this.repositorioAnalisis = repositorioAnalisis;
   }
 
   @Override
@@ -46,6 +52,14 @@ public class LectorCollarServiceImpl implements LectorCollarService {
     RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
 
     inicializarPresionSiEsNecesario(rango);
+
+    Analisis ultimoAnalisis = repositorioAnalisis.obtenerUltimoAnalisis(idMascota);
+    double latBase = (ultimoAnalisis != null && ultimoAnalisis.getLatitud() != null)
+      ? ultimoAnalisis.getLatitud()
+      : -34.7222;
+    double lonBase = (ultimoAnalisis != null && ultimoAnalisis.getLongitud() != null)
+      ? ultimoAnalisis.getLongitud()
+      : -58.5250;
 
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(siguienteFrecuencia(idMascota, rango));
@@ -58,8 +72,8 @@ public class LectorCollarServiceImpl implements LectorCollarService {
     lectura.setGyroX(siguienteRotacion());
     lectura.setGyroY(siguienteRotacion());
     lectura.setGyroZ(siguienteRotacion());
-    lectura.setLatitud(siguienteLatitud());
-    lectura.setLongitud(siguienteLongitud());
+    lectura.setLatitud(siguienteLatitud(latBase));
+    lectura.setLongitud(siguienteLongitud(lonBase));
 
     return lectura;
   }
@@ -118,14 +132,12 @@ public class LectorCollarServiceImpl implements LectorCollarService {
     return Math.abs(variacion(5.0));
   }
 
-  private double siguienteLatitud() {
-    latitudActual += variacion(VARIACION_GPS_LEVE);
-    return latitudActual;
+  private double siguienteLatitud(double latitudBase) {
+    return latitudBase + variacion(VARIACION_GPS_LEVE);
   }
 
-  private double siguienteLongitud() {
-    longitudActual += variacion(VARIACION_GPS_NORMAL);
-    return longitudActual;
+  private double siguienteLongitud(double longitudBase) {
+    return longitudBase + variacion(VARIACION_GPS_NORMAL);
   }
 
   private double variacion(double magnitud) {
