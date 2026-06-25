@@ -14,6 +14,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -58,6 +59,46 @@ public class ControladorAmistad {
     modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
     modelo.put("solicitudesEnviadas", servicioAmistad.obtenerSolicitudesEnviadas(idUsuario));
     return new ModelAndView("amigos", modelo);
+  }
+
+  @RequestMapping(path = "/amigos/estado", method = RequestMethod.GET)
+  @ResponseBody
+  public java.util.Map<String, Object> estadoAmigos(HttpServletRequest request) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    java.util.Map<String, Object> respuesta = new java.util.HashMap<>();
+    if (idUsuario == null) {
+      respuesta.put("error", "no-session");
+      return respuesta;
+    }
+
+    List<Usuario> amigos = servicioAmistad.obtenerAmigos(idUsuario);
+    List<SolicitudAmistad> pendientes = servicioAmistad.obtenerSolicitudesPendientes(idUsuario);
+    List<SolicitudAmistad> enviadas = servicioAmistad.obtenerSolicitudesEnviadas(idUsuario);
+
+    String hashAmigos = amigos != null
+      ? amigos
+        .stream()
+        .map(a -> String.valueOf(a.getId()))
+        .sorted()
+        .collect(java.util.stream.Collectors.joining(","))
+      : "";
+    String hashPendientes = pendientes != null
+      ? pendientes
+        .stream()
+        .map(s -> String.valueOf(s.getId()))
+        .sorted()
+        .collect(java.util.stream.Collectors.joining(","))
+      : "";
+    String hashEnviadas = enviadas != null
+      ? enviadas
+        .stream()
+        .map(s -> String.valueOf(s.getId()))
+        .sorted()
+        .collect(java.util.stream.Collectors.joining(","))
+      : "";
+
+    respuesta.put("hash", hashAmigos + "|" + hashPendientes + "|" + hashEnviadas);
+    return respuesta;
   }
 
   @RequestMapping(path = "/amigos/enviar-solicitud", method = RequestMethod.POST)

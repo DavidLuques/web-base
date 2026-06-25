@@ -162,6 +162,37 @@
   </div>
 </main>
 
+<script>
+  (function () {
+    let hashInicial = null;
+
+    async function obtenerHash() {
+      try {
+        const res = await fetch('/spring/amigos/estado');
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (data.error) return null;
+        return data.hash;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function iniciarPolling() {
+      hashInicial = await obtenerHash();
+      if (hashInicial === null) return;
+
+      setInterval(async () => {
+        const hashActual = await obtenerHash();
+        if (hashActual !== null && hashActual !== hashInicial) {
+          window.location.reload();
+        }
+      }, 3000);
+    }
+
+    iniciarPolling();
+  })();
+</script>
 <script>lucide.createIcons();</script>
 </body>
 </html>
