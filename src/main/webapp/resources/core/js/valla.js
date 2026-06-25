@@ -131,7 +131,7 @@ function inicializarValla(idMascota) {
         const resultados = await response.json();
 
         if (resultados.length === 0) {
-            listaResultados.innerHTML = "<li class='p-3 text-sm text-gray-500'>No se encontraron resultados.</li>";
+          listaResultados.innerHTML = "<li class='p-3 text-sm text-gray-500'>No se encontraron resultados.</li>";
         } else {
           // Armamos la lista de opciones clickeables
           resultados.forEach(lugar => {
