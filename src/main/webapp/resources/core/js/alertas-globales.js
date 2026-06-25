@@ -1,36 +1,31 @@
 /* global Notification */
 
-(function() {
-  const STORAGE_KEY = 'alertas-emergencia-notificadas-global';
+(function () {
+  const STORAGE_KEY = "alertas-emergencia-notificadas-global";
 
   function cargarNotificadas() {
     try {
-      return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
-    } catch (e) {
+      return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+    } catch (err) {
       return new Set();
     }
   }
 
   function guardarNotificadas(set) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
-    } catch (e) {
-
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
   }
 
   const notificadas = cargarNotificadas();
 
   function puedeNotificar() {
-    return ('Notification' in window) && Notification.permission === 'granted';
+    return ("Notification" in window) && Notification.permission === "granted";
   }
 
   function pedirPermisoSiCorresponde() {
-    if (!('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-      Notification.requestPermission().then(function(p) {
-        if (p === 'granted') {
-          // Al obtener permiso, realizar una consulta inmediata
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then(function (p) {
+        if (p === "granted") {
           consultarEmergenciasGlobales();
           consultarAlertasUsuario();
         }
@@ -42,68 +37,64 @@
     try {
       new Notification(titulo, {
         body: cuerpo,
-        tag: 'alerta-global-' + id,
+        tag: "alerta-global-" + id,
         requireInteraction: true
       });
-    } catch (e) {
-      console.error('Error creando notificacion:', e);
+    } catch (err) {
+      console.error("Error creando notificacion:", err);
     }
   }
 
   async function consultarEmergenciasGlobales() {
     if (!puedeNotificar()) return;
     try {
-      const response = await fetch('/spring/analisis/alertas/emergencias-activas');
+      const response = await fetch("/spring/analisis/alertas/emergencias-activas");
       if (!response.ok) return;
       const alertas = await response.json();
       if (!alertas || !Array.isArray(alertas)) return;
 
-      alertas.forEach(a => {
+      alertas.forEach(function (a) {
         const id = String(a.id);
         if (!notificadas.has(id)) {
           notificadas.add(id);
           guardarNotificadas(notificadas);
-          crearNotificacion('EMERGENCIA - ' + (a.nombreMascota || ''), a.mensaje || '', id);
+          crearNotificacion("EMERGENCIA - " + (a.nombreMascota || ""), a.mensaje || "", id);
         }
       });
     } catch (err) {
-      console.error('Error consultando emergencias globales:', err);
+      console.error("Error consultando emergencias globales:", err);
     }
   }
 
   async function consultarAlertasUsuario() {
     if (!puedeNotificar()) return;
     try {
-      const response = await fetch('/spring/analisis/alertas/usuario');
+      const response = await fetch("/spring/analisis/alertas/usuario");
       if (!response.ok) return;
       const alertas = await response.json();
       if (!alertas || !Array.isArray(alertas)) return;
 
-      alertas.forEach(a => {
-        // Estructura: AlertaDto con tipo y leido
+      alertas.forEach(function (a) {
         const id = String(a.id);
-        const tipo = a.tipo || (a.tipo && a.tipo.name) || null;
-        const esEmergencia = tipo === 'EMERGENCIA' || (a.tipo && a.tipo === 'EMERGENCIA');
+        const esEmergencia = a.tipo === "EMERGENCIA";
         const leido = !!a.leido;
         if (esEmergencia && !leido && !notificadas.has(id)) {
           notificadas.add(id);
           guardarNotificadas(notificadas);
-          crearNotificacion('EMERGENCIA', a.mensaje || '', id);
+          crearNotificacion("EMERGENCIA", a.mensaje || "", id);
         }
       });
     } catch (err) {
-      console.error('Error consultando alertas de usuario:', err);
+      console.error("Error consultando alertas de usuario:", err);
     }
   }
 
-  // Inicializacion
-  if ('Notification' in window) {
+  if ("Notification" in window) {
     pedirPermisoSiCorresponde();
-    if (Notification.permission === 'granted') {
+    if (Notification.permission === "granted") {
       consultarEmergenciasGlobales();
       consultarAlertasUsuario();
     }
-    // Polling periódico
     setInterval(consultarEmergenciasGlobales, 10000);
     setInterval(consultarAlertasUsuario, 10000);
   }
