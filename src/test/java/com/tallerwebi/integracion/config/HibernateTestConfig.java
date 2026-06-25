@@ -4,6 +4,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -14,12 +15,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class HibernateTestConfig {
 
   @Bean
+  @Primary
   public DataSource dataSource() {
     DriverManagerDataSource dataSource = new DriverManagerDataSource();
     dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
     dataSource.setUrl("jdbc:hsqldb:mem:db_");
     dataSource.setUsername("sa");
     dataSource.setPassword("");
+    dataSource.setUrl("jdbc:hsqldb:mem:db_;sql.syntax_mys=true");
     return dataSource;
   }
 

@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.dto.AlertaDto;
 import com.tallerwebi.dominio.servicio.ServicioAlerta;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -75,5 +76,21 @@ public class ControladorAlerta {
   public ResponseEntity<Void> marcarAlertaComoLeida(@PathVariable Long idAlerta) {
     servicioAlerta.marcarComoLeida(idAlerta);
     return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/emergencias-activas")
+  @ResponseBody
+  public ResponseEntity<List<Map<String, Object>>> obtenerEmergenciasActivas(
+    HttpServletRequest request
+  ) {
+    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    if (idUsuario == null) {
+      return ResponseEntity.status(401).build();
+    }
+
+    List<Map<String, Object>> emergencias = servicioAlerta.obtenerEmergenciasActivasPorUsuario(
+      idUsuario
+    );
+    return ResponseEntity.ok(emergencias);
   }
 }

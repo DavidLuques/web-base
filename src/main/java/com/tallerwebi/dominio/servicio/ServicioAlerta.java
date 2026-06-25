@@ -6,9 +6,12 @@ import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.Mascota;
 import java.util.List;
+import java.util.Map;
 
 public interface ServicioAlerta {
   Alerta buscarUltimaAlertaDePeso(Long idMascota);
+
+  Alerta buscarUltimaAlertaDeVallado(Long idMascota);
 
   void crearAlerta(Mascota mascota, TipoAlerta tipo, String mensaje);
 
@@ -19,4 +22,6 @@ public interface ServicioAlerta {
   List<AlertaDto> obtenerAlertasPorUsuario(Long idUsuario);
 
   void marcarComoLeida(Long idAlerta);
+
+  List<Map<String, Object>> obtenerEmergenciasActivasPorUsuario(Long idUsuario);
 }

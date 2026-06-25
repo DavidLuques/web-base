@@ -21,7 +21,12 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EnableScheduling
 @Configuration
 @ComponentScan(
-  { "com.tallerwebi.presentacion", "com.tallerwebi.dominio", "com.tallerwebi.infraestructura" }
+  {
+    "com.tallerwebi.presentacion",
+    "com.tallerwebi.dominio",
+    "com.tallerwebi.infraestructura",
+    "com.tallerwebi.config",
+  }
 )
 public class SpringWebConfig implements WebMvcConfigurer {
 
@@ -34,6 +39,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
     registry.addResourceHandler("/css/**").addResourceLocations("/resources/core/css/");
     registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
     registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
+    registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
   }
 
   @Override
@@ -44,6 +50,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
       .addInterceptor(new com.tallerwebi.presentacion.interceptor.AuthInterceptor())
       .addPathPatterns("/**")
       .excludePathPatterns(
+        "/",
         "/login",
         "/validar-login",
         "/registrarme",

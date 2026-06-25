@@ -1,6 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioAlerta;
+import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
 import java.util.List;
 import org.hibernate.SessionFactory;
@@ -63,6 +64,22 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
   }
 
   @Override
+  public Alerta buscarUltimaAlertaDeValladoPorMascota(Long idMascota) {
+    List<Alerta> alertas = sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT a FROM Alerta a WHERE a.mascota.id = :idMascota " +
+        "AND a.mensaje LIKE :prefijo ORDER BY a.fechaYHora DESC",
+        Alerta.class
+      )
+      .setParameter("idMascota", idMascota)
+      .setParameter("prefijo", "EMERGENCIA: % se alejo %")
+      .setMaxResults(1)
+      .getResultList();
+    return alertas.isEmpty() ? null : alertas.get(0);
+  }
+
+  @Override
   public void actualizar(Alerta alerta) {
     sessionFactory.getCurrentSession().update(alerta);
   }
@@ -74,5 +91,20 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
       .createQuery("SELECT a FROM Alerta a WHERE a.id = :id", Alerta.class)
       .setParameter("id", idAlerta)
       .uniqueResult();
+  }
+
+  @Override
+  public List<Alerta> buscarEmergenciasActivasPorUsuario(Long idUsuario) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT a FROM Alerta a JOIN FETCH a.mascota m " +
+        "WHERE m.usuario.id = :idUsuario " +
+        "AND a.tipo = :tipo AND a.leido = false",
+        Alerta.class
+      )
+      .setParameter("idUsuario", idUsuario)
+      .setParameter("tipo", TipoAlerta.EMERGENCIA)
+      .getResultList();
   }
 }

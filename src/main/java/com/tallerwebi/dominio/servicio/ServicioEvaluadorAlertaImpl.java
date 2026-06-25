@@ -8,6 +8,8 @@ import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import com.tallerwebi.dominio.modelo.Vallado;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,6 +29,7 @@ public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
     "Alerta: Anomalia en la medicion de la presion arterial de ";
   private static final String INFIJO_LA_PRESION = ". La presion ";
   private static final int RADIO_TIERRA = 6371000;
+  private static final long INTERVALO_ALERTA_VALLADO_SEGUNDOS = 30;
 
   private final ServicioAlerta servicioAlerta;
   private final ValladoDao valladoDao;
@@ -307,11 +310,21 @@ public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
     if (lectura == null || vallado == null) return;
 
     if (distanciaMetros > vallado.getRadioMetros()) {
+      Alerta ultimaAlertaVallado = servicioAlerta.buscarUltimaAlertaDeVallado(mascota.getId());
+      if (
+        ultimaAlertaVallado != null &&
+        Duration.between(ultimaAlertaVallado.getFechaYHora(), LocalDateTime.now()).getSeconds() <
+          INTERVALO_ALERTA_VALLADO_SEGUNDOS
+      ) {
+        // Si ya se envió una alerta de vallado en los últimos 30 segundos, no enviar otra.
+        return;
+      }
+
       double distanciaExceso = distanciaMetros - vallado.getRadioMetros();
       servicioAlerta.crearAlerta(
         mascota,
-        TipoAlerta.ALERTA,
-        "Alerta: " +
+        TipoAlerta.EMERGENCIA,
+        "EMERGENCIA: " +
         mascota.getNombre() +
         " se alejo " +
         Math.round(distanciaExceso) +

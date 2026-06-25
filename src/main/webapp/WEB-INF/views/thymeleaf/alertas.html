@@ -18,47 +18,52 @@
     <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'alertas', 'Historial de Alertas')"></header>
 
     <div class="flex-1 p-8 overflow-y-auto">
-        <div class="max-w-4xl mx-auto w-full flex flex-col gap-10">
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
             <!-- Alertas de signos vitales -->
-            <section>
-                <div class="flex justify-between items-center mb-4">
+            <section class="flex flex-col gap-4">
+                <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800">Signos vitales</h2>
                         <p class="text-sm text-slate-500">Alertas generadas por los sensores en tiempo real.</p>
                     </div>
-                    <span th:if="${idMascota != null}" id="contador-alertas" class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">0 Alertas</span>
+                    <span th:if="${idMascota != null}" id="contador-alertas"
+                          class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">
+                        0 Alertas
+                    </span>
                 </div>
 
-			<!-- Sin mascota registrada -->
-			<div th:if="${idMascota == null}"
-			     class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
-			    <i data-lucide="paw-print" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-			    <p class="text-sm text-slate-500">No ten&eacute;s ninguna mascota registrada. &iexcl;Registr&aacute; la primera para empezar!</p>
-			</div>
+                <!-- Sin mascota registrada -->
+                <div th:if="${idMascota == null}"
+                     class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
+                    <i data-lucide="paw-print" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+                    <p class="text-sm text-slate-500">No ten&eacute;s ninguna mascota registrada. &iexcl;Registr&aacute; la primera para empezar!</p>
+                </div>
 
                 <!-- Con mascota: lista dinámica -->
                 <div th:if="${idMascota != null}" id="lista-alertas-exclusiva" class="flex flex-col gap-4">
                     <div class="text-center py-12 text-slate-400">
-                        <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2" role="status" aria-label="loading"></div>
+                        <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2"
+                             role="status" aria-label="loading"></div>
                         <p class="text-sm">Buscando alertas en el servidor...</p>
                     </div>
                 </div>
             </section>
 
-			<!-- Alertas de amigos y transferencias -->
-			<section>
-			    <div class="mb-4">
-			        <h2 class="text-lg font-bold text-slate-800">Notificaciones</h2>
-			        <p class="text-sm text-slate-500">Solicitudes de amistad, transferencias y actividad social.</p>
-			    </div>
-			    <div id="lista-alertas-usuario" class="flex flex-col gap-4">
-			        <div class="text-center py-12 text-slate-400">
-			            <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2" role="status" aria-label="loading"></div>
-			            <p class="text-sm">Buscando notificaciones...</p>
-			        </div>
-			    </div>
-			</section>
+            <!-- Alertas de amigos y transferencias -->
+            <section class="flex flex-col gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Notificaciones</h2>
+                    <p class="text-sm text-slate-500">Solicitudes de amistad, transferencias y actividad social.</p>
+                </div>
+                <div id="lista-alertas-usuario" class="flex flex-col gap-4">
+                    <div class="text-center py-12 text-slate-400">
+                        <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2"
+                             role="status" aria-label="loading"></div>
+                        <p class="text-sm">Buscando notificaciones...</p>
+                    </div>
+                </div>
+            </section>
 
         </div>
     </div>

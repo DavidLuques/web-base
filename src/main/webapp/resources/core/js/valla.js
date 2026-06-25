@@ -133,6 +133,65 @@ function inicializarValla(idMascota) {
     }
   }
 
+  // Notificaciones de emergencia globales (persisten en localStorage para evitar duplicados)
+  const GLOBAL_NOTIFICADAS_KEY = 'alertas-emergencia-notificadas-global';
+  function cargarNotificadasGlobales() {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(GLOBAL_NOTIFICADAS_KEY) || '[]'));
+    } catch (e) {
+      return new Set();
+    }
+  }
+  function guardarNotificadasGlobales(set) {
+    try {
+      localStorage.setItem(GLOBAL_NOTIFICADAS_KEY, JSON.stringify(Array.from(set)));
+    } catch (e) {
+      // noop
+    }
+  }
+  const alertasGlobalesNotificadas = cargarNotificadasGlobales();
+
+  async function consultarEmergenciasGlobales() {
+    if (Notification.permission !== "granted") return;
+    try {
+      const response = await fetch("/spring/analisis/alertas/emergencias-activas");
+      if (!response.ok) return;
+      const alertas = await response.json();
+      if (!alertas || !Array.isArray(alertas)) return;
+      alertas.forEach(alerta => {
+        const id = String(alerta.id);
+        if (!alertasGlobalesNotificadas.has(id)) {
+          alertasGlobalesNotificadas.add(id);
+          guardarNotificadasGlobales(alertasGlobalesNotificadas);
+          new Notification("EMERGENCIA - " + (alerta.nombreMascota || ''), {
+            body: alerta.mensaje,
+            tag: "emergencia-" + id,
+            requireInteraction: true
+          });
+        }
+      });
+    } catch (err) {
+      console.error("Error consultando emergencias:", err);
+    }
+  }
+
+// Pedir permiso y arrancar polling
+  if ("Notification" in window) {
+    if (Notification.permission === "granted") {
+      consultarEmergenciasGlobales();
+      setInterval(consultarEmergenciasGlobales, 10000);
+    } else if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          consultarEmergenciasGlobales();
+          setInterval(consultarEmergenciasGlobales, 10000);
+        }
+      });
+    }
+  }
+
+  console.log("Permiso notificaciones:", Notification.permission);
+
   cargarVallado();
   actualizarPosicion();
   setInterval(actualizarPosicion, 30000);
