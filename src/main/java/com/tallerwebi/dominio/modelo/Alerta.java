@@ -1,6 +1,5 @@
 package com.tallerwebi.dominio.modelo;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import java.time.LocalDateTime;
 import java.util.Locale;

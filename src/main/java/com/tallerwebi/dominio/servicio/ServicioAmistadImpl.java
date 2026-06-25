@@ -1,13 +1,13 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dao.SolicitudAmistadDao;
 import com.tallerwebi.dominio.enums.EstadoAmistad;
 import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.excepcion.AccionNoPermitidaEnEsteEstadoException;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.dominio.modelo.SolicitudAmistad;
+import com.tallerwebi.dominio.modelo.Usuario;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

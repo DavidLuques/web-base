@@ -1,6 +1,5 @@
 package com.tallerwebi.dominio.modelo;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import javax.persistence.Column;

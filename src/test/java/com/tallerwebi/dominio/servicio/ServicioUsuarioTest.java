@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.modelo.Direccion;
+import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.presentacion.DatosPerfil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

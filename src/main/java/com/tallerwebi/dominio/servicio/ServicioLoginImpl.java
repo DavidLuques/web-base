@@ -1,8 +1,10 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.Usuario;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;

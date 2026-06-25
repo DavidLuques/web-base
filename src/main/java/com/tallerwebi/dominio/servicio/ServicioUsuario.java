@@ -1,6 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.presentacion.DatosPerfil;
 
 /**

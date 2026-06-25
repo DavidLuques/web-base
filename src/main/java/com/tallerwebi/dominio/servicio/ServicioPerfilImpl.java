@@ -1,9 +1,6 @@
-package com.tallerwebi.dominio.servicio.impl;
+package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
-import com.tallerwebi.dominio.servicio.ServicioMascota;
-import com.tallerwebi.dominio.servicio.ServicioPerfil;
-import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosPerfil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

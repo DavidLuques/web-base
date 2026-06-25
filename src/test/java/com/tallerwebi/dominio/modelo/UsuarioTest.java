@@ -2,7 +2,6 @@ package com.tallerwebi.dominio.modelo;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.tallerwebi.dominio.Usuario;
 import org.junit.jupiter.api.Test;
 
 public class UsuarioTest {

@@ -1,11 +1,11 @@
 package com.tallerwebi.dominio.servicio;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.modelo.DatosMascota;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.dominio.modelo.Vallado;
 import com.tallerwebi.presentacion.DatosAltaMascota;
 import java.time.LocalDate;

@@ -1,6 +1,5 @@
 package com.tallerwebi.dominio.modelo;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.enums.EstadoAmistad;
 import java.time.LocalDateTime;
 import javax.persistence.*;

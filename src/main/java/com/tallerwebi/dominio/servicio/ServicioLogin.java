@@ -1,7 +1,8 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import com.tallerwebi.dominio.modelo.Mascota;
+import com.tallerwebi.dominio.modelo.Usuario;
 import java.util.List;
 
 /**

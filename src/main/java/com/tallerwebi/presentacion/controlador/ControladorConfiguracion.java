@@ -1,6 +1,6 @@
 package com.tallerwebi.presentacion.controlador;
 
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosAltaMascota;

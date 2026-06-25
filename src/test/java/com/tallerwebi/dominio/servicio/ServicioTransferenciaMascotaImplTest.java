@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.SolicitudTransferenciaDao;
 import com.tallerwebi.dominio.enums.EstadoTransferencia;
@@ -19,6 +18,7 @@ import com.tallerwebi.dominio.excepcion.AccionNoPermitidaEnEsteEstadoException;
 import com.tallerwebi.dominio.excepcion.NoSonAmigosException;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.SolicitudTransferencia;
+import com.tallerwebi.dominio.modelo.Usuario;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -3,9 +3,10 @@ package com.tallerwebi.presentacion.controlador;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
+import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
+import com.tallerwebi.dominio.servicio.ServicioPerfilImpl;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosPerfil;
 import javax.servlet.http.HttpServletRequest;
@@ -33,12 +34,7 @@ public class ControladorPerfilTest {
     sessionMock = mock(HttpSession.class);
     when(requestMock.getSession()).thenReturn(sessionMock);
     controlador =
-      new ControladorPerfil(
-        new com.tallerwebi.dominio.servicio.impl.ServicioPerfilImpl(
-          servicioUsuarioMock,
-          servicioMascotaMock
-        )
-      );
+      new ControladorPerfil(new ServicioPerfilImpl(servicioUsuarioMock, servicioMascotaMock));
     controladorConfiguracion =
       new ControladorConfiguracion(servicioUsuarioMock, servicioMascotaMock);
   }

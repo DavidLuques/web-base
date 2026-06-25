@@ -2,9 +2,7 @@ package com.tallerwebi.dominio.estado;
 
 import java.util.Random;
 
-/**
- *  datos.
- */
+
 public class EstadoCorriendo implements ComportamientoEstado {
 
   @Override

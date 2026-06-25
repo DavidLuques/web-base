@@ -1,9 +1,9 @@
 package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioUsuario;
-import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.dominio.modelo.Direccion;
+import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.presentacion.DatosPerfil;
 import javax.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;

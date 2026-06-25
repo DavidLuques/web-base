@@ -1,6 +1,5 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.dominio.modelo;
 
-import com.tallerwebi.dominio.modelo.Direccion;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
