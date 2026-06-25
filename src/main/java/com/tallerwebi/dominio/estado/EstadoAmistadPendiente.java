@@ -21,4 +21,14 @@ public class EstadoAmistadPendiente implements ComportamientoEstadoAmistad {
   public String getNombre() {
     return "PENDIENTE";
   }
+
+  @Override
+  public boolean puedeCancelar() {
+    return true;
+  }
+
+  @Override
+  public boolean puedeEliminar() {
+    return false;
+  }
 }

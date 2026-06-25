@@ -12,4 +12,7 @@ public interface ServicioAmistad {
   List<Usuario> obtenerAmigos(Long idUsuario);
   List<SolicitudAmistad> obtenerSolicitudesPendientes(Long idUsuario);
   SolicitudAmistad enviarSolicitudPorEmail(Long idEmisor, String emailReceptor);
+  List<SolicitudAmistad> obtenerSolicitudesEnviadas(Long idUsuario);
+  void cancelarSolicitud(Long idSolicitud);
+  void eliminarAmigo(Long idUsuario, Long idAmigo);
 }

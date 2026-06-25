@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion.controlador;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,8 +47,6 @@ public class ControladorAmistadTest {
     when(sessionMock.getAttribute(ATRIBUTO_ID_USUARIO)).thenReturn(idUsuario);
   }
 
-  // ── verAmigos ────────────────────────────────────────────────────
-
   @Test
   public void siNoHayUsuarioLogueadoVerAmigosDebeRedirigirALogin() {
     ModelAndView mav = controlador.verAmigos(requestMock, null);
@@ -73,8 +72,6 @@ public class ControladorAmistadTest {
     assertThat(mav.getModel().get("misMascotas"), equalTo(misMascotas));
     assertThat(mav.getModel().get("idMascota"), equalTo(5L));
   }
-
-  // ── enviarSolicitud ──────────────────────────────────────────────
 
   @Test
   public void siNoHayUsuarioLogueadoEnviarSolicitudDebeRedirigirALogin() {
@@ -117,8 +114,6 @@ public class ControladorAmistadTest {
     assertThat(mav.getViewName(), equalTo("redirect:/amigos?error=No podés agregarte a vos mismo"));
   }
 
-  // ── aceptarSolicitud ─────────────────────────────────────────────
-
   @Test
   public void siNoHayUsuarioLogueadoAceptarSolicitudDebeRedirigirALogin() {
     ModelAndView mav = controlador.aceptarSolicitud(requestMock, 10L, null);
@@ -145,8 +140,6 @@ public class ControladorAmistadTest {
     assertThat(mav.getViewName(), equalTo("redirect:/amigos?exito=true"));
   }
 
-  // ── rechazarSolicitud ────────────────────────────────────────────
-
   @Test
   public void siNoHayUsuarioLogueadoRechazarSolicitudDebeRedirigirALogin() {
     ModelAndView mav = controlador.rechazarSolicitud(requestMock, 10L, null);
@@ -172,4 +165,86 @@ public class ControladorAmistadTest {
 
     assertThat(mav.getViewName(), equalTo("redirect:/amigos?exito=true"));
   }
+  
+  @Test
+  public void siNoHayUsuarioLogueadoCancelarSolicitudDebeRedirigirALogin() {
+      ModelAndView mav = controlador.cancelarSolicitud(requestMock, 10L, null);
+
+      assertThat(mav.getViewName(), equalTo("redirect:/login"));
+  }
+
+  @Test
+  public void siSeCancelaSolicitudDebeRedirigirAExitoYLlamarAlServicio() {
+      simularUsuarioLogueado(1L);
+
+      ModelAndView mav = controlador.cancelarSolicitud(requestMock, 10L, 5L);
+
+      assertThat(mav.getViewName(), equalTo("redirect:/amigos?exito=true&idMascota=5"));
+      verify(servicioAmistadMock, times(1)).cancelarSolicitud(10L);
+  }
+
+  @Test
+  public void siSeCancelaSolicitudSinIdMascotaDebeRedirigirAExitoSinSufijo() {
+      simularUsuarioLogueado(1L);
+
+      ModelAndView mav = controlador.cancelarSolicitud(requestMock, 10L, null);
+
+      assertThat(mav.getViewName(), equalTo("redirect:/amigos?exito=true"));
+  }
+  
+  @Test
+  public void siNoHayUsuarioLogueadoEliminarAmigoDebeRedirigirALogin() {
+      ModelAndView mav = controlador.eliminarAmigo(requestMock, 2L, null);
+
+      assertThat(mav.getViewName(), equalTo("redirect:/login"));
+  }
+
+  @Test
+  public void siSeEliminaAmigoDebeRedirigirAExitoYLlamarAlServicio() {
+      simularUsuarioLogueado(1L);
+
+      ModelAndView mav = controlador.eliminarAmigo(requestMock, 2L, 5L);
+
+      assertThat(mav.getViewName(), equalTo("redirect:/amigos?exito=true&idMascota=5"));
+      verify(servicioAmistadMock, times(1)).eliminarAmigo(1L, 2L);
+  }
+
+  @Test
+  public void siSeEliminaAmigoSinIdMascotaDebeRedirigirAExitoSinSufijo() {
+      simularUsuarioLogueado(1L);
+
+      ModelAndView mav = controlador.eliminarAmigo(requestMock, 2L, null);
+
+      assertThat(mav.getViewName(), equalTo("redirect:/amigos?exito=true"));
+  }
+  
+  @Test
+  public void siLaAccionNoEstaPermitidaAlCancelarSolicitudDebeRedirigirConError() {
+      simularUsuarioLogueado(1L);
+      doThrow(new AccionNoPermitidaEnEsteEstadoException("No se puede cancelar una solicitud en estado ACEPTADA"))
+        .when(servicioAmistadMock).cancelarSolicitud(10L);
+
+      ModelAndView mav = controlador.cancelarSolicitud(requestMock, 10L, 5L);
+
+      assertThat(
+        mav.getViewName(),
+        equalTo("redirect:/amigos?error=No se puede cancelar una solicitud en estado ACEPTADA&idMascota=5")
+      );
+  }
+
+  @Test
+  public void siLaAccionNoEstaPermitidaAlEliminarAmigoDebeRedirigirConError() {
+      simularUsuarioLogueado(1L);
+      doThrow(new AccionNoPermitidaEnEsteEstadoException("No se puede eliminar esta amistad"))
+        .when(servicioAmistadMock).eliminarAmigo(1L, 2L);
+
+      ModelAndView mav = controlador.eliminarAmigo(requestMock, 2L, 5L);
+
+      assertThat(
+        mav.getViewName(),
+        equalTo("redirect:/amigos?error=No se puede eliminar esta amistad&idMascota=5")
+      );
+  }
+
+
 }

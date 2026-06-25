@@ -21,4 +21,14 @@ public class EstadoAmistadAceptada implements ComportamientoEstadoAmistad {
   public String getNombre() {
     return "ACEPTADA";
   }
+
+  @Override
+  public boolean puedeCancelar() {
+    return false;
+  }
+
+  @Override
+  public boolean puedeEliminar() {
+    return true;
+  }
 }
