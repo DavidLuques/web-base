@@ -244,6 +244,6 @@ function inicializarValla(idMascota) {
 
   cargarVallado().then(() => {
     actualizarPosicion();
-    setInterval(actualizarPosicion, 30000);
+    setInterval(actualizarPosicion, 60000);
   });
 }
