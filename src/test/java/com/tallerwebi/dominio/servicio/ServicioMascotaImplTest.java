@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.dominio.dao.MascotaDao;
+import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.modelo.Mascota;
@@ -18,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 public class ServicioMascotaImplTest {
 
   private MascotaDao mascotaDaoMock;
+  private ValladoDao valladoDaoMock;
   private ServicioUsuario servicioUsuarioMock;
   private ServicioMascotaImpl servicioMascota;
 
@@ -25,7 +27,8 @@ public class ServicioMascotaImplTest {
   public void init() {
     mascotaDaoMock = mock(MascotaDao.class);
     servicioUsuarioMock = mock(ServicioUsuario.class);
-    servicioMascota = new ServicioMascotaImpl(mascotaDaoMock, servicioUsuarioMock);
+    valladoDaoMock = mock(ValladoDao.class);
+    servicioMascota = new ServicioMascotaImpl(mascotaDaoMock, valladoDaoMock, servicioUsuarioMock);
   }
 
   @Test
