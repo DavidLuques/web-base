@@ -133,22 +133,21 @@ function inicializarValla(idMascota) {
     }
   }
 
-  // Notificaciones de emergencia globales (persisten en localStorage para evitar duplicados)
-  const GLOBAL_NOTIFICADAS_KEY = 'alertas-emergencia-notificadas-global';
+  // Notificaciones de emergencia globales
+  const GLOBAL_NOTIFICADAS_KEY = "alertas-emergencia-notificadas-global";
+
   function cargarNotificadasGlobales() {
     try {
-      return new Set(JSON.parse(localStorage.getItem(GLOBAL_NOTIFICADAS_KEY) || '[]'));
-    } catch (e) {
+      return new Set(JSON.parse(localStorage.getItem(GLOBAL_NOTIFICADAS_KEY) || "[]"));
+    } catch (err) {
       return new Set();
     }
   }
+
   function guardarNotificadasGlobales(set) {
-    try {
-      localStorage.setItem(GLOBAL_NOTIFICADAS_KEY, JSON.stringify(Array.from(set)));
-    } catch (e) {
-      // noop
-    }
+    localStorage.setItem(GLOBAL_NOTIFICADAS_KEY, JSON.stringify(Array.from(set)));
   }
+
   const alertasGlobalesNotificadas = cargarNotificadasGlobales();
 
   async function consultarEmergenciasGlobales() {
@@ -158,12 +157,12 @@ function inicializarValla(idMascota) {
       if (!response.ok) return;
       const alertas = await response.json();
       if (!alertas || !Array.isArray(alertas)) return;
-      alertas.forEach(alerta => {
+      alertas.forEach(function (alerta) {
         const id = String(alerta.id);
         if (!alertasGlobalesNotificadas.has(id)) {
           alertasGlobalesNotificadas.add(id);
           guardarNotificadasGlobales(alertasGlobalesNotificadas);
-          new Notification("EMERGENCIA - " + (alerta.nombreMascota || ''), {
+          new Notification("EMERGENCIA - " + (alerta.nombreMascota || ""), {
             body: alerta.mensaje,
             tag: "emergencia-" + id,
             requireInteraction: true
@@ -175,13 +174,12 @@ function inicializarValla(idMascota) {
     }
   }
 
-// Pedir permiso y arrancar polling
   if ("Notification" in window) {
     if (Notification.permission === "granted") {
       consultarEmergenciasGlobales();
       setInterval(consultarEmergenciasGlobales, 10000);
     } else if (Notification.permission === "default") {
-      Notification.requestPermission().then(permission => {
+      Notification.requestPermission().then(function (permission) {
         if (permission === "granted") {
           consultarEmergenciasGlobales();
           setInterval(consultarEmergenciasGlobales, 10000);
@@ -189,8 +187,6 @@ function inicializarValla(idMascota) {
       });
     }
   }
-
-  console.log("Permiso notificaciones:", Notification.permission);
 
   cargarVallado();
   actualizarPosicion();
