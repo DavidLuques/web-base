@@ -23,7 +23,7 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-slate-800">Mis Amigos</h1>
-          <p class="text-slate-500">Agregá amigos para poder transferirles tus mascotas</p>
+          <p class="text-slate-500">Agrega amigos para poder transferirles tus mascotas</p>
         </div>
       </div>
 
@@ -58,11 +58,13 @@
         </form>
       </div>
 
-      <!-- Solicitudes pendientes -->
-      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8" th:if="${not #lists.isEmpty(solicitudesPendientes)}">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Solicitudes pendientes</h3>
+      <!-- Solicitudes recibidas pendientes -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8"
+           th:if="${not #lists.isEmpty(solicitudesPendientes)}">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Solicitudes recibidas</h3>
         <ul class="divide-y divide-slate-100">
-          <li th:each="solicitud : ${solicitudesPendientes}" class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <li th:each="solicitud : ${solicitudesPendientes}"
+              class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3 w-full sm:w-auto">
               <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
                 <i data-lucide="user" class="w-5 h-5"></i>
@@ -92,6 +94,35 @@
         </ul>
       </div>
 
+      <!-- Solicitudes enviadas pendientes -->
+      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8"
+           th:if="${not #lists.isEmpty(solicitudesEnviadas)}">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Solicitudes enviadas</h3>
+        <ul class="divide-y divide-slate-100">
+          <li th:each="solicitud : ${solicitudesEnviadas}"
+              class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
+                <i data-lucide="user" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="font-semibold text-slate-800 truncate" th:text="${solicitud.receptor.nombre}">Nombre</p>
+                <p class="text-sm text-slate-500 truncate" th:text="${solicitud.receptor.email}">email@ejemplo.com</p>
+                <span class="text-xs text-amber-600 font-medium">Pendiente de aceptacion</span>
+              </div>
+            </div>
+            <form th:action="@{/amigos/cancelar-solicitud}" method="POST" class="w-full sm:w-auto">
+              <input type="hidden" name="idSolicitud" th:value="${solicitud.id}" />
+              <input type="hidden" name="idMascota" th:value="${idMascota}" />
+              <button type="submit"
+                      class="w-full sm:w-auto bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                <i data-lucide="x" class="w-4 h-4"></i> Cancelar solicitud
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+
       <!-- Lista de amigos -->
       <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Mis amigos</h3>
@@ -100,18 +131,29 @@
           <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-3">
             <i data-lucide="users" class="w-6 h-6"></i>
           </div>
-          <p class="text-slate-400">Todavía no tenés amigos agregados</p>
+          <p class="text-slate-400">Todavia no tenes amigos agregados</p>
         </div>
 
         <ul class="divide-y divide-slate-100" th:unless="${#lists.isEmpty(amigos)}">
-          <li th:each="amigo : ${amigos}" class="py-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-              <i data-lucide="user" class="w-5 h-5"></i>
+          <li th:each="amigo : ${amigos}"
+              class="py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                <i data-lucide="user" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="font-semibold text-slate-800 truncate" th:text="${amigo.nombre}">Nombre</p>
+                <p class="text-sm text-slate-500 truncate" th:text="${amigo.email}">email@ejemplo.com</p>
+              </div>
             </div>
-            <div class="min-w-0 flex-1">
-              <p class="font-semibold text-slate-800 truncate" th:text="${amigo.nombre}">Nombre</p>
-              <p class="text-sm text-slate-500 truncate" th:text="${amigo.email}">email@ejemplo.com</p>
-            </div>
+            <form th:action="@{/amigos/eliminar}" method="POST" class="shrink-0">
+              <input type="hidden" name="idAmigo" th:value="${amigo.id}" />
+              <input type="hidden" name="idMascota" th:value="${idMascota}" />
+              <button type="submit"
+                      class="bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2">
+                <i data-lucide="user-minus" class="w-4 h-4"></i> Eliminar
+              </button>
+            </form>
           </li>
         </ul>
       </div>

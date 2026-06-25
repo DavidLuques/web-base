@@ -236,81 +236,81 @@ public class ControladorTransferenciaTest {
     assertThat(mav.getViewName(), equalTo("redirect:/transferencias?exito=true&idMascota=5"));
     verify(servicioTransferenciaMascotaMock, times(1)).cancelarTransferencia(10L);
   }
-  
+
   @Test
   public void siElUsuarioTieneMascotasYNoVieneCOnIdMascotaVerTransferenciasDebeRedirigirAlDashboard() {
-      simularUsuarioLogueado(1L);
-      Mascota mascota = new Mascota();
-      mascota.setId(7L);
-      when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of(mascota));
+    simularUsuarioLogueado(1L);
+    Mascota mascota = new Mascota();
+    mascota.setId(7L);
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of(mascota));
 
-      ModelAndView mav = controlador.verTransferencias(requestMock, null);
+    ModelAndView mav = controlador.verTransferencias(requestMock, null);
 
-      assertThat(mav.getViewName(), equalTo("redirect:/analisis/dashboard/7"));
+    assertThat(mav.getViewName(), equalTo("redirect:/analisis/dashboard/7"));
   }
-  
+
   @Test
   public void siElUsuarioNoTieneMascotasNiPendientesVerTransferenciasDebeRedirigirASinMascota() {
-      simularUsuarioLogueado(1L);
-      when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of());
-      when(servicioTransferenciaMascotaMock.obtenerPendientesPorUsuario(1L)).thenReturn(List.of());
+    simularUsuarioLogueado(1L);
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of());
+    when(servicioTransferenciaMascotaMock.obtenerPendientesPorUsuario(1L)).thenReturn(List.of());
 
-      ModelAndView mav = controlador.verTransferencias(requestMock, null);
+    ModelAndView mav = controlador.verTransferencias(requestMock, null);
 
-      assertThat(mav.getViewName(), equalTo("redirect:/sin-mascota"));
+    assertThat(mav.getViewName(), equalTo("redirect:/sin-mascota"));
   }
-  
+
   @Test
   public void siLaTransferenciaSeCompletaYElOrigenTieneMascotasRestantesDebeRedirigirAlDashboard() {
-      simularUsuarioLogueado(1L);
-      Usuario origen = mock(Usuario.class);
-      when(origen.getId()).thenReturn(1L);
-      SolicitudTransferencia solicitud = new SolicitudTransferencia();
-      solicitud.setUsuarioOrigen(origen);
-      solicitud.setEstado(EstadoTransferencia.COMPLETADA);
-      when(servicioTransferenciaMascotaMock.confirmarPorOrigen(10L)).thenReturn(solicitud);
-      Mascota mascotaRestante = new Mascota();
-      mascotaRestante.setId(99L);
-      when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of(mascotaRestante));
+    simularUsuarioLogueado(1L);
+    Usuario origen = mock(Usuario.class);
+    when(origen.getId()).thenReturn(1L);
+    SolicitudTransferencia solicitud = new SolicitudTransferencia();
+    solicitud.setUsuarioOrigen(origen);
+    solicitud.setEstado(EstadoTransferencia.COMPLETADA);
+    when(servicioTransferenciaMascotaMock.confirmarPorOrigen(10L)).thenReturn(solicitud);
+    Mascota mascotaRestante = new Mascota();
+    mascotaRestante.setId(99L);
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of(mascotaRestante));
 
-      ModelAndView mav = controlador.confirmarPorOrigen(requestMock, 10L, 5L);
+    ModelAndView mav = controlador.confirmarPorOrigen(requestMock, 10L, 5L);
 
-      assertThat(mav.getViewName(), equalTo("redirect:/analisis/dashboard/99"));
+    assertThat(mav.getViewName(), equalTo("redirect:/analisis/dashboard/99"));
   }
-  
+
   @Test
   public void siLaTransferenciaSeCompletaYElLogueadoEraElDestinoDebeRedirigirAlDashboardDeLaMascota() {
-      simularUsuarioLogueado(2L);
-      Usuario destino = mock(Usuario.class);
-      when(destino.getId()).thenReturn(2L);
-      Mascota mascota = new Mascota();
-      mascota.setId(42L);
-      SolicitudTransferencia solicitud = new SolicitudTransferencia();
-      solicitud.setUsuarioDestino(destino);
-      solicitud.setEstado(EstadoTransferencia.COMPLETADA);
-      solicitud.setMascota(mascota);
-      when(servicioTransferenciaMascotaMock.confirmarPorDestino(10L)).thenReturn(solicitud);
+    simularUsuarioLogueado(2L);
+    Usuario destino = mock(Usuario.class);
+    when(destino.getId()).thenReturn(2L);
+    Mascota mascota = new Mascota();
+    mascota.setId(42L);
+    SolicitudTransferencia solicitud = new SolicitudTransferencia();
+    solicitud.setUsuarioDestino(destino);
+    solicitud.setEstado(EstadoTransferencia.COMPLETADA);
+    solicitud.setMascota(mascota);
+    when(servicioTransferenciaMascotaMock.confirmarPorDestino(10L)).thenReturn(solicitud);
 
-      ModelAndView mav = controlador.confirmarPorDestino(requestMock, 10L, 5L);
+    ModelAndView mav = controlador.confirmarPorDestino(requestMock, 10L, 5L);
 
-      assertThat(mav.getViewName(), equalTo("redirect:/analisis/dashboard/42"));
+    assertThat(mav.getViewName(), equalTo("redirect:/analisis/dashboard/42"));
   }
-  
+
   @Test
   public void cancelarTransferenciaDebeInvocarElServicioExactamenteUnaVez() {
-      simularUsuarioLogueado(1L);
+    simularUsuarioLogueado(1L);
 
-      controlador.cancelarTransferencia(requestMock, 10L, null);
+    controlador.cancelarTransferencia(requestMock, 10L, null);
 
-      verify(servicioTransferenciaMascotaMock, times(1)).cancelarTransferencia(10L);
+    verify(servicioTransferenciaMascotaMock, times(1)).cancelarTransferencia(10L);
   }
-  
+
   @Test
   public void cancelarTransferenciaSinIdMascotaDebeRedirigirASoloExito() {
-      simularUsuarioLogueado(1L);
+    simularUsuarioLogueado(1L);
 
-      ModelAndView mav = controlador.cancelarTransferencia(requestMock, 10L, null);
+    ModelAndView mav = controlador.cancelarTransferencia(requestMock, 10L, null);
 
-      assertThat(mav.getViewName(), equalTo("redirect:/transferencias?exito=true"));
+    assertThat(mav.getViewName(), equalTo("redirect:/transferencias?exito=true"));
   }
 }

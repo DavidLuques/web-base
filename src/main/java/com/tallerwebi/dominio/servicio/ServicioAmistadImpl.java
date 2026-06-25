@@ -133,4 +133,30 @@ public class ServicioAmistadImpl implements ServicioAmistad {
     }
     return enviarSolicitud(idEmisor, receptor.getId());
   }
+
+  @Override
+  public List<SolicitudAmistad> obtenerSolicitudesEnviadas(Long idUsuario) {
+    return solicitudAmistadDao.buscarEnviadasPorEmisor(idUsuario);
+  }
+
+  @Override
+  public void cancelarSolicitud(Long idSolicitud) {
+    SolicitudAmistad solicitud = solicitudAmistadDao.buscarPorId(idSolicitud);
+    if (!solicitud.getEstado().getComportamiento().puedeCancelar()) {
+      throw new AccionNoPermitidaEnEsteEstadoException(
+        "No se puede cancelar una solicitud en estado " +
+        solicitud.getEstado().getComportamiento().getNombre()
+      );
+    }
+    solicitudAmistadDao.eliminar(solicitud);
+  }
+
+  @Override
+  public void eliminarAmigo(Long idUsuario, Long idAmigo) {
+    SolicitudAmistad solicitud = solicitudAmistadDao.buscarEntreUsuarios(idUsuario, idAmigo);
+    if (solicitud == null || !solicitud.getEstado().getComportamiento().puedeEliminar()) {
+      throw new AccionNoPermitidaEnEsteEstadoException("No se puede eliminar esta amistad");
+    }
+    solicitudAmistadDao.eliminar(solicitud);
+  }
 }

@@ -20,6 +20,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorAmistad {
 
   private static final String REDIRECT_LOGIN = "redirect:/login";
+  private static final String REDIRECT_AMIGOS_EXITO = "redirect:/amigos?exito=true";
+  private static final String REDIRECT_AMIGOS_ERROR = "redirect:/amigos?error=";
+  private static final String PARAMETRO_ID_MASCOTA = "&idMascota=";
   private static final String ATRIBUTO_ID_USUARIO = "ID_USUARIO";
 
   private final ServicioAmistad servicioAmistad;
@@ -29,6 +32,10 @@ public class ControladorAmistad {
   public ControladorAmistad(ServicioAmistad servicioAmistad, ServicioMascota servicioMascota) {
     this.servicioAmistad = servicioAmistad;
     this.servicioMascota = servicioMascota;
+  }
+
+  private String armarSufijoMascota(Long idMascota) {
+    return idMascota != null ? PARAMETRO_ID_MASCOTA + idMascota : "";
   }
 
   @RequestMapping(path = "/amigos", method = RequestMethod.GET)
@@ -49,6 +56,7 @@ public class ControladorAmistad {
     modelo.put("solicitudesPendientes", pendientes);
     modelo.put("idMascota", idMascota);
     modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    modelo.put("solicitudesEnviadas", servicioAmistad.obtenerSolicitudesEnviadas(idUsuario));
     return new ModelAndView("amigos", modelo);
   }
 
@@ -63,13 +71,12 @@ public class ControladorAmistad {
       return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    String sufijoMascota = idMascota != null ? "&idMascota=" + idMascota : "";
-
+    String sufijoMascota = armarSufijoMascota(idMascota);
     try {
       servicioAmistad.enviarSolicitudPorEmail(idUsuario, emailReceptor);
-      return new ModelAndView("redirect:/amigos?exito=true" + sufijoMascota);
+      return new ModelAndView(REDIRECT_AMIGOS_EXITO + sufijoMascota);
     } catch (AccionNoPermitidaEnEsteEstadoException | UsuarioNoEncontrado e) {
-      return new ModelAndView("redirect:/amigos?error=" + e.getMessage() + sufijoMascota);
+      return new ModelAndView(REDIRECT_AMIGOS_ERROR + e.getMessage() + sufijoMascota);
     }
   }
 
@@ -85,8 +92,7 @@ public class ControladorAmistad {
     }
 
     servicioAmistad.aceptarSolicitud(idSolicitud);
-    String sufijoMascota = idMascota != null ? "&idMascota=" + idMascota : "";
-    return new ModelAndView("redirect:/amigos?exito=true" + sufijoMascota);
+    return new ModelAndView(REDIRECT_AMIGOS_EXITO + armarSufijoMascota(idMascota));
   }
 
   @RequestMapping(path = "/amigos/rechazar", method = RequestMethod.POST)
@@ -101,7 +107,46 @@ public class ControladorAmistad {
     }
 
     servicioAmistad.rechazarSolicitud(idSolicitud);
-    String sufijoMascota = idMascota != null ? "&idMascota=" + idMascota : "";
-    return new ModelAndView("redirect:/amigos?exito=true" + sufijoMascota);
+    return new ModelAndView(REDIRECT_AMIGOS_EXITO + armarSufijoMascota(idMascota));
+  }
+
+  @RequestMapping(path = "/amigos/cancelar-solicitud", method = RequestMethod.POST)
+  public ModelAndView cancelarSolicitud(
+    HttpServletRequest request,
+    @RequestParam Long idSolicitud,
+    @RequestParam(required = false) Long idMascota
+  ) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    if (idUsuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+
+    String sufijoMascota = armarSufijoMascota(idMascota);
+    try {
+      servicioAmistad.cancelarSolicitud(idSolicitud);
+      return new ModelAndView(REDIRECT_AMIGOS_EXITO + sufijoMascota);
+    } catch (AccionNoPermitidaEnEsteEstadoException e) {
+      return new ModelAndView(REDIRECT_AMIGOS_ERROR + e.getMessage() + sufijoMascota);
+    }
+  }
+
+  @RequestMapping(path = "/amigos/eliminar", method = RequestMethod.POST)
+  public ModelAndView eliminarAmigo(
+    HttpServletRequest request,
+    @RequestParam Long idAmigo,
+    @RequestParam(required = false) Long idMascota
+  ) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    if (idUsuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+
+    String sufijoMascota = armarSufijoMascota(idMascota);
+    try {
+      servicioAmistad.eliminarAmigo(idUsuario, idAmigo);
+      return new ModelAndView(REDIRECT_AMIGOS_EXITO + sufijoMascota);
+    } catch (AccionNoPermitidaEnEsteEstadoException e) {
+      return new ModelAndView(REDIRECT_AMIGOS_ERROR + e.getMessage() + sufijoMascota);
+    }
   }
 }

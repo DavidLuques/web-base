@@ -72,4 +72,21 @@ public class SolicitudAmistadDaoImpl implements SolicitudAmistadDao {
       .uniqueResultOptional()
       .orElse(null);
   }
+
+  @Override
+  public List<SolicitudAmistad> buscarEnviadasPorEmisor(Long idEmisor) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "FROM SolicitudAmistad s WHERE s.emisor.id = :idEmisor AND s.estado = 'PENDIENTE'",
+        SolicitudAmistad.class
+      )
+      .setParameter("idEmisor", idEmisor)
+      .list();
+  }
+
+  @Override
+  public void eliminar(SolicitudAmistad solicitud) {
+    sessionFactory.getCurrentSession().delete(solicitud);
+  }
 }
