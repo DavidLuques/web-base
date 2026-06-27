@@ -57,4 +57,9 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
     return modelo;
   }
+
+  @Override
+  public void eliminarCuenta(Long idUsuario) {
+    servicioUsuario.eliminarCuenta(idUsuario);
+  }
 }

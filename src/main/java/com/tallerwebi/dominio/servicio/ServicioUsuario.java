@@ -11,4 +11,5 @@ public interface ServicioUsuario {
   void eliminar(Long id);
   void actualizarPerfil(Long id, DatosPerfil datosPerfil);
   DatosPerfil obtenerDatosPerfil(Long id);
+  void eliminarCuenta(Long id);
 }

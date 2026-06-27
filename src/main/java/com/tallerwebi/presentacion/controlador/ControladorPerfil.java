@@ -21,6 +21,7 @@ public class ControladorPerfil {
 
   private static final String REDIRECT_LOGIN = "redirect:/login";
   private static final String ATRIBUTO_DATOS_PERFIL = "datosPerfil";
+  private static final String ATRIBUTO_ID_USUARIO = "ID_USUARIO";
 
   private ServicioPerfil servicioPerfil;
 
@@ -34,11 +35,10 @@ public class ControladorPerfil {
     HttpServletRequest request,
     @RequestParam(required = false) Long idMascota
   ) {
-    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
     if (idUsuario == null) {
       return new ModelAndView(REDIRECT_LOGIN);
     }
-
     try {
       ModelMap modelo = servicioPerfil.prepararVerPerfil(idUsuario, idMascota);
       return new ModelAndView("ver-perfil", modelo);
@@ -52,11 +52,10 @@ public class ControladorPerfil {
     HttpServletRequest request,
     @RequestParam(required = false) Long idMascota
   ) {
-    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
     if (idUsuario == null) {
       return new ModelAndView(REDIRECT_LOGIN);
     }
-
     try {
       ModelMap modelo = servicioPerfil.prepararEditarPerfil(idUsuario, idMascota);
       return new ModelAndView("perfil", modelo);
@@ -71,11 +70,10 @@ public class ControladorPerfil {
     HttpServletRequest request,
     @RequestParam(required = false) Long idMascota
   ) {
-    Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
     if (idUsuario == null) {
       return new ModelAndView(REDIRECT_LOGIN);
     }
-
     try {
       servicioPerfil.actualizarPerfil(idUsuario, datosPerfil);
       String redirectUrl = idMascota != null
@@ -91,5 +89,16 @@ public class ControladorPerfil {
       );
       return new ModelAndView("perfil", modelo);
     }
+  }
+
+  @RequestMapping(path = "/perfil/eliminar-cuenta", method = RequestMethod.POST)
+  public ModelAndView eliminarCuenta(HttpServletRequest request) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    if (idUsuario == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+    servicioPerfil.eliminarCuenta(idUsuario);
+    request.getSession().invalidate();
+    return new ModelAndView(REDIRECT_LOGIN);
   }
 }

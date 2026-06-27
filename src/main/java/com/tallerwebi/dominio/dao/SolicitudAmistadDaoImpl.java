@@ -89,4 +89,13 @@ public class SolicitudAmistadDaoImpl implements SolicitudAmistadDao {
   public void eliminar(SolicitudAmistad solicitud) {
     sessionFactory.getCurrentSession().delete(solicitud);
   }
+
+  @Override
+  public void eliminarPorUsuario(Long idUsuario) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("DELETE FROM SolicitudAmistad s WHERE s.emisor.id = :id OR s.receptor.id = :id")
+      .setParameter("id", idUsuario)
+      .executeUpdate();
+  }
 }

@@ -44,4 +44,9 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
   public Usuario buscarPorId(Long id) {
     return sessionFactory.getCurrentSession().get(Usuario.class, id);
   }
+
+  @Override
+  public void eliminar(Usuario usuario) {
+    sessionFactory.getCurrentSession().delete(usuario);
+  }
 }

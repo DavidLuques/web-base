@@ -19,4 +19,8 @@ public interface RepositorioAlerta {
   Alerta buscarPorId(Long idAlerta);
 
   List<Alerta> buscarEmergenciasActivasPorUsuario(Long idUsuario);
+
+  void eliminarPorUsuario(Long idUsuario);
+
+  void eliminarPorMascota(Long id);
 }

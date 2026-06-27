@@ -44,4 +44,15 @@ public class SolicitudTransferenciaDaoImpl implements SolicitudTransferenciaDao 
       .setParameter("idUsuario", idUsuario)
       .list();
   }
+
+  @Override
+  public void eliminarPorUsuario(Long idUsuario) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "DELETE FROM SolicitudTransferencia s WHERE s.usuarioOrigen.id = :id OR s.usuarioDestino.id = :id"
+      )
+      .setParameter("id", idUsuario)
+      .executeUpdate();
+  }
 }

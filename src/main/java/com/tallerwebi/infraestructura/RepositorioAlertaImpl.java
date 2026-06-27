@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository("repositorioAlerta")
 public class RepositorioAlertaImpl implements RepositorioAlerta {
 
+  private static final String PARAM_ID_MASCOTA = "idMascota";
+
   private final SessionFactory sessionFactory;
 
   @Autowired
@@ -31,7 +33,7 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
         "SELECT a FROM Alerta a JOIN FETCH a.mascota WHERE a.mascota.id = :idMascota",
         Alerta.class
       )
-      .setParameter("idMascota", idMascota)
+      .setParameter(PARAM_ID_MASCOTA, idMascota)
       .getResultList();
   }
 
@@ -56,7 +58,7 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
         "AND a.mensaje LIKE :prefijo ORDER BY a.fechaYHora DESC",
         Alerta.class
       )
-      .setParameter("idMascota", idMascota)
+      .setParameter(PARAM_ID_MASCOTA, idMascota)
       .setParameter("prefijo", "Atencion: El peso%")
       .setMaxResults(1)
       .getResultList();
@@ -72,7 +74,7 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
         "AND a.mensaje LIKE :prefijo ORDER BY a.fechaYHora DESC",
         Alerta.class
       )
-      .setParameter("idMascota", idMascota)
+      .setParameter(PARAM_ID_MASCOTA, idMascota)
       .setParameter("prefijo", "EMERGENCIA: % se alejo %")
       .setMaxResults(1)
       .getResultList();
@@ -106,5 +108,23 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
       .setParameter("idUsuario", idUsuario)
       .setParameter("tipo", TipoAlerta.EMERGENCIA)
       .getResultList();
+  }
+
+  @Override
+  public void eliminarPorUsuario(Long idUsuario) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("DELETE FROM Alerta a WHERE a.usuario.id = :idUsuario")
+      .setParameter("idUsuario", idUsuario)
+      .executeUpdate();
+  }
+
+  @Override
+  public void eliminarPorMascota(Long idMascota) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("DELETE FROM Alerta a WHERE a.mascota.id = :idMascota")
+      .setParameter(PARAM_ID_MASCOTA, idMascota)
+      .executeUpdate();
   }
 }

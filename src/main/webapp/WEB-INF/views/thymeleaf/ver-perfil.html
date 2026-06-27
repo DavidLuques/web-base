@@ -95,12 +95,21 @@
             </div>
           </div>
 
-          <div class="pt-6 flex justify-end">
-            <a th:href="@{/perfil/editar(idMascota=${idMascota})}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
-              <i data-lucide="edit-2" class="w-5 h-5"></i>
-              Editar Perfil
-            </a>
-          </div>
+		<div class="pt-6 flex justify-between items-center">
+		  <form th:action="@{/perfil/eliminar-cuenta}" method="POST"
+		        onsubmit="return confirm('&iquest;Est&aacute;s seguro de que quer&eacute;s eliminar tu cuenta? Esta acci&oacute;n no se puede deshacer y se eliminar&aacute;n todas tus mascotas.');">
+		    <button type="submit"
+		            class="text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-medium py-3 px-6 rounded-xl transition-colors flex items-center gap-2">
+		      <i data-lucide="trash-2" class="w-5 h-5"></i>
+		      Eliminar cuenta
+		    </button>
+		  </form>
+		  <a th:href="@{/perfil/editar(idMascota=${idMascota})}"
+		     class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+		    <i data-lucide="edit-2" class="w-5 h-5"></i>
+		    Editar Perfil
+		  </a>
+		</div>
 
         </div>
       </div>

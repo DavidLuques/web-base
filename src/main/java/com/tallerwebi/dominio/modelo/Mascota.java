@@ -41,7 +41,7 @@ public class Mascota {
   private DatosMascota datos;
 
   @ManyToOne
-  @JoinColumn(name = "usuario_id", nullable = false)
+  @JoinColumn(name = "usuario_id", nullable = true)
   private Usuario usuario;
 
   public Mascota() {

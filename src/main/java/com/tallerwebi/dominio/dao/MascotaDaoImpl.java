@@ -66,4 +66,13 @@ public class MascotaDaoImpl implements MascotaDao {
   public void eliminar(Mascota mascota) {
     sessionFactory.getCurrentSession().delete(mascota);
   }
+
+  @Override
+  public List<Mascota> buscarTodoPorUsuarioId(Long usuarioId) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("FROM Mascota m WHERE m.usuario.id = :usuarioId", Mascota.class)
+      .setParameter("usuarioId", usuarioId)
+      .list();
+  }
 }

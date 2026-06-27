@@ -16,4 +16,6 @@ public interface ServicioPerfil {
     Long idMascota,
     String mensajeError
   );
+
+  void eliminarCuenta(Long idUsuario);
 }

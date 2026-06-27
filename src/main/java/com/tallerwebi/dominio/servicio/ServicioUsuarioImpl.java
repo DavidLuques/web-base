@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.excepcion.UsuarioNoEncontrado;
 import com.tallerwebi.dominio.modelo.Direccion;
 import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.presentacion.DatosPerfil;
+import java.util.List;
 import javax.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,24 @@ import org.springframework.stereotype.Service;
 public class ServicioUsuarioImpl implements ServicioUsuario {
 
   private RepositorioUsuario repositorioUsuario;
+  private com.tallerwebi.dominio.dao.MascotaDao mascotaDao;
+  private com.tallerwebi.dominio.RepositorioAlerta repositorioAlerta;
+  private com.tallerwebi.dominio.dao.SolicitudAmistadDao solicitudAmistadDao;
+  private com.tallerwebi.dominio.dao.SolicitudTransferenciaDao solicitudTransferenciaDao;
 
   @Autowired
-  public ServicioUsuarioImpl(RepositorioUsuario repositorioUsuario) {
+  public ServicioUsuarioImpl(
+    RepositorioUsuario repositorioUsuario,
+    com.tallerwebi.dominio.dao.MascotaDao mascotaDao,
+    com.tallerwebi.dominio.RepositorioAlerta repositorioAlerta,
+    com.tallerwebi.dominio.dao.SolicitudAmistadDao solicitudAmistadDao,
+    com.tallerwebi.dominio.dao.SolicitudTransferenciaDao solicitudTransferenciaDao
+  ) {
     this.repositorioUsuario = repositorioUsuario;
+    this.mascotaDao = mascotaDao;
+    this.repositorioAlerta = repositorioAlerta;
+    this.solicitudAmistadDao = solicitudAmistadDao;
+    this.solicitudTransferenciaDao = solicitudTransferenciaDao;
   }
 
   @Override
@@ -56,7 +71,7 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
   public void eliminar(Long id) {
     Usuario usuario = repositorioUsuario.buscarPorId(id);
     if (usuario != null) {
-      usuario.setActivo(false); // queda el usuario como inactivo en lugar de eliminarlo fisicamente
+      usuario.setActivo(false);
     }
   }
 
@@ -87,5 +102,23 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
     usuario.setUbicacion(ubicacion);
 
     repositorioUsuario.modificar(usuario);
+  }
+
+  @Override
+  public void eliminarCuenta(Long id) {
+    List<com.tallerwebi.dominio.modelo.Mascota> mascotas = mascotaDao.buscarTodoPorUsuarioId(id);
+    if (mascotas != null) {
+      for (com.tallerwebi.dominio.modelo.Mascota mascota : mascotas) {
+        mascota.setUsuario(null);
+        mascotaDao.modificar(mascota);
+      }
+    }
+    repositorioAlerta.eliminarPorUsuario(id);
+    solicitudTransferenciaDao.eliminarPorUsuario(id);
+    solicitudAmistadDao.eliminarPorUsuario(id);
+    Usuario usuario = repositorioUsuario.buscarPorId(id);
+    if (usuario != null) {
+      repositorioUsuario.eliminar(usuario);
+    }
   }
 }

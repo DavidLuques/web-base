@@ -12,4 +12,5 @@ public interface SolicitudAmistadDao {
   SolicitudAmistad buscarEntreUsuarios(Long idUsuario1, Long idUsuario2);
   List<SolicitudAmistad> buscarEnviadasPorEmisor(Long idEmisor);
   void eliminar(SolicitudAmistad solicitud);
+  void eliminarPorUsuario(Long idUsuario);
 }

@@ -11,4 +11,5 @@ public interface MascotaDao {
   List<Mascota> buscarPorUsuarioId(Long usuarioId);
   void guardar(Mascota mascota);
   void eliminar(Mascota mascota);
+  List<Mascota> buscarTodoPorUsuarioId(Long id);
 }
