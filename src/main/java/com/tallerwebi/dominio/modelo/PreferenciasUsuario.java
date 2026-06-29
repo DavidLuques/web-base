@@ -7,7 +7,7 @@ import javax.persistence.Embeddable;
 public class PreferenciasUsuario {
 
   @Column(name = "notificaciones_mail_activas", nullable = false)
-  private Boolean notificacionesMailActivas = true;
+  private Boolean notificacionesMailActivas = false;
 
   public Boolean getNotificacionesMailActivas() {
     return notificacionesMailActivas;

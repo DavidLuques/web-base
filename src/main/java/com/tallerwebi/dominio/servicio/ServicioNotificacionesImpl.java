@@ -43,7 +43,7 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
     }
 
     Boolean mailActivo = alerta.getMascota().getUsuario().getNotificacionesMailActivas();
-    if (mailActivo != null && !mailActivo) {
+    if (mailActivo == null || !mailActivo) {
       return;
     }
 

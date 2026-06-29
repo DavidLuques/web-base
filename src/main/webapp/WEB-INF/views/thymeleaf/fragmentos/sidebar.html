@@ -17,13 +17,18 @@
          th:class="${paginaActiva == 'vista'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
         <i th:class="${paginaActiva == 'vista'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="activity"></i>
       </a>
-      <a th:href="@{/analisis/alertas/{id}(id=${idMascota})}"
-         th:class="${paginaActiva == 'alertas'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
-        <i th:class="${paginaActiva == 'alertas'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="bell"></i>
-      </a>
       <a th:href="@{/analisis/valla/{id}(id=${idMascota})}"
          th:class="${paginaActiva == 'valla'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
         <i th:class="${paginaActiva == 'valla'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="map-pin"></i>
+      </a>
+      <a th:href="@{/analisis/alertas/{id}(id=${idMascota})}"
+         th:class="${paginaActiva == 'alertas'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+        <div class="relative">
+          <i th:class="${paginaActiva == 'alertas'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="bell"></i>
+          <span id="badge-alertas-sin-leer" class="absolute -top-1 -right-2 bg-rose-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">
+            0
+          </span>
+        </div>
       </a>
       <a th:href="@{/amigos(idMascota=${idMascota})}"
          th:class="${paginaActiva == 'amigos'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">

@@ -167,6 +167,26 @@ function inicializarAlertas(idMascota) {
       });
   }
 
+  function actualizarBadgeInmediato(valor) {
+    const badge = document.getElementById("badge-alertas-sin-leer");
+    if (!badge) return;
+
+    if (valor === 0) {
+      badge.classList.add("hidden");
+      return;
+    }
+
+    const actual = parseInt(badge.textContent) || 0;
+    const nuevo = Math.max(0, actual + valor);
+
+    if (nuevo === 0) {
+      badge.classList.add("hidden");
+    } else {
+      badge.textContent = nuevo > 99 ? "99+" : nuevo;
+      badge.classList.remove("hidden");
+    }
+  }
+
   window.marcarAlertaComoLeida = function (idAlerta) {
     fetch("/spring/analisis/alertas/" + idAlerta + "/leer", {
       method: "PUT",
@@ -176,6 +196,7 @@ function inicializarAlertas(idMascota) {
         if (response.ok) {
           cargarAlertasMascota();
           cargarAlertasUsuario();
+          actualizarBadgeInmediato(-1);
         }
       })
       .catch(function (error) {
@@ -184,7 +205,7 @@ function inicializarAlertas(idMascota) {
   };
 
   const notifWindowsKey = "notificaciones-windows-activas-" + idMascota;
-  let notifWindowsActivas = localStorage.getItem(notifWindowsKey) !== "false";
+  let notifWindowsActivas = localStorage.getItem(notifWindowsKey) === "true";
 
   window.toggleNotificacionesWindows = function() {
     notifWindowsActivas = !notifWindowsActivas;
@@ -228,6 +249,7 @@ function inicializarAlertas(idMascota) {
       if (res.ok) {
         cargarAlertasMascota();
         cargarAlertasUsuario();
+        actualizarBadgeInmediato(0);
       }
     });
   };
