@@ -1,4 +1,3 @@
-/* global lucide */
 (function () {
   function inicializarNotificacionesBg(idMascota) {
     if (!("Notification" in window)) return;
@@ -9,7 +8,7 @@
 
     const sessionKey = "alertas-notificadas-sesion-" + idMascota;
     const notificadas = new Set(
-      JSON.parse(sessionStorage.getItem(sessionKey) || "[]")
+        JSON.parse(sessionStorage.getItem(sessionKey) || "[]")
     );
 
     function guardarNotificadas() {
@@ -21,7 +20,6 @@
       return localStorage.getItem(notifWindowsKey) === "true";
     }
 
-    // Flag que indica si en el ciclo anterior estaban desactivadas
     let estabanDesactivadas = !notificacionesWindowsActivas();
 
     function chequearEmergencias() {
@@ -42,7 +40,7 @@
 
             actualizarBadge(alertas);
 
-            if (!activasAhora) return; // corta solo las notificaciones, no el badge
+            if (!activasAhora) return;
 
             alertas.forEach(function (alerta) {
               if (alerta.tipo === "EMERGENCIA" && !alerta.leido) {
