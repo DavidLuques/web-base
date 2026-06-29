@@ -3,7 +3,10 @@ package com.tallerwebi.dominio.servicio;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.RepositorioAlerta;
 import com.tallerwebi.dominio.RepositorioAnalisis;
+import com.tallerwebi.dominio.enums.TipoAlerta;
+import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.Mascota;
@@ -23,13 +26,16 @@ public class ServicioExportacionImplTest {
   private ServicioExportacionImpl servicioExportacion;
   private ServicioMascota servicioMascota;
   private RepositorioAnalisis repositorioAnalisis;
+  private RepositorioAlerta repositorioAlerta;
   private HttpServletResponse responseMock;
 
   @BeforeEach
   public void setUp() {
     servicioMascota = mock(ServicioMascota.class);
     repositorioAnalisis = mock(RepositorioAnalisis.class);
-    servicioExportacion = new ServicioExportacionImpl(servicioMascota, repositorioAnalisis);
+    repositorioAlerta = mock(RepositorioAlerta.class);
+    servicioExportacion =
+      new ServicioExportacionImpl(servicioMascota, repositorioAnalisis, repositorioAlerta);
     responseMock = mock(HttpServletResponse.class);
   }
 
@@ -46,7 +52,7 @@ public class ServicioExportacionImplTest {
     mascota.setPeso(20.5);
 
     Analisis analisis = new Analisis();
-    analisis.setFechaYHora(LocalDateTime.now());
+    analisis.setFechaYHora(LocalDateTime.now().minusDays(5));
     DatosAnalisis datos = new DatosAnalisis();
     datos.setFrecuenciaCardiaca(80);
     datos.setTemperatura(38.5);
@@ -57,8 +63,16 @@ public class ServicioExportacionImplTest {
     List<Analisis> historial = new ArrayList<>();
     historial.add(analisis);
 
+    Alerta alerta = new Alerta();
+    alerta.setTipo(TipoAlerta.EMERGENCIA);
+    alerta.setMensaje("Pulsaciones altas");
+    alerta.setFechaYHora(LocalDateTime.now().minusDays(2));
+    List<Alerta> alertas = new ArrayList<>();
+    alertas.add(alerta);
+
     when(servicioMascota.obtenerMascotaPorId(idMascota)).thenReturn(mascota);
     when(repositorioAnalisis.buscarPorMascota(idMascota)).thenReturn(historial);
+    when(repositorioAlerta.buscarPorMascota(idMascota)).thenReturn(alertas);
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ServletOutputStream servletOutputStream = new ServletOutputStream() {
@@ -91,6 +105,7 @@ public class ServicioExportacionImplTest {
     verify(responseMock).setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
     verify(servicioMascota, times(1)).obtenerMascotaPorId(idMascota);
     verify(repositorioAnalisis, times(1)).buscarPorMascota(idMascota);
+    verify(repositorioAlerta, times(1)).buscarPorMascota(idMascota);
     assert (out.size() > 0);
   }
 
@@ -105,6 +120,7 @@ public class ServicioExportacionImplTest {
 
     when(servicioMascota.obtenerMascotaPorId(idMascota)).thenReturn(mascota);
     when(repositorioAnalisis.buscarPorMascota(idMascota)).thenReturn(new ArrayList<>());
+    when(repositorioAlerta.buscarPorMascota(idMascota)).thenReturn(new ArrayList<>());
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ServletOutputStream servletOutputStream = new ServletOutputStream() {
@@ -168,6 +184,7 @@ public class ServicioExportacionImplTest {
 
     when(servicioMascota.obtenerMascotaPorId(idMascota)).thenReturn(mascota);
     when(repositorioAnalisis.buscarPorMascota(idMascota)).thenReturn(historial);
+    when(repositorioAlerta.buscarPorMascota(idMascota)).thenReturn(new ArrayList<>());
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ServletOutputStream servletOutputStream = new ServletOutputStream() {
