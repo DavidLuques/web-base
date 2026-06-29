@@ -78,6 +78,8 @@ public class ControladorPerfilMascotaTest {
   public void alActualizarPerfilLlamaAlServicioYRedirigeAlPerfil() {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(1L);
     DatosAltaMascota datosMascota = new DatosAltaMascota();
+    datosMascota.setPeso(10.0);
+    datosMascota.setFechaNacimiento("2020-01-01");
 
     ModelAndView mav = controlador.actualizarPerfilMascota(datosMascota, requestMock, 1L);
 
@@ -86,6 +88,31 @@ public class ControladorPerfilMascotaTest {
       "redirect:/configuraciones/mascota/perfil?exito=true&idMascota=1",
       mav.getViewName()
     );
+  }
+
+  @Test
+  public void alActualizarPerfilConPesoInvalidoRetornaConError() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(1L);
+    DatosAltaMascota datosMascota = new DatosAltaMascota();
+    datosMascota.setPeso(0.0);
+
+    ModelAndView mav = controlador.actualizarPerfilMascota(datosMascota, requestMock, 1L);
+
+    assertEquals("perfil-mascota", mav.getViewName());
+    assertEquals("El peso debe ser mayor a 0.", mav.getModel().get("error"));
+  }
+
+  @Test
+  public void alActualizarPerfilConFechaNacimientoInvalidaRetornaConError() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(1L);
+    DatosAltaMascota datosMascota = new DatosAltaMascota();
+    datosMascota.setPeso(10.0);
+    datosMascota.setFechaNacimiento("1800-01-01");
+
+    ModelAndView mav = controlador.actualizarPerfilMascota(datosMascota, requestMock, 1L);
+
+    assertEquals("perfil-mascota", mav.getViewName());
+    assertEquals("El año de nacimiento debe ser mayor a 1900.", mav.getModel().get("error"));
   }
 
   @Test

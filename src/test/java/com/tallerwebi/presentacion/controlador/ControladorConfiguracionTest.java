@@ -145,6 +145,7 @@ public class ControladorConfiguracionTest {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
     DatosAltaMascota datos = new DatosAltaMascota();
     datos.setPeso(10.0);
+    datos.setFechaNacimiento("2020-01-01");
 
     when(servicioMascotaMock.registrarMascota(datos, idUsuario)).thenReturn(99L);
 
@@ -160,6 +161,7 @@ public class ControladorConfiguracionTest {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
     DatosAltaMascota datos = new DatosAltaMascota();
     datos.setPeso(10.0);
+    datos.setFechaNacimiento("2020-01-01");
 
     doThrow(new IllegalArgumentException("Error test"))
       .when(servicioMascotaMock)
@@ -177,10 +179,39 @@ public class ControladorConfiguracionTest {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
     DatosAltaMascota datos = new DatosAltaMascota();
     datos.setPeso(0.0);
+    datos.setFechaNacimiento("2020-01-01");
 
     ModelAndView mav = controlador.registrarMascota(datos, requestMock);
 
     assertThat(mav.getViewName(), equalTo("nueva-mascota"));
     assertThat(mav.getModel().get("error"), equalTo("El peso debe ser mayor a 0."));
+  }
+
+  @Test
+  public void registrarMascotaConFechaNacimientoInvalidaRetornaVistaNuevaMascotaConError() {
+    Long idUsuario = 1L;
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    DatosAltaMascota datos = new DatosAltaMascota();
+    datos.setPeso(10.0);
+    datos.setFechaNacimiento("1800-01-01"); // Invalid year
+
+    ModelAndView mav = controlador.registrarMascota(datos, requestMock);
+
+    assertThat(mav.getViewName(), equalTo("nueva-mascota"));
+    assertThat(mav.getModel().get("error"), equalTo("El año de nacimiento debe ser mayor a 1900."));
+  }
+
+  @Test
+  public void registrarMascotaConFechaNacimientoMalaRetornaVistaNuevaMascotaConError() {
+    Long idUsuario = 1L;
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    DatosAltaMascota datos = new DatosAltaMascota();
+    datos.setPeso(10.0);
+    datos.setFechaNacimiento("not-a-date");
+
+    ModelAndView mav = controlador.registrarMascota(datos, requestMock);
+
+    assertThat(mav.getViewName(), equalTo("nueva-mascota"));
+    assertThat(mav.getModel().get("error"), equalTo("La fecha ingresada no es válida."));
   }
 }
