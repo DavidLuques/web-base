@@ -5,9 +5,11 @@ import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosAltaMascota;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -69,12 +71,21 @@ public class ControladorConfiguracion {
 
   @RequestMapping(path = "/configuraciones/mascota/nueva", method = RequestMethod.POST)
   public ModelAndView registrarMascota(
-    @ModelAttribute("datosMascota") DatosAltaMascota datosMascota,
+    @ModelAttribute("datosMascota") @Valid DatosAltaMascota datosMascota,
+    BindingResult result,
     HttpServletRequest request
   ) {
     Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
     if (idUsuario == null) {
       return new ModelAndView("redirect:/login");
+    }
+
+    if (result.hasErrors()) {
+      ModelMap modelo = new ModelMap();
+      modelo.put("datosMascota", datosMascota);
+      modelo.put("error", "Por favor, corrige los errores en el formulario.");
+      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      return new ModelAndView("nueva-mascota", modelo);
     }
 
     try {
