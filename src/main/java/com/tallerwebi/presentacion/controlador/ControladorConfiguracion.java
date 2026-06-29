@@ -5,11 +5,9 @@ import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioUsuario;
 import com.tallerwebi.presentacion.DatosAltaMascota;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +19,9 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class ControladorConfiguracion {
+
+  private static final String ATRIBUTO_MIS_MASCOTAS = "misMascotas";
+  private static final String ATRIBUTO_DATOS_MASCOTA = "datosMascota";
 
   private ServicioUsuario servicioUsuario;
   private ServicioMascota servicioMascota;
@@ -48,7 +49,7 @@ public class ControladorConfiguracion {
     ModelMap modelo = new ModelMap();
     modelo.put("usuario", usuario);
     modelo.put("idMascota", idMascota);
-    modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    modelo.put(ATRIBUTO_MIS_MASCOTAS, servicioMascota.obtenerMascotasPorUsuario(idUsuario));
     return new ModelAndView("configuraciones", modelo);
   }
 
@@ -63,16 +64,15 @@ public class ControladorConfiguracion {
     }
 
     ModelMap modelo = new ModelMap();
-    modelo.put("datosMascota", new DatosAltaMascota());
+    modelo.put(ATRIBUTO_DATOS_MASCOTA, new DatosAltaMascota());
     modelo.put("idMascota", idMascota);
-    modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+    modelo.put(ATRIBUTO_MIS_MASCOTAS, servicioMascota.obtenerMascotasPorUsuario(idUsuario));
     return new ModelAndView("nueva-mascota", modelo);
   }
 
   @RequestMapping(path = "/configuraciones/mascota/nueva", method = RequestMethod.POST)
   public ModelAndView registrarMascota(
-    @ModelAttribute("datosMascota") @Valid DatosAltaMascota datosMascota,
-    BindingResult result,
+    @ModelAttribute(ATRIBUTO_DATOS_MASCOTA) DatosAltaMascota datosMascota,
     HttpServletRequest request
   ) {
     Long idUsuario = (Long) request.getSession().getAttribute("ID_USUARIO");
@@ -80,11 +80,11 @@ public class ControladorConfiguracion {
       return new ModelAndView("redirect:/login");
     }
 
-    if (result.hasErrors()) {
+    if (datosMascota.getPeso() == null || datosMascota.getPeso() <= 0) {
       ModelMap modelo = new ModelMap();
-      modelo.put("datosMascota", datosMascota);
-      modelo.put("error", "Por favor, corrige los errores en el formulario.");
-      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      modelo.put(ATRIBUTO_DATOS_MASCOTA, datosMascota);
+      modelo.put("error", "El peso debe ser mayor a 0.");
+      modelo.put(ATRIBUTO_MIS_MASCOTAS, servicioMascota.obtenerMascotasPorUsuario(idUsuario));
       return new ModelAndView("nueva-mascota", modelo);
     }
 
@@ -93,9 +93,9 @@ public class ControladorConfiguracion {
       return new ModelAndView("redirect:/configuraciones?idMascota=" + nuevaMascotaId);
     } catch (Exception e) {
       ModelMap modelo = new ModelMap();
-      modelo.put("datosMascota", datosMascota);
+      modelo.put(ATRIBUTO_DATOS_MASCOTA, datosMascota);
       modelo.put("error", "Ocurrió un error al registrar la mascota: " + e.getMessage());
-      modelo.put("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
+      modelo.put(ATRIBUTO_MIS_MASCOTAS, servicioMascota.obtenerMascotasPorUsuario(idUsuario));
       return new ModelAndView("nueva-mascota", modelo);
     }
   }

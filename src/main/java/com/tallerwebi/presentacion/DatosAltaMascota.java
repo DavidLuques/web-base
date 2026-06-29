@@ -1,8 +1,6 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.enums.TamanoMascota;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotNull;
 
 /**
  * as
@@ -13,9 +11,8 @@ public class DatosAltaMascota {
   private String tipo;
   private String raza;
   private String genero;
-  @NotNull(message = "El peso no puede ser nulo")
-  @DecimalMin(value = "0.1", message = "El peso debe ser mayor a 0")
   private Double peso;
+
   private TamanoMascota tamano;
   private String fechaNacimiento;
 

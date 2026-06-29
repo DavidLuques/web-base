@@ -144,6 +144,7 @@ public class ControladorConfiguracionTest {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
     DatosAltaMascota datos = new DatosAltaMascota();
+    datos.setPeso(10.0);
 
     when(servicioMascotaMock.registrarMascota(datos, idUsuario)).thenReturn(99L);
 
@@ -158,6 +159,7 @@ public class ControladorConfiguracionTest {
     Long idUsuario = 1L;
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
     DatosAltaMascota datos = new DatosAltaMascota();
+    datos.setPeso(10.0);
 
     doThrow(new IllegalArgumentException("Error test"))
       .when(servicioMascotaMock)
@@ -167,5 +169,18 @@ public class ControladorConfiguracionTest {
 
     assertThat(mav.getViewName(), equalTo("nueva-mascota"));
     assertThat(mav.getModel().get("error") != null, equalTo(true));
+  }
+
+  @Test
+  public void registrarMascotaConPesoInvalidoRetornaVistaNuevaMascotaConError() {
+    Long idUsuario = 1L;
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(idUsuario);
+    DatosAltaMascota datos = new DatosAltaMascota();
+    datos.setPeso(0.0);
+
+    ModelAndView mav = controlador.registrarMascota(datos, requestMock);
+
+    assertThat(mav.getViewName(), equalTo("nueva-mascota"));
+    assertThat(mav.getModel().get("error"), equalTo("El peso debe ser mayor a 0."));
   }
 }
