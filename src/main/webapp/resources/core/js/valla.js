@@ -1,6 +1,6 @@
 /* global L, lucide */
 
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line max-lines-per-function
 function inicializarValla(idMascota) {
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
@@ -15,12 +15,12 @@ function inicializarValla(idMascota) {
   let lonHogar = -58.5250;
   let radioValla = 150;
   let ultimaDistanciaReal = 0;
+  let valladoActivo = true;
 
   const inputRadio = document.getElementById("input-radio");
   const btnConfirmar = document.getElementById("btn-confirmar-radio");
-  
-  const inputDireccionValla = document.getElementById("input-direccion-valla");
-  const btnActualizarCentro = document.getElementById("btn-actualizar-centro");
+
+  const toggleVallado = document.getElementById("toggle-vallado");
 
   const badgeAlerta = document.getElementById("badge-alerta");
   const indicadorLuz = document.getElementById("indicador-luz");
@@ -52,23 +52,70 @@ function inicializarValla(idMascota) {
 
     distanciaTexto.innerText = `${Math.round(ultimaDistanciaReal)} metros del hogar`;
 
+    // Si la valla está apagada, forzamos un estado visual neutral
+    if (!valladoActivo) {
+      estadoTexto.innerText = "Vallado Desactivado";
+      estadoTexto.className = "text-2xl font-semibold text-slate-500";
+      if (badgeAlerta) {
+        badgeAlerta.className = "bg-slate-100 text-slate-600 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 border border-slate-300";
+      }
+      if (indicadorLuz) {
+        indicadorLuz.className = "w-3 h-3 rounded-full bg-slate-400";
+      }
+      if (vallaCircle) {
+        vallaCircle.setStyle({ color: "#94a3b8", fillColor: "#cbd5e1", fillOpacity: 0.2 });
+      }
+      return;
+    }
+
     if (ultimaDistanciaReal > radioValla) {
       estadoTexto.innerText = "¡Mascota fuera de la zona segura!";
       estadoTexto.className = "text-2xl font-semibold text-red-600";
-      
-      if (badgeAlerta) badgeAlerta.className = "bg-red-50 text-red-700 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 border-2 border-red-200";
-      if (indicadorLuz) indicadorLuz.className = "w-3 h-3 rounded-full bg-red-600 animate-pulse";
 
-      if (vallaCircle) vallaCircle.setStyle({ color: "#ef4444", fillColor: "#ef4444" });
+      if (badgeAlerta) {
+        badgeAlerta.className = "bg-red-50 text-red-700 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 border-2 border-red-200";
+      }
+      if (indicadorLuz) {
+        indicadorLuz.className = "w-3 h-3 rounded-full bg-red-600 animate-pulse";
+      }
+      if (vallaCircle) {
+        vallaCircle.setStyle({ color: "#ef4444", fillColor: "#ef4444", fillOpacity: 0.1 });
+      }
     } else {
       estadoTexto.innerText = "Dentro del perímetro establecido";
       estadoTexto.className = "text-2xl font-semibold text-green-700";
-      
-      if (badgeAlerta) badgeAlerta.className = "bg-green-50 text-green-700 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 border-2 border-green-200";
-      if (indicadorLuz) indicadorLuz.className = "w-3 h-3 rounded-full bg-green-500";
 
-      if (vallaCircle) vallaCircle.setStyle({ color: "#3b82f6", fillColor: "#3b82f6" });
+      if (badgeAlerta) {
+        badgeAlerta.className = "bg-green-50 text-green-700 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 border-2 border-green-200";
+      }
+      if (indicadorLuz) {
+        indicadorLuz.className = "w-3 h-3 rounded-full bg-green-500";
+      }
+      if (vallaCircle) {
+        vallaCircle.setStyle({ color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 0.1 });
+      }
     }
+  }
+
+  // Evento de Encendido / Apagado (Switch) ---
+  if (toggleVallado) {
+    toggleVallado.addEventListener("change", async (e) => {
+      valladoActivo = e.target.checked;
+      evaluarAlerta(); 
+
+      const formData = new URLSearchParams();
+      formData.append("activo", valladoActivo.toString());
+
+      try {
+        await fetch(`/spring/analisis/valla/${idMascota}/estado`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData
+        });
+      } catch (error) {
+        console.error("Error cambiando estado del vallado:", error);
+      }
+    });
   }
 
   // --- Eventos para el Radio ---
@@ -138,24 +185,22 @@ function inicializarValla(idMascota) {
             const li = document.createElement("li");
             li.className = "p-3 text-sm border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors";
             li.innerText = lugar.display_name;
-            
+
             // Evento al hacer clic en un resultado
             li.addEventListener("click", () => {
               const lat = parseFloat(lugar.lat);
               const lon = parseFloat(lugar.lon);
-              
+
               // Ocultamos la lista y actualizamos el input
               listaResultados.classList.add("hidden");
               inputDireccion.value = lugar.display_name.split(","); // Mostramos solo la calle corta
 
-              //  Movemos el mapa y el círculo visualmente
               latHogar = lat;
               lonHogar = lon;
               if (map) map.setView([lat, lon], 16);
               if (mascotaMarker) mascotaMarker.setLatLng([lat, lon]);
               if (vallaCircle) vallaCircle.setLatLng([lat, lon]);
 
-              
               guardarCentroEnBaseDeDatos(lat, lon);
             });
 
@@ -178,7 +223,7 @@ function inicializarValla(idMascota) {
     });
   }
 
-  // Función separada para guardar
+  // Función separada para guardar el nuevo centro
   async function guardarCentroEnBaseDeDatos(lat, lon) {
     const formData = new URLSearchParams();
     formData.append("latitud", lat.toString());
@@ -214,9 +259,19 @@ function inicializarValla(idMascota) {
       lonHogar = datos.longitud;
       radioValla = datos.radio;
 
+      // Leemos si el vallado está encendido o apagado de la Base de Datos
+      if (datos.activo !== undefined) {
+        valladoActivo = datos.activo;
+        if (toggleVallado) {
+          toggleVallado.checked = valladoActivo;
+        }
+      }
+
       if (inputRadio) inputRadio.value = datos.radio;
 
       inicializarMapaReal();
+      
+      evaluarAlerta(); 
     } catch (error) {
       console.error("Error cargando vallado:", error);
     }

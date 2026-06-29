@@ -41,3 +41,20 @@
     z-index: 20;
     transition: left 0.5s ease, top 0.5s ease, color 0.3s ease;
 }
+
+.barra-controles-vallado {
+    position: relative !important;
+    z-index: 1010 !important;
+}
+
+.lista-sugerencias-valla {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    z-index: 1020 !important;
+}
+
+.contenedor-mapa-valla {
+    position: relative !important;
+    z-index: 1 !important;
+}

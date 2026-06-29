@@ -65,6 +65,8 @@ public class ServicioValladoImpl implements ServicioVallado {
         vallado.setMascota(mascota);
         vallado.setLatitudCentro(latitud);
         vallado.setLongitudCentro(longitud);
+        vallado.setRadioMetros(150);
+        vallado.setActivo(true);
         valladoDao.guardar(vallado);
       } else {
         vallado.setLatitudCentro(latitud);
@@ -154,5 +156,14 @@ public class ServicioValladoImpl implements ServicioVallado {
     nuevo.setDatos(nuevosDatos);
 
     return nuevo;
+  }
+
+  @Override
+  public void alternarEstadoVallado(Long idMascota, Boolean estado) {
+    Vallado vallado = valladoDao.buscarPorMascota(idMascota);
+    if (vallado != null) {
+      vallado.setActivo(estado);
+      valladoDao.modificar(vallado);
+    }
   }
 }

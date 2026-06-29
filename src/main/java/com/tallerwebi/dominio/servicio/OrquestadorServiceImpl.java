@@ -177,9 +177,14 @@ public class OrquestadorServiceImpl implements OrquestadorService {
       ? vallado.getLongitudCentro()
       : -58.5250;
 
+    Boolean valladoActivo = (vallado != null && vallado.getActivo() != null)
+      ? vallado.getActivo()
+      : true;
+
     Map<String, Object> respuesta = new HashMap<>();
     respuesta.put(CLAVE_LATITUD, latHogar);
     respuesta.put(CLAVE_LONGITUD, lonHogar);
+    respuesta.put("activo", valladoActivo);
 
     if (vallado != null && vallado.getRadioMetros() != null) {
       respuesta.put(CLAVE_RADIO, vallado.getRadioMetros().doubleValue());

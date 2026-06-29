@@ -309,7 +309,7 @@ public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
   ) {
     if (lectura == null || vallado == null) return;
 
-    if (distanciaMetros > vallado.getRadioMetros()) {
+    if (distanciaMetros > vallado.getRadioMetros() && vallado.getActivo() == true) {
       Alerta ultimaAlertaVallado = servicioAlerta.buscarUltimaAlertaDeVallado(mascota.getId());
       if (
         ultimaAlertaVallado != null &&

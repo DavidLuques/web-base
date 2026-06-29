@@ -94,4 +94,14 @@ public class ControladorValla {
     servicioVallado.actualizarCentroVallado(idMascota, latitud, longitud);
     return ResponseEntity.ok("{\"status\":\"success\"}");
   }
+
+  @PostMapping(path = "/analisis/valla/{idMascota}/estado")
+  @ResponseBody
+  public ResponseEntity<String> alternarEstado(
+    @PathVariable Long idMascota,
+    @RequestParam("activo") Boolean activo
+  ) {
+    servicioVallado.alternarEstadoVallado(idMascota, activo);
+    return ResponseEntity.ok("{\"status\":\"success\"}");
+  }
 }

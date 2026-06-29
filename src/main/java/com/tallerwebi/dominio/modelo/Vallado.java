@@ -30,6 +30,9 @@ public class Vallado {
   @Column(name = "radio_metros", nullable = false)
   private Integer radioMetros;
 
+  @Column(name = "activo", columnDefinition = "boolean default true")
+  private Boolean activo = true;
+
   public Vallado() {}
 
   public Vallado(
@@ -82,5 +85,13 @@ public class Vallado {
 
   public void setRadioMetros(Integer radioMetros) {
     this.radioMetros = radioMetros;
+  }
+
+  public Boolean getActivo() {
+    return this.activo;
+  }
+
+  public void setActivo(Boolean activo) {
+    this.activo = activo;
   }
 }

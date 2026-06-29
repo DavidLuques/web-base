@@ -42,8 +42,7 @@
         </div>
       </div>
 
-      <div
-        class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6 flex flex-col sm:flex-row items-center justify-between gap-6 barra-controles-vallado">        
         <div class="flex items-center gap-4">
           <label for="input-radio" class="font-medium text-slate-700">Radio (metros):</label>
           <input type="number" id="input-radio" value="150" min="10" max="2000" step="10"
@@ -53,10 +52,19 @@
             Confirmar
           </button>
         </div>
+
+        <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
+          <span class="font-semibold text-slate-700">Activar Vallado</span>
+          <label for="toggle-vallado" class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="toggle-vallado" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 rounded-full peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+          </label>
+        </div>
+
         <div class="flex items-center gap-3">
           <label class="font-semibold text-slate-700">Dirección del centro:</label>
-          
-          <div class="relative w-80"> <div class="flex gap-2">
+          <div class="relative w-80">
+            <div class="flex gap-2">
               <input type="text" id="input-direccion-valla" placeholder="Ej: Obelisco, Buenos Aires" 
                     class="border border-slate-300 px-3 py-1.5 rounded-lg w-full focus:outline-none focus:border-blue-500" />
               <button id="btn-buscar-direccion" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-1.5 px-4 rounded-lg">
@@ -64,13 +72,14 @@
               </button>
             </div>
             
-            <ul id="lista-resultados" class="absolute z- w-full bg-white border border-gray-200 shadow-lg rounded-lg mt-1 hidden max-h-90 overflow-y-auto">
+              <ul id="lista-resultados" class="absolute left-0 top-full w-full bg-white border border-gray-200 shadow-lg rounded-lg mt-1 hidden max-h-60 overflow-y-auto lista-sugerencias-valla">
               </ul>
           </div>
         </div>
+
       </div>
 
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex justify-center overflow-x-auto">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex justify-center overflow-x-auto contenedor-mapa-valla">
         <div class="w-full h-[450px] rounded-xl shadow-inner border border-slate-200" id="mapa-valla"></div>
       </div>
     </div>
