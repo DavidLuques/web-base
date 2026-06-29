@@ -93,4 +93,11 @@ public class ControladorAlerta {
     );
     return ResponseEntity.ok(emergencias);
   }
+
+  @PutMapping("/todas-leidas/{idMascota}")
+  @ResponseBody
+  public ResponseEntity<Void> marcarTodasComoLeidas(@PathVariable Long idMascota) {
+    servicioAlerta.marcarTodasComoLeidas(idMascota);
+    return ResponseEntity.ok().build();
+  }
 }

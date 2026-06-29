@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.modelo.Alerta;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,18 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
       return;
     }
 
+    Boolean mailActivo = alerta.getMascota().getUsuario().getNotificacionesMailActivas();
+    if (mailActivo != null && !mailActivo) {
+      return;
+    }
+
+    SimpleMailMessage mensaje = getSimpleMailMessage(alerta, correoUsuario);
+
+    mailSender.send(mensaje);
+  }
+
+  @Nonnull
+  private static SimpleMailMessage getSimpleMailMessage(Alerta alerta, String correoUsuario) {
     SimpleMailMessage mensaje = new SimpleMailMessage();
     mensaje.setFrom(REMITENTE);
     mensaje.setTo(correoUsuario);
@@ -61,8 +74,7 @@ public class ServicioNotificacionesImpl implements ServicioNotificaciones {
       "\n\n" +
       "Por favor, revisa el sistema inmediatamente."
     );
-
-    mailSender.send(mensaje);
+    return mensaje;
   }
 
   private String obtenerCorreoUsuario(Alerta alerta) {

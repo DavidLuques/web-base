@@ -121,4 +121,12 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
       repositorioUsuario.eliminar(usuario);
     }
   }
+
+  @Override
+  @Transactional
+  public void toggleNotificacionesMail(Long idUsuario) {
+    Usuario usuario = repositorioUsuario.buscarPorId(idUsuario);
+    usuario.setNotificacionesMailActivas(!usuario.getNotificacionesMailActivas());
+    repositorioUsuario.modificar(usuario);
+  }
 }

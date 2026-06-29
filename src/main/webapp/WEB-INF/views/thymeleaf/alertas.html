@@ -33,6 +33,22 @@
                         0 Alertas
                     </span>
                 </div>
+                <div class="flex gap-3 mt-4">
+                    <button id="btn-notif-windows"
+                            onclick="toggleNotificacionesWindows()"
+                            class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm px-4 py-2 rounded-xl font-medium transition">
+                        Desactivar notificaciones Windows
+                    </button>
+                    <button id="btn-notif-mail"
+                            onclick="toggleNotificacionesMail()"
+                            class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm px-4 py-2 rounded-xl font-medium transition">
+                        Desactivar notificaciones por mail
+                    </button>
+                    <button onclick="marcarTodasComoLeidas()"
+                            class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm px-4 py-2 rounded-xl font-medium transition">
+                        Marcar todas como leídas
+                    </button>
+                </div>
 
                 <!-- Sin mascota registrada -->
                 <div th:if="${idMascota == null}"

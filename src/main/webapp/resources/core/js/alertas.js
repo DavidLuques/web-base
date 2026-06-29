@@ -3,18 +3,6 @@
 function inicializarAlertas(idMascota) {
   lucide.createIcons();
 
-  const alertasNotificadasKey = "alertas-emergencia-notificadas-" + idMascota;
-  const alertasNotificadas = new Set(
-    JSON.parse(localStorage.getItem(alertasNotificadasKey) || "[]")
-  );
-
-  function guardarAlertasNotificadas() {
-    localStorage.setItem(
-      alertasNotificadasKey,
-      JSON.stringify(Array.from(alertasNotificadas))
-    );
-  }
-
   function formatearFecha(fechaStr) {
     const fecha = new Date(fechaStr);
     const hoy = new Date();
@@ -61,7 +49,7 @@ function inicializarAlertas(idMascota) {
     const opacidad = alerta.leido ? "opacity-60" : "";
     const badge = alerta.leido
       ? "<span class=\"bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold\">&#10003; Le\u00eddo</span>"
-      : "<span class=\"bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-blue-200\">Marcar como le\u00edda</span>";
+      : "<span class=\"bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-blue-200\">Sin leer</span>";
     const fechaFormato = formatearFecha(alerta.fechaYHora);
 
     return (
@@ -79,19 +67,6 @@ function inicializarAlertas(idMascota) {
       "</div>" +
       "</div>"
     );
-  }
-
-  function notificarEmergencia(alerta) {
-    if (!("Notification" in window) || Notification.permission !== "granted") {
-      return;
-    }
-    new Notification("EMERGENCIA", {
-      body: alerta.mensaje,
-      tag: "alerta-mascota-" + alerta.id,
-      requireInteraction: true
-    });
-    alertasNotificadas.add(alerta.id);
-    guardarAlertasNotificadas();
   }
 
   function cargarAlertasMascota() {
@@ -121,9 +96,6 @@ function inicializarAlertas(idMascota) {
         contador.textContent = listaDeAlertas.length + " Alertas";
         contenedor.innerHTML = [...listaDeAlertas].reverse()
           .map(function (alerta) {
-            if (alerta.tipo === "EMERGENCIA" && !alerta.leido && !alertasNotificadas.has(alerta.id)) {
-              notificarEmergencia(alerta);
-            }
             return construirHtmlAlerta(alerta);
           })
           .join("");
@@ -173,6 +145,28 @@ function inicializarAlertas(idMascota) {
       });
   }
 
+  function actualizarBotonWindows() {
+    const btn = document.getElementById("btn-notif-windows");
+    if (btn) {
+      btn.textContent = notifWindowsActivas
+        ? "Desactivar notificaciones Windows"
+        : "Activar notificaciones Windows";
+    }
+  }
+
+  function inicializarBotonMail() {
+    fetch("/spring/perfil/usuario/notificaciones-mail")
+      .then(function(response) { return response.json(); })
+      .then(function(activo) {
+        const btn = document.getElementById("btn-notif-mail");
+        if (btn) {
+          btn.textContent = activo
+            ? "Desactivar notificaciones por mail"
+            : "Activar notificaciones por mail";
+        }
+      });
+  }
+
   window.marcarAlertaComoLeida = function (idAlerta) {
     fetch("/spring/analisis/alertas/" + idAlerta + "/leer", {
       method: "PUT",
@@ -189,9 +183,54 @@ function inicializarAlertas(idMascota) {
       });
   };
 
-  if ("Notification" in window && Notification.permission === "default") {
-    Notification.requestPermission();
-  }
+  const notifWindowsKey = "notificaciones-windows-activas-" + idMascota;
+  let notifWindowsActivas = localStorage.getItem(notifWindowsKey) !== "false";
+
+  window.toggleNotificacionesWindows = function() {
+    notifWindowsActivas = !notifWindowsActivas;
+    localStorage.setItem(notifWindowsKey, String(notifWindowsActivas));
+    actualizarBotonWindows();
+
+    if (notifWindowsActivas && idMascota) {
+      const sessionKey = "alertas-notificadas-sesion-" + idMascota;
+      const notificadas = new Set(
+        JSON.parse(sessionStorage.getItem(sessionKey) || "[]")
+      );
+      fetch("/spring/analisis/alertas/datos/" + idMascota)
+        .then(function (res) { return res.json(); })
+        .then(function (alertas) {
+          alertas.forEach(function (alerta) {
+            if (alerta.tipo === "EMERGENCIA" && !alerta.leido) {
+              notificadas.add(alerta.id);
+            }
+          });
+          sessionStorage.setItem(sessionKey, JSON.stringify(Array.from(notificadas)));
+        });
+    }
+  };
+
+  window.toggleNotificacionesMail = function() {
+    fetch("/spring/perfil/usuario/notificaciones-mail", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" }
+    }).then(function(response) {
+      if (response.ok) {
+        inicializarBotonMail();
+      }
+    });
+  };
+
+  window.marcarTodasComoLeidas = function () {
+    fetch("/spring/analisis/alertas/todas-leidas/" + idMascota, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" }
+    }).then(function (res) {
+      if (res.ok) {
+        cargarAlertasMascota();
+        cargarAlertasUsuario();
+      }
+    });
+  };
 
   if (idMascota !== null && idMascota !== undefined) {
     cargarAlertasMascota();
@@ -199,5 +238,7 @@ function inicializarAlertas(idMascota) {
   }
 
   cargarAlertasUsuario();
+  actualizarBotonWindows();
+  inicializarBotonMail();
   setInterval(cargarAlertasUsuario, 5000);
 }

@@ -28,6 +28,9 @@ public class Usuario {
   @Embedded
   private Direccion ubicacion = new Direccion();
 
+  @Embedded
+  private PreferenciasUsuario preferencias = new PreferenciasUsuario();
+
   public Usuario() {}
 
   public Direccion getUbicacion() {
@@ -49,16 +52,6 @@ public class Usuario {
   public void setFechaCreacion(String fechaCreacion) {
     this.fechaCreacion = fechaCreacion;
   }
-
-  public String getAvatarUrl() {
-    return this.avatarUrl;
-  }
-
-  public void setAvatarUrl(String avatarUrl) {
-    this.avatarUrl = avatarUrl;
-  }
-
-  private String avatarUrl;
 
   public String getNombre() {
     return nombre;
@@ -118,5 +111,21 @@ public class Usuario {
 
   public void setTelefono(Long telefono) {
     this.telefono = telefono;
+  }
+
+  public PreferenciasUsuario getPreferencias() {
+    return preferencias;
+  }
+
+  public void setPreferencias(PreferenciasUsuario preferencias) {
+    this.preferencias = preferencias;
+  }
+
+  public Boolean getNotificacionesMailActivas() {
+    return preferencias.getNotificacionesMailActivas();
+  }
+
+  public void setNotificacionesMailActivas(Boolean activas) {
+    preferencias.setNotificacionesMailActivas(activas);
   }
 }
