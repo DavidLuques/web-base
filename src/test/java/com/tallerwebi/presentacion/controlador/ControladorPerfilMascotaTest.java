@@ -116,6 +116,19 @@ public class ControladorPerfilMascotaTest {
   }
 
   @Test
+  public void alActualizarPerfilConFechaNacimientoMalaRetornaConError() {
+    when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(1L);
+    DatosAltaMascota datosMascota = new DatosAltaMascota();
+    datosMascota.setPeso(10.0);
+    datosMascota.setFechaNacimiento("not-a-date");
+
+    ModelAndView mav = controlador.actualizarPerfilMascota(datosMascota, requestMock, 1L);
+
+    assertEquals("perfil-mascota", mav.getViewName());
+    assertEquals("La fecha ingresada no es válida.", mav.getModel().get("error"));
+  }
+
+  @Test
   public void alEliminarMascotaYNoQuedarMascotasRedirigeASinMascota() {
     when(sessionMock.getAttribute("ID_USUARIO")).thenReturn(1L);
     when(servicioMascotaMock.obtenerMascotasPorUsuario(1L))

@@ -109,7 +109,13 @@ public class ServicioExportacionImpl implements ServicioExportacion {
     table.setWidthPercentage(100f);
     table.setWidths(new float[] { 2.5f, 1.5f, 1.5f, 1.5f, 1.5f });
 
-    String[] headers = { "Fecha", "Frec. Cardíaca", "Presión (S/D)", "Temp.", "Oxigenación" };
+    String[] headers = {
+      "Fecha",
+      "Frec. Cardíaca",
+      "Presión (S/D)",
+      "Temp.",
+      "Índ. Trabajo Cardíaco",
+    };
     Font fontHeader = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
     fontHeader.setColor(Color.WHITE);
 
@@ -158,9 +164,18 @@ public class ServicioExportacionImpl implements ServicioExportacion {
       : "-";
     table.addCell(temp);
 
-    String oxi = analisis.getDatos().getOxigenacion() != null
-      ? analisis.getDatos().getOxigenacion() + "%"
-      : "-";
-    table.addCell(oxi);
+    final String indiceTrabajoCardiaco;
+    if (
+      analisis.getDatos().getFrecuenciaCardiaca() != null &&
+      analisis.getDatos().getPresionSistolica() != null
+    ) {
+      double rpp =
+        (analisis.getDatos().getFrecuenciaCardiaca() * analisis.getDatos().getPresionSistolica()) /
+        100.0;
+      indiceTrabajoCardiaco = String.format(java.util.Locale.US, "%.1f", rpp);
+    } else {
+      indiceTrabajoCardiaco = "-";
+    }
+    table.addCell(indiceTrabajoCardiaco);
   }
 }

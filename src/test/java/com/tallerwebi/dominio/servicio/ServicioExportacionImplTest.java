@@ -52,7 +52,6 @@ public class ServicioExportacionImplTest {
     datos.setTemperatura(38.5);
     datos.setPresionSistolica(120);
     datos.setPresionDiastolica(80);
-    datos.setOxigenacion(98.0);
     analisis.setDatos(datos);
 
     List<Analisis> historial = new ArrayList<>();
@@ -146,5 +145,52 @@ public class ServicioExportacionImplTest {
         servicioExportacion.exportarPdfMascota(idMascota, responseMock);
       }
     );
+  }
+
+  @Test
+  public void exportarPdf_MascotaConAnalisisValoresNulos_NoFalla() throws Exception {
+    // Arrange
+    Long idMascota = 1L;
+    Mascota mascota = new Mascota();
+    mascota.setId(idMascota);
+
+    Analisis analisis = new Analisis();
+    analisis.setFechaYHora(null);
+    DatosAnalisis datos = new DatosAnalisis();
+    datos.setFrecuenciaCardiaca(null);
+    datos.setPresionSistolica(null);
+    datos.setTemperatura(null);
+    datos.setPresionDiastolica(null);
+    analisis.setDatos(datos);
+
+    List<Analisis> historial = new ArrayList<>();
+    historial.add(analisis);
+
+    when(servicioMascota.obtenerMascotaPorId(idMascota)).thenReturn(mascota);
+    when(repositorioAnalisis.buscarPorMascota(idMascota)).thenReturn(historial);
+
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ServletOutputStream servletOutputStream = new ServletOutputStream() {
+      @Override
+      public boolean isReady() {
+        return true;
+      }
+
+      @Override
+      public void setWriteListener(WriteListener writeListener) {}
+
+      @Override
+      public void write(int b) throws IOException {
+        out.write(b);
+      }
+    };
+
+    when(responseMock.getOutputStream()).thenReturn(servletOutputStream);
+
+    // Act
+    servicioExportacion.exportarPdfMascota(idMascota, responseMock);
+
+    // Assert
+    assert (out.size() > 0);
   }
 }
