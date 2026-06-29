@@ -12,4 +12,5 @@ public interface ServicioUsuario {
   void actualizarPerfil(Long id, DatosPerfil datosPerfil);
   DatosPerfil obtenerDatosPerfil(Long id);
   void eliminarCuenta(Long id);
+  void toggleNotificacionesMail(Long idUsuario);
 }

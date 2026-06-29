@@ -127,4 +127,15 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
       .setParameter(PARAM_ID_MASCOTA, idMascota)
       .executeUpdate();
   }
+
+  @Override
+  public void marcarTodasComoLeidasPorMascota(Long idMascota) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "UPDATE Alerta a SET a.leido = true WHERE a.mascota.id = :idMascota AND a.leido = false"
+      )
+      .setParameter(PARAM_ID_MASCOTA, idMascota)
+      .executeUpdate();
+  }
 }

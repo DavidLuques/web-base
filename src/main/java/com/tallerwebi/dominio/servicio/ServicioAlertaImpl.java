@@ -126,4 +126,10 @@ public class ServicioAlertaImpl implements ServicioAlerta {
       alerta.getLeido()
     );
   }
+
+  @Override
+  @Transactional
+  public void marcarTodasComoLeidas(Long idMascota) {
+    repositorioAlerta.marcarTodasComoLeidasPorMascota(idMascota);
+  }
 }
