@@ -5,7 +5,7 @@
   <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-8">
     <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
   </div>
-  <nav class="flex flex-col gap-6 w-full">
+  <nav class="flex flex-col gap-2 w-full">
 
     <!-- Con mascota: todos los íconos habilitados -->
     <th:block th:if="${idMascota != null}">
@@ -20,6 +20,10 @@
       <a th:href="@{/analisis/valla/{id}(id=${idMascota})}"
          th:class="${paginaActiva == 'valla'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
         <i th:class="${paginaActiva == 'valla'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="map-pin"></i>
+      </a>
+      <a th:href="@{/analisis/veterinaria/mascota/{id}(id=${idMascota})}"
+         th:class="${paginaActiva == 'veterinaria'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
+        <i th:class="${paginaActiva == 'veterinaria'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="house-heart"></i>
       </a>
       <a th:href="@{/analisis/alertas/{id}(id=${idMascota})}"
          th:class="${paginaActiva == 'alertas'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
