@@ -8,7 +8,7 @@
 
     const sessionKey = "alertas-notificadas-sesion-" + idMascota;
     const notificadas = new Set(
-        JSON.parse(sessionStorage.getItem(sessionKey) || "[]")
+      JSON.parse(sessionStorage.getItem(sessionKey) || "[]")
     );
 
     function guardarNotificadas() {
@@ -31,37 +31,37 @@
       estabanDesactivadas = !activasAhora;
 
       fetch("/spring/analisis/alertas/datos/" + idMascota)
-          .then(function (res) {
-            if (!res.ok) return null;
-            return res.json();
-          })
-          .then(function (alertas) {
-            if (!alertas || !Array.isArray(alertas)) return;
+        .then(function (res) {
+          if (!res.ok) return null;
+          return res.json();
+        })
+        .then(function (alertas) {
+          if (!alertas || !Array.isArray(alertas)) return;
 
-            actualizarBadge(alertas);
+          actualizarBadge(alertas);
 
-            if (!activasAhora) return;
+          if (!activasAhora) return;
 
-            alertas.forEach(function (alerta) {
-              if (alerta.tipo === "EMERGENCIA" && !alerta.leido) {
-                if (recienActivadas) {
-                  notificadas.add(alerta.id);
-                } else if (!notificadas.has(alerta.id)) {
-                  const notif = new Notification("⚠️ EMERGENCIA - PetTracker", {
-                    body: alerta.mensaje,
-                    tag: "emergencia-" + alerta.id,
-                    requireInteraction: false,
-                  });
-                  setTimeout(function () {
-                    notif.close();
-                  }, 5000);
-                  notificadas.add(alerta.id);
-                }
+          alertas.forEach(function (alerta) {
+            if (alerta.tipo === "EMERGENCIA" && !alerta.leido) {
+              if (recienActivadas) {
+                notificadas.add(alerta.id);
+              } else if (!notificadas.has(alerta.id)) {
+                const notif = new Notification("⚠️ EMERGENCIA - PetTracker", {
+                  body: alerta.mensaje,
+                  tag: "emergencia-" + alerta.id,
+                  requireInteraction: false,
+                });
+                setTimeout(function () {
+                  notif.close();
+                }, 5000);
+                notificadas.add(alerta.id);
               }
-            });
-            guardarNotificadas();
-          })
-          .catch(function () {});
+            }
+          });
+          guardarNotificadas();
+        })
+        .catch(function () {});
     }
 
     function actualizarBadge(alertas) {
