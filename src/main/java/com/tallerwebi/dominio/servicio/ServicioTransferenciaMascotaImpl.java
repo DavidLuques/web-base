@@ -151,8 +151,6 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     return solicitudTransferenciaDao.buscarPendientesPorUsuario(idUsuario);
   }
 
-  // ── privados ─────────────────────────────────────────────
-
   private void validarPuedeConfirmar(SolicitudTransferencia solicitud) {
     boolean puedeConfirmar =
       solicitud.getEstado().getComportamiento().puedeConfirmarOrigen() ||
@@ -197,5 +195,10 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
       solicitud.getUsuarioOrigen().getNombre() +
       " se completo exitosamente."
     );
+  }
+
+  @Override
+  public List<SolicitudTransferencia> obtenerHistorialPorUsuario(Long idUsuario) {
+    return solicitudTransferenciaDao.buscarHistorialPorUsuario(idUsuario);
   }
 }

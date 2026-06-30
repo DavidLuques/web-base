@@ -14,6 +14,7 @@ import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.SolicitudTransferenciaDao;
 import com.tallerwebi.dominio.enums.EstadoTransferencia;
+import com.tallerwebi.dominio.enums.TipoAlerta;
 import com.tallerwebi.dominio.excepcion.AccionNoPermitidaEnEsteEstadoException;
 import com.tallerwebi.dominio.excepcion.NoSonAmigosException;
 import com.tallerwebi.dominio.modelo.Mascota;
@@ -50,8 +51,6 @@ public class ServicioTransferenciaMascotaImplTest {
       );
   }
 
-  // ── helpers ──────────────────────────────────────────────────────
-
   private Mascota mascotaConNombre(String nombre) {
     Mascota m = new Mascota();
     m.setNombre(nombre);
@@ -70,8 +69,6 @@ public class ServicioTransferenciaMascotaImplTest {
     s.setUsuarioDestino(destino);
     return s;
   }
-
-  // ── iniciarTransferencia ─────────────────────────────────────────
 
   @Test
   public void dadosDosAmigosDebeIniciarLaTransferenciaEnEstadoPendiente() {
@@ -103,8 +100,6 @@ public class ServicioTransferenciaMascotaImplTest {
     assertThrows(NoSonAmigosException.class, () -> servicio.iniciarTransferencia(5L, 1L, 2L));
     verify(solicitudTransferenciaDaoMock, never()).guardar(org.mockito.ArgumentMatchers.any());
   }
-
-  // ── confirmarPorOrigen ───────────────────────────────────────────
 
   @Test
   public void dadaUnaSolicitudPendienteAlConfirmarPorOrigenDebeQuedarMarcadaSinCompletarse() {
@@ -145,8 +140,6 @@ public class ServicioTransferenciaMascotaImplTest {
     );
   }
 
-  // ── confirmarPorDestino ──────────────────────────────────────────
-
   @Test
   public void dadaUnaSolicitudPendienteAlConfirmarPorDestinoDebeQuedarMarcadaSinCompletarse() {
     SolicitudTransferencia solicitud = solicitudPendienteCompleta();
@@ -186,8 +179,6 @@ public class ServicioTransferenciaMascotaImplTest {
     );
   }
 
-  // ── cancelarTransferencia ────────────────────────────────────────
-
   @Test
   public void dadaUnaSolicitudPendienteAlCancelarDebeQuedarCancelada() {
     SolicitudTransferencia solicitud = solicitudPendienteCompleta();
@@ -211,8 +202,6 @@ public class ServicioTransferenciaMascotaImplTest {
     );
   }
 
-  // ── obtenerPendientesPorUsuario ──────────────────────────────────
-
   @Test
   public void obtenerPendientesPorUsuarioDebeDelegarEnElDao() {
     SolicitudTransferencia pendiente = new SolicitudTransferencia();
@@ -222,5 +211,82 @@ public class ServicioTransferenciaMascotaImplTest {
     List<SolicitudTransferencia> pendientes = servicio.obtenerPendientesPorUsuario(1L);
 
     assertThat(pendientes, contains(pendiente));
+  }
+  
+  @Test
+  public void obtenerHistorialPorUsuarioDebeDelegarEnElDao() {
+    SolicitudTransferencia historica = new SolicitudTransferencia();
+    when(solicitudTransferenciaDaoMock.buscarHistorialPorUsuario(1L))
+      .thenReturn(List.of(historica));
+
+    List<SolicitudTransferencia> historial = servicio.obtenerHistorialPorUsuario(1L);
+
+    assertThat(historial, contains(historica));
+  }
+  
+  @Test
+  public void alIniciarTransferenciaDebeCrearAlertaParaElUsuarioDestino() {
+    Mascota mascota = mascotaConNombre("Firulais");
+    Usuario origen = mock(Usuario.class);
+    when(origen.getNombre()).thenReturn("Carlos");
+    Usuario destino = mock(Usuario.class);
+    when(destino.getNombre()).thenReturn("Ana");
+
+    when(servicioAmistadMock.sonAmigos(1L, 2L)).thenReturn(true);
+    when(mascotaDaoMock.buscarPorId(5L)).thenReturn(mascota);
+    when(repositorioUsuarioMock.buscarPorId(1L)).thenReturn(origen);
+    when(repositorioUsuarioMock.buscarPorId(2L)).thenReturn(destino);
+
+    servicio.iniciarTransferencia(5L, 1L, 2L);
+
+    verify(servicioAlertaMock, times(1))
+      .crearAlertaUsuario(
+        org.mockito.ArgumentMatchers.eq(destino),
+        org.mockito.ArgumentMatchers.eq(TipoAlerta.INFO),
+        org.mockito.ArgumentMatchers.contains("Firulais")
+      );
+  }
+  
+  @Test
+  public void siLaTransferenciaSeCompletaPorConfirmacionDeOrigenDebeNotificarAOrigenYDestino() {
+    SolicitudTransferencia solicitud = solicitudPendienteCompleta();
+    solicitud.setConfirmadaPorDestino(true);
+    when(solicitudTransferenciaDaoMock.buscarPorId(20L)).thenReturn(solicitud);
+
+    servicio.confirmarPorOrigen(20L);
+
+    verify(servicioAlertaMock, times(1))
+      .crearAlertaUsuario(
+        org.mockito.ArgumentMatchers.eq(solicitud.getUsuarioOrigen()),
+        org.mockito.ArgumentMatchers.eq(TipoAlerta.INFO),
+        org.mockito.ArgumentMatchers.anyString()
+      );
+    verify(servicioAlertaMock, times(1))
+      .crearAlertaUsuario(
+        org.mockito.ArgumentMatchers.eq(solicitud.getUsuarioDestino()),
+        org.mockito.ArgumentMatchers.eq(TipoAlerta.INFO),
+        org.mockito.ArgumentMatchers.anyString()
+      );
+  }
+  
+  @Test
+  public void alCancelarUnaTransferenciaDebeNotificarAOrigenYDestino() {
+    SolicitudTransferencia solicitud = solicitudPendienteCompleta();
+    when(solicitudTransferenciaDaoMock.buscarPorId(30L)).thenReturn(solicitud);
+
+    servicio.cancelarTransferencia(30L);
+
+    verify(servicioAlertaMock, times(1))
+      .crearAlertaUsuario(
+        org.mockito.ArgumentMatchers.eq(solicitud.getUsuarioOrigen()),
+        org.mockito.ArgumentMatchers.eq(TipoAlerta.INFO),
+        org.mockito.ArgumentMatchers.contains("cancelada")
+      );
+    verify(servicioAlertaMock, times(1))
+      .crearAlertaUsuario(
+        org.mockito.ArgumentMatchers.eq(solicitud.getUsuarioDestino()),
+        org.mockito.ArgumentMatchers.eq(TipoAlerta.INFO),
+        org.mockito.ArgumentMatchers.contains("cancelada")
+      );
   }
 }

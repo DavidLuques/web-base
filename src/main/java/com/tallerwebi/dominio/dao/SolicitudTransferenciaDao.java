@@ -9,4 +9,5 @@ public interface SolicitudTransferenciaDao {
   SolicitudTransferencia buscarPorId(Long id);
   List<SolicitudTransferencia> buscarPendientesPorUsuario(Long idUsuario);
   void eliminarPorUsuario(Long idUsuario);
+  List<SolicitudTransferencia> buscarHistorialPorUsuario(Long idUsuario);
 }

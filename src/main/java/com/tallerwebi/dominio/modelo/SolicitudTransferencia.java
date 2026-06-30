@@ -104,4 +104,9 @@ public class SolicitudTransferencia {
   public void setFechaCreacion(LocalDateTime fechaCreacion) {
     this.fechaCreacion = fechaCreacion;
   }
+
+  public String getFechaFormateada() {
+    if (fechaCreacion == null) return "-";
+    return fechaCreacion.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+  }
 }

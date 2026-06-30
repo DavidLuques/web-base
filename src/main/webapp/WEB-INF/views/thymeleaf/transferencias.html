@@ -9,185 +9,223 @@
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
 
-<div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'transferencias')"></div>
+  <div th:replace="fragmentos/sidebar :: sidebar(${idMascota}, 'transferencias')"></div>
 
-<main class="flex-1 flex flex-col h-full overflow-hidden">
-  <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'transferencias', 'Transferencias')"></header>
+  <main class="flex-1 flex flex-col h-full overflow-hidden">
+    <header th:replace="fragmentos/header :: header(${mascotaNombre ?: 'Mascota'}, ${idMascota}, 'transferencias', 'Transferencias')"></header>
 
-  <div class="flex-1 p-4 sm:p-8 overflow-y-auto">
-    <div class="max-w-2xl mx-auto mt-8">
+    <div class="flex-1 p-4 sm:p-8 overflow-y-auto">
+      <div class="max-w-2xl mx-auto mt-8">
 
-      <div class="mb-8 flex items-center gap-4">
-        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-500 shadow-sm border border-slate-200">
-          <i data-lucide="repeat" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold text-slate-800">Transferencias</h1>
-          <p class="text-slate-500">Transferí tus mascotas a un amigo, manteniendo todo su historial</p>
-        </div>
-      </div>
-
-      <div th:if="${param.exito}" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3">
-        <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
-          <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
-        </div>
-        <p class="font-medium">¡Listo!</p>
-      </div>
-
-      <div th:if="${param.error}" class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 px-6 py-4 rounded-2xl flex items-center gap-3">
-        <div class="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center shrink-0">
-          <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
-        </div>
-        <p class="font-medium" th:text="${param.error}">Error</p>
-      </div>
-
-      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferir una mascota</h3>
-
-        <!-- Sin mascotas registradas -->
-        <div th:if="${misMascotas == null or #lists.isEmpty(misMascotas)}"
-             class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
-          <i data-lucide="paw-print" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-          <p class="text-sm text-slate-500">No ten&eacute;s ninguna mascota registrada. &iexcl;Registr&aacute; la primera para empezar!</p>
+        <div class="mb-8 flex items-center gap-4">
+          <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-500 shadow-sm border border-slate-200">
+            <i data-lucide="repeat" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-800">Transferencias</h1>
+            <p class="text-slate-500">Transfer&iacute; tus mascotas a un amigo, manteniendo todo su historial</p>
+          </div>
         </div>
 
-        <!-- Con mascotas pero sin amigos -->
-        <div th:if="${(misMascotas != null and !#lists.isEmpty(misMascotas)) and (amigos == null or #lists.isEmpty(amigos))}"
-             class="text-center py-6">
-          <p class="text-slate-400 text-sm">
-            Necesit&aacute;s tener amigos agregados para poder transferir una mascota.
-            <a th:href="@{/amigos(idMascota=${idMascota})}" class="text-indigo-600 font-medium hover:underline">Agregar amigos</a>
-          </p>
+        <div th:if="${param.exito}" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3">
+          <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+            <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+          </div>
+          <p class="font-medium">&iexcl;Listo!</p>
         </div>
 
-        <!-- Con mascotas y con amigos -->
-        <form th:if="${misMascotas != null and !#lists.isEmpty(misMascotas) and amigos != null and !#lists.isEmpty(amigos)}"
-              th:action="@{/transferencias/iniciar}" method="POST" class="space-y-4">
-          <div class="space-y-2">
-            <label class="text-sm font-semibold text-slate-700">Mascota a transferir</label>
-            <select name="idMascota" required
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-              <option th:each="mascota : ${misMascotas}" th:value="${mascota.id}" th:text="${mascota.nombre}"></option>
-            </select>
+        <div th:if="${param.error}" class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 px-6 py-4 rounded-2xl flex items-center gap-3">
+          <div class="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center shrink-0">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
+          </div>
+          <p class="font-medium" th:text="${param.error}">Error</p>
+        </div>
+
+        <!-- Transferir una mascota -->
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8">
+          <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferir una mascota</h3>
+
+          <div th:if="${misMascotas == null or #lists.isEmpty(misMascotas)}"
+               class="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
+            <i data-lucide="paw-print" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+            <p class="text-sm text-slate-500">No ten&eacute;s ninguna mascota registrada. &iexcl;Registr&aacute; la primera para empezar!</p>
           </div>
 
-          <div class="space-y-2">
-            <label class="text-sm font-semibold text-slate-700">Transferir a</label>
-            <select name="idDestino" required
-                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-              <option th:each="amigo : ${amigos}" th:value="${amigo.id}" th:text="${amigo.nombre + ' (' + amigo.email + ')'}"></option>
-            </select>
+          <div th:if="${(misMascotas != null and !#lists.isEmpty(misMascotas)) and (amigos == null or #lists.isEmpty(amigos))}"
+               class="text-center py-6">
+            <p class="text-slate-400 text-sm">
+              Necesit&aacute;s tener amigos agregados para poder transferir una mascota.
+              <a th:href="@{/amigos(idMascota=${idMascota})}" class="text-indigo-600 font-medium hover:underline">Agregar amigos</a>
+            </p>
           </div>
 
-          <div class="pt-2 flex justify-end">
-            <button type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
-              <i data-lucide="send" class="w-5 h-5"></i>
-              Iniciar transferencia
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferencias pendientes</h3>
-
-        <div th:if="${#lists.isEmpty(transferenciasPendientes)}" class="text-center py-8">
-          <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-3">
-            <i data-lucide="repeat" class="w-6 h-6"></i>
-          </div>
-          <p class="text-slate-400">No tenés transferencias pendientes</p>
-        </div>
-
-        <ul class="divide-y divide-slate-100" th:unless="${#lists.isEmpty(transferenciasPendientes)}">
-          <li th:each="t : ${transferenciasPendientes}" class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                <i data-lucide="dog" class="w-5 h-5"></i>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="font-semibold text-slate-800 truncate" th:text="${t.mascota.nombre}">Mascota</p>
-                <p class="text-sm text-slate-500 truncate">
-                  <span th:text="${t.usuarioOrigen.nombre}">Origen</span>
-                  →
-                  <span th:text="${t.usuarioDestino.nombre}">Destino</span>
-                </p>
-                <p class="text-xs text-slate-400 mt-1">
-                  <span th:if="${t.confirmadaPorOrigen}">✓ Confirmada por origen</span>
-                  <span th:unless="${t.confirmadaPorOrigen}">Pendiente de confirmación del origen</span>
-                  ·
-                  <span th:if="${t.confirmadaPorDestino}">✓ Confirmada por destino</span>
-                  <span th:unless="${t.confirmadaPorDestino}">Pendiente de confirmación del destino</span>
-                </p>
-              </div>
+          <form th:if="${misMascotas != null and !#lists.isEmpty(misMascotas) and amigos != null and !#lists.isEmpty(amigos)}"
+                th:action="@{/transferencias/iniciar}" method="POST" class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700">Mascota a transferir</label>
+              <select name="idMascota" required
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                <option th:each="mascota : ${misMascotas}" th:value="${mascota.id}" th:text="${mascota.nombre}"></option>
+              </select>
             </div>
-
-            <div class="flex flex-col sm:flex-row gap-2 shrink-0 w-full sm:w-auto">
-              <form th:if="${t.usuarioOrigen.id == idUsuarioActual and !t.confirmadaPorOrigen}"
-                    th:action="@{/transferencias/confirmar-origen}" method="POST" class="w-full sm:w-auto">
-                <input type="hidden" name="idSolicitud" th:value="${t.id}" />
-                <input type="hidden" name="idMascota" th:value="${idMascota}" />
-                <button type="submit" class="w-full sm:w-auto bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4"></i> Confirmar
-                </button>
-              </form>
-
-              <form th:if="${t.usuarioDestino.id == idUsuarioActual and !t.confirmadaPorDestino}"
-                    th:action="@{/transferencias/confirmar-destino}" method="POST" class="w-full sm:w-auto">
-                <input type="hidden" name="idSolicitud" th:value="${t.id}" />
-                <input type="hidden" name="idMascota" th:value="${idMascota}" />
-                <button type="submit" class="w-full sm:w-auto bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4"></i> Confirmar
-                </button>
-              </form>
-
-              <form th:action="@{/transferencias/cancelar}" method="POST" class="w-full sm:w-auto">
-                <input type="hidden" name="idSolicitud" th:value="${t.id}" />
-                <input type="hidden" name="idMascota" th:value="${idMascota}" />
-                <button type="submit" class="w-full sm:w-auto bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
-                  <i data-lucide="x" class="w-4 h-4"></i> Cancelar
-                </button>
-              </form>
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-slate-700">Transferir a</label>
+              <select name="idDestino" required
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                <option th:each="amigo : ${amigos}" th:value="${amigo.id}" th:text="${amigo.nombre + ' (' + amigo.email + ')'}"></option>
+              </select>
             </div>
-          </li>
-        </ul>
-      </div>
+            <div class="pt-2 flex justify-end">
+              <button type="submit"
+                      class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2">
+                <i data-lucide="send" class="w-5 h-5"></i>
+                Iniciar transferencia
+              </button>
+            </div>
+          </form>
+        </div>
 
+        <!-- Transferencias pendientes -->
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100 mb-8">
+          <h3 class="text-lg font-semibold text-slate-800 mb-4">Transferencias pendientes</h3>
+
+          <div th:if="${#lists.isEmpty(transferenciasPendientes)}" class="text-center py-8">
+            <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-3">
+              <i data-lucide="repeat" class="w-6 h-6"></i>
+            </div>
+            <p class="text-slate-400">No ten&eacute;s transferencias pendientes</p>
+          </div>
+
+          <ul class="divide-y divide-slate-100" th:unless="${#lists.isEmpty(transferenciasPendientes)}">
+            <li th:each="t : ${transferenciasPendientes}"
+                class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                  <i data-lucide="dog" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="font-semibold text-slate-800 truncate" th:text="${t.mascota.nombre}">Mascota</p>
+                  <p class="text-sm text-slate-500 truncate">
+                    <span th:text="${t.usuarioOrigen.nombre}">Origen</span>
+                    &rarr;
+                    <span th:text="${t.usuarioDestino.nombre}">Destino</span>
+                  </p>
+                  <p class="text-xs text-slate-400 mt-1">
+                    <span th:if="${t.confirmadaPorOrigen}">&#10003; Confirmada por origen</span>
+                    <span th:unless="${t.confirmadaPorOrigen}">Pendiente de confirmaci&oacute;n del origen</span>
+                    &middot;
+                    <span th:if="${t.confirmadaPorDestino}">&#10003; Confirmada por destino</span>
+                    <span th:unless="${t.confirmadaPorDestino}">Pendiente de confirmaci&oacute;n del destino</span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-2 shrink-0 w-full sm:w-auto">
+                <form th:if="${t.usuarioOrigen.id == idUsuarioActual and !t.confirmadaPorOrigen}"
+                      th:action="@{/transferencias/confirmar-origen}" method="POST" class="w-full sm:w-auto">
+                  <input type="hidden" name="idSolicitud" th:value="${t.id}" />
+                  <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                  <button type="submit" class="w-full sm:w-auto bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i> Confirmar
+                  </button>
+                </form>
+
+                <form th:if="${t.usuarioDestino.id == idUsuarioActual and !t.confirmadaPorDestino}"
+                      th:action="@{/transferencias/confirmar-destino}" method="POST" class="w-full sm:w-auto">
+                  <input type="hidden" name="idSolicitud" th:value="${t.id}" />
+                  <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                  <button type="submit" class="w-full sm:w-auto bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i> Confirmar
+                  </button>
+                </form>
+
+                <form th:action="@{/transferencias/cancelar}" method="POST" class="w-full sm:w-auto">
+                  <input type="hidden" name="idSolicitud" th:value="${t.id}" />
+                  <input type="hidden" name="idMascota" th:value="${idMascota}" />
+                  <button type="submit" class="w-full sm:w-auto bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium py-2 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="x" class="w-4 h-4"></i> Cancelar
+                  </button>
+                </form>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Historial de transferencias -->
+        <div th:if="${historialTransferencias != null and !#lists.isEmpty(historialTransferencias)}"
+             class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 p-8 border border-slate-100">
+          <h3 class="text-lg font-semibold text-slate-800 mb-4">Historial de transferencias</h3>
+
+          <ul class="divide-y divide-slate-100">
+            <li th:each="t : ${historialTransferencias}"
+                class="py-4 flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+
+                <div th:if="${t.estado.name() == 'COMPLETADA'}"
+                     class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                  <i data-lucide="check-circle" class="w-5 h-5"></i>
+                </div>
+                <div th:if="${t.estado.name() == 'CANCELADA'}"
+                     class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                  <i data-lucide="x-circle" class="w-5 h-5"></i>
+                </div>
+
+                <div class="min-w-0">
+                  <p class="font-semibold text-slate-800 truncate" th:text="${t.mascota.nombre}">Mascota</p>
+                  <p class="text-sm text-slate-500 truncate">
+                    <span th:text="${t.usuarioOrigen.nombre}">Origen</span>
+                    &rarr;
+                    <span th:text="${t.usuarioDestino.nombre}">Destino</span>
+                  </p>
+                  <p class="text-xs text-slate-400 mt-0.5" th:text="${t.fechaFormateada}"></p>
+                </div>
+              </div>
+
+              <div th:if="${t.estado.name() == 'COMPLETADA'}"
+                   class="shrink-0 bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
+                Completada
+              </div>
+              <div th:if="${t.estado.name() == 'CANCELADA'}"
+                   class="shrink-0 bg-rose-50 text-rose-700 text-xs font-bold px-3 py-1 rounded-full">
+                Cancelada
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
     </div>
-  </div>
-</main>
+  </main>
 
-<script>
-  (function () {
-    let hashInicial = null;
-
-    async function obtenerHash() {
-      try {
-        const res = await fetch('/spring/transferencias/estado');
-        if (!res.ok) return null;
-        const data = await res.json();
-        if (data.error) return null;
-        return data.hash;
-      } catch (_) {
-        return null;
-      }
-    }
-
-    async function iniciarPolling() {
-      hashInicial = await obtenerHash();
-      if (hashInicial === null) return;
-
-      setInterval(async () => {
-        const hashActual = await obtenerHash();
-        if (hashActual !== null && hashActual !== hashInicial) {
-          window.location.href = '/spring/transferencias';
+  <script>
+    (function () {
+      let hashInicial = null;
+      async function obtenerHash() {
+        try {
+          const res = await fetch('/spring/transferencias/estado');
+          if (!res.ok) return null;
+          const data = await res.json();
+          if (data.error) return null;
+          return data.hash;
+        } catch (_) {
+          return null;
         }
-      }, 3000);
-    }
-
-    iniciarPolling();
-  })();
-</script>
-<script>lucide.createIcons();</script>
+      }
+      async function iniciarPolling() {
+        hashInicial = await obtenerHash();
+        if (hashInicial === null) return;
+        setInterval(async () => {
+          const hashActual = await obtenerHash();
+          if (hashActual !== null && hashActual !== hashInicial) {
+        	  const params = new URLSearchParams(window.location.search);
+        	  const idMascota = params.get('idMascota');
+        	  window.location.href = '/spring/transferencias' + (idMascota ? '?idMascota=' + idMascota : '');
+          }
+        }, 3000);
+      }
+      iniciarPolling();
+    })();
+  </script>
+  <script>lucide.createIcons();</script>
 </body>
 </html>

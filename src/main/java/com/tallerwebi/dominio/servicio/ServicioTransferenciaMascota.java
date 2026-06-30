@@ -9,4 +9,5 @@ public interface ServicioTransferenciaMascota {
   SolicitudTransferencia confirmarPorDestino(Long idSolicitud);
   void cancelarTransferencia(Long idSolicitud);
   List<SolicitudTransferencia> obtenerPendientesPorUsuario(Long idUsuario);
+  List<SolicitudTransferencia> obtenerHistorialPorUsuario(Long idUsuario);
 }

@@ -55,4 +55,19 @@ public class SolicitudTransferenciaDaoImpl implements SolicitudTransferenciaDao 
       .setParameter("id", idUsuario)
       .executeUpdate();
   }
+
+  @Override
+  public List<SolicitudTransferencia> buscarHistorialPorUsuario(Long idUsuario) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "FROM SolicitudTransferencia s WHERE " +
+        "(s.usuarioOrigen.id = :idUsuario OR s.usuarioDestino.id = :idUsuario) " +
+        "AND s.estado != 'PENDIENTE' " +
+        "ORDER BY s.fechaCreacion DESC",
+        SolicitudTransferencia.class
+      )
+      .setParameter("idUsuario", idUsuario)
+      .list();
+  }
 }

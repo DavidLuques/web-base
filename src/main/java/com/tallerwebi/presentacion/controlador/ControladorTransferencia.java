@@ -70,8 +70,6 @@ public class ControladorTransferencia {
     );
   }
 
-  // Devuelve el redirect correcto para el origen tras completarse la transferencia,
-  // o null si el usuario logueado no era el origen.
   private ModelAndView redirigirTrasCompletarSiEraOrigen(
     SolicitudTransferencia solicitud,
     Long idUsuario
@@ -117,6 +115,10 @@ public class ControladorTransferencia {
     modelo.put("idUsuarioActual", idUsuario);
     modelo.put("idMascota", idMascota);
     modelo.put("misMascotas", misMascotas);
+    modelo.put(
+      "historialTransferencias",
+      servicioTransferenciaMascota.obtenerHistorialPorUsuario(idUsuario)
+    );
     return new ModelAndView("transferencias", modelo);
   }
 

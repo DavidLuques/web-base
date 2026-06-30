@@ -313,4 +313,58 @@ public class ControladorTransferenciaTest {
 
     assertThat(mav.getViewName(), equalTo("redirect:/transferencias?exito=true"));
   }
+  
+  @Test
+  public void siNoHayUsuarioLogueadoEstadoTransferenciasDebeDevolverErrorNoSession() {
+    java.util.Map<String, Object> respuesta = controlador.estadoTransferencias(requestMock);
+
+    assertThat(respuesta.get("error"), equalTo("no-session"));
+  }
+
+  @Test
+  public void siHayUsuarioLogueadoEstadoTransferenciasDebeDevolverHashDePendientesYMascotas() {
+    simularUsuarioLogueado(1L);
+
+    SolicitudTransferencia solicitud = new SolicitudTransferencia();
+    solicitud.setId(10L);
+    solicitud.setEstado(EstadoTransferencia.PENDIENTE);
+
+    Mascota mascota = new Mascota();
+    mascota.setId(7L);
+
+    when(servicioTransferenciaMascotaMock.obtenerPendientesPorUsuario(1L))
+      .thenReturn(List.of(solicitud));
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of(mascota));
+
+    java.util.Map<String, Object> respuesta = controlador.estadoTransferencias(requestMock);
+
+    assertThat(respuesta.get("hash"), equalTo("10:PENDIENTE|7"));
+  }
+
+  @Test
+  public void siNoHayPendientesNiMascotasEstadoTransferenciasDebeDevolverHashVacio() {
+    simularUsuarioLogueado(1L);
+    when(servicioTransferenciaMascotaMock.obtenerPendientesPorUsuario(1L)).thenReturn(List.of());
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of());
+
+    java.util.Map<String, Object> respuesta = controlador.estadoTransferencias(requestMock);
+
+    assertThat(respuesta.get("hash"), equalTo("|"));
+  }
+  
+  @Test
+  public void siElUsuarioNoTieneMascotasPeroTienePendientesVerTransferenciasDebeMostrarLaVista() {
+    simularUsuarioLogueado(1L);
+    List<SolicitudTransferencia> pendientes = List.of(new SolicitudTransferencia());
+    List<Usuario> amigos = List.of(mock(Usuario.class));
+    when(servicioMascotaMock.obtenerMascotasPorUsuario(1L)).thenReturn(List.of());
+    when(servicioTransferenciaMascotaMock.obtenerPendientesPorUsuario(1L)).thenReturn(pendientes);
+    when(servicioAmistadMock.obtenerAmigos(1L)).thenReturn(amigos);
+
+    ModelAndView mav = controlador.verTransferencias(requestMock, null);
+
+    assertThat(mav.getViewName(), equalTo("transferencias"));
+    assertThat(mav.getModel().get("misMascotas"), equalTo(List.of()));
+    assertThat(mav.getModel().get("transferenciasPendientes"), equalTo(pendientes));
+  }
 }
