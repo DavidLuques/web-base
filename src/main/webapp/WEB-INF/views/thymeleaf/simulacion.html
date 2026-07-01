@@ -31,37 +31,50 @@
       </div>
     </div>
 
-    <!-- RESUMEN -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h3 class="text-lg font-bold mb-6">Resumen</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+<!-- RESUMEN -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+  <div class="mb-4 flex items-center justify-between">
+    <h3 class="text-lg font-bold text-slate-800">Resumen</h3>
+    <select id="selector-rango" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+      <option value="3">Últimos 3 minutos</option>
+      <option value="5">Últimos 5 minutos</option>
+      <option value="10">Últimos 10 minutos</option>
+      <option value="15">Últimos 15 minutos</option>
+      <option value="30">Últimos 30 minutos</option>
+      <option value="45">Últimos 45 minutos</option>
+      <option value="60">Última hora</option>
+      <option value="0">Todo el historial</option>
+    </select>
+  </div>
 
-        <div class="flex flex-col items-center">
-          <div id="chart-distancia"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Distancia Recorrida</p>
-          <button onclick="abrirModalSim('distancia')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
-        </div>
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
 
-        <div class="flex flex-col items-center">
-          <div id="chart-calorias"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Calorías Quemadas</p>
-          <button onclick="abrirModalSim('calorias')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
-        </div>
-
-        <div class="flex flex-col items-center">
-          <div id="chart-sueno"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Tiempo de Sueño</p>
-          <button onclick="abrirModalSim('sueno')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
-        </div>
-
-        <div class="flex flex-col items-center">
-          <div id="chart-pasos"></div>
-          <p class="text-sm font-medium text-gray-700 mt-2">Pasos Hoy</p>
-          <button onclick="abrirModalSim('pasos')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
-        </div>
-
-      </div>
+    <div class="flex flex-col items-center">
+      <div id="chart-distancia"></div>
+      <p class="text-sm font-medium text-gray-700 mt-2">Distancia Recorrida</p>
+      <button onclick="abrirModalSim('distancia')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
     </div>
+
+    <div class="flex flex-col items-center">
+      <div id="chart-calorias"></div>
+      <p class="text-sm font-medium text-gray-700 mt-2">Calorías Quemadas</p>
+      <button onclick="abrirModalSim('calorias')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
+    </div>
+
+    <div class="flex flex-col items-center">
+      <div id="chart-sueno"></div>
+      <p class="text-sm font-medium text-gray-700 mt-2">Tiempo de Sueño</p>
+      <button onclick="abrirModalSim('sueno')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
+    </div>
+
+    <div class="flex flex-col items-center">
+      <div id="chart-pasos"></div>
+      <p class="text-sm font-medium text-gray-700 mt-2">Pasos Hoy</p>
+      <button onclick="abrirModalSim('pasos')" class="text-xs text-blue-500 hover:text-blue-700 font-medium mt-1">Ver m&aacute;s</button>
+    </div>
+
+  </div>
+</div>
 
     <!-- HISTORIAL DISTANCIA -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">

@@ -25,14 +25,26 @@
       <div class="lg:col-span-2 flex flex-col gap-8">
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
-            <h3 class="text-slate-800 font-bold">Resumen</h3>
-            <a th:href="@{/mascota/exportar/pdf(idMascota=${idMascota})}"
-               class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors">
-              <i data-lucide="file-down" class="w-4 h-4"></i>
-              Exportar PDF
-            </a>
-          </div>
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+  <h3 class="text-slate-800 font-bold">Resumen</h3>
+  <div class="flex items-center gap-3">
+    <select id="selector-rango" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+      <option value="3">Últimos 3 minutos</option>
+      <option value="5">Últimos 5 minutos</option>
+      <option value="10">Últimos 10 minutos</option>
+      <option value="15">Últimos 15 minutos</option>
+      <option value="30">Últimos 30 minutos</option>
+      <option value="45">Últimos 45 minutos</option>
+      <option value="60">Última hora</option>
+      <option value="0">Todo el historial</option>
+    </select>
+    <a th:href="@{/mascota/exportar/pdf(idMascota=${idMascota})}"
+       class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors">
+      <i data-lucide="file-down" class="w-4 h-4"></i>
+      Exportar PDF
+    </a>
+  </div>
+</div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 
             <div class="flex flex-col items-center">
