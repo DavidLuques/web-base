@@ -105,7 +105,11 @@ public class ControladorTransferencia {
       servicioTransferenciaMascota.obtenerPendientesPorUsuario(idUsuario);
     boolean tienePendientes = pendientes != null && !pendientes.isEmpty();
 
-    if (!tieneMascotas && !tienePendientes) {
+    List<SolicitudTransferencia> historial =
+      servicioTransferenciaMascota.obtenerHistorialPorUsuario(idUsuario);
+    boolean tieneHistorial = historial != null && !historial.isEmpty();
+
+    if (!tieneMascotas && !tienePendientes && !tieneHistorial) {
       return new ModelAndView(REDIRECT_SIN_MASCOTA);
     }
 
@@ -115,10 +119,7 @@ public class ControladorTransferencia {
     modelo.put("idUsuarioActual", idUsuario);
     modelo.put("idMascota", idMascota);
     modelo.put("misMascotas", misMascotas);
-    modelo.put(
-      "historialTransferencias",
-      servicioTransferenciaMascota.obtenerHistorialPorUsuario(idUsuario)
-    );
+    modelo.put("historialTransferencias", historial);
     return new ModelAndView("transferencias", modelo);
   }
 

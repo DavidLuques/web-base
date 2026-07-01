@@ -313,7 +313,7 @@ public class ControladorTransferenciaTest {
 
     assertThat(mav.getViewName(), equalTo("redirect:/transferencias?exito=true"));
   }
-  
+
   @Test
   public void siNoHayUsuarioLogueadoEstadoTransferenciasDebeDevolverErrorNoSession() {
     java.util.Map<String, Object> respuesta = controlador.estadoTransferencias(requestMock);
@@ -351,7 +351,7 @@ public class ControladorTransferenciaTest {
 
     assertThat(respuesta.get("hash"), equalTo("|"));
   }
-  
+
   @Test
   public void siElUsuarioNoTieneMascotasPeroTienePendientesVerTransferenciasDebeMostrarLaVista() {
     simularUsuarioLogueado(1L);

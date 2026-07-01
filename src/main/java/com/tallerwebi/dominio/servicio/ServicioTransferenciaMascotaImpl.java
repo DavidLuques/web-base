@@ -58,6 +58,8 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     solicitud.setMascota(mascota);
     solicitud.setUsuarioOrigen(origen);
     solicitud.setUsuarioDestino(destino);
+    solicitud.setNombreOrigen(origen.getNombre());
+    solicitud.setNombreDestino(destino.getNombre());
     solicitudTransferenciaDao.guardar(solicitud);
 
     servicioAlerta.crearAlertaUsuario(
@@ -189,9 +191,8 @@ public class ServicioTransferenciaMascotaImpl implements ServicioTransferenciaMa
     servicioAlerta.crearAlertaUsuario(
       solicitud.getUsuarioDestino(),
       TipoAlerta.INFO,
-      "¡" +
       nombreMascota +
-      " ahora es tuyo/a! La transferencia de " +
+      " ahora es tuyo/a. La transferencia de " +
       solicitud.getUsuarioOrigen().getNombre() +
       " se completo exitosamente."
     );

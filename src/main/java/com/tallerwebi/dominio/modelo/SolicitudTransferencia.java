@@ -17,11 +17,11 @@ public class SolicitudTransferencia {
   private Mascota mascota;
 
   @ManyToOne
-  @JoinColumn(name = "usuario_origen_id", nullable = false)
+  @JoinColumn(name = "usuario_origen_id", nullable = true)
   private Usuario usuarioOrigen;
 
   @ManyToOne
-  @JoinColumn(name = "usuario_destino_id", nullable = false)
+  @JoinColumn(name = "usuario_destino_id", nullable = true)
   private Usuario usuarioDestino;
 
   @Column(name = "confirmada_por_origen")
@@ -35,6 +35,12 @@ public class SolicitudTransferencia {
 
   @Column(name = "fecha_creacion")
   private LocalDateTime fechaCreacion;
+
+  @Column(name = "nombre_origen")
+  private String nombreOrigen;
+
+  @Column(name = "nombre_destino")
+  private String nombreDestino;
 
   public SolicitudTransferencia() {
     this.fechaCreacion = LocalDateTime.now();
@@ -108,5 +114,23 @@ public class SolicitudTransferencia {
   public String getFechaFormateada() {
     if (fechaCreacion == null) return "-";
     return fechaCreacion.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+  }
+
+  public String getNombreOrigenDisplay() {
+    if (usuarioOrigen != null) return usuarioOrigen.getNombre();
+    return nombreOrigen != null ? nombreOrigen : "Usuario eliminado";
+  }
+
+  public String getNombreDestinoDisplay() {
+    if (usuarioDestino != null) return usuarioDestino.getNombre();
+    return nombreDestino != null ? nombreDestino : "Usuario eliminado";
+  }
+
+  public void setNombreOrigen(String nombre) {
+    this.nombreOrigen = nombre;
+  }
+
+  public void setNombreDestino(String nombre) {
+    this.nombreDestino = nombre;
   }
 }

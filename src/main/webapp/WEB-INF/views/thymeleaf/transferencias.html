@@ -172,11 +172,11 @@
 
                 <div class="min-w-0">
                   <p class="font-semibold text-slate-800 truncate" th:text="${t.mascota.nombre}">Mascota</p>
-                  <p class="text-sm text-slate-500 truncate">
-                    <span th:text="${t.usuarioOrigen.nombre}">Origen</span>
-                    &rarr;
-                    <span th:text="${t.usuarioDestino.nombre}">Destino</span>
-                  </p>
+					<p class="text-sm text-slate-500 truncate">
+					    <span th:text="${t.nombreOrigenDisplay}">Origen</span>
+					    &rarr;
+					    <span th:text="${t.nombreDestinoDisplay}">Destino</span>
+					</p>
                   <p class="text-xs text-slate-400 mt-0.5" th:text="${t.fechaFormateada}"></p>
                 </div>
               </div>

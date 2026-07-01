@@ -212,7 +212,7 @@ public class ServicioTransferenciaMascotaImplTest {
 
     assertThat(pendientes, contains(pendiente));
   }
-  
+
   @Test
   public void obtenerHistorialPorUsuarioDebeDelegarEnElDao() {
     SolicitudTransferencia historica = new SolicitudTransferencia();
@@ -223,7 +223,7 @@ public class ServicioTransferenciaMascotaImplTest {
 
     assertThat(historial, contains(historica));
   }
-  
+
   @Test
   public void alIniciarTransferenciaDebeCrearAlertaParaElUsuarioDestino() {
     Mascota mascota = mascotaConNombre("Firulais");
@@ -246,7 +246,7 @@ public class ServicioTransferenciaMascotaImplTest {
         org.mockito.ArgumentMatchers.contains("Firulais")
       );
   }
-  
+
   @Test
   public void siLaTransferenciaSeCompletaPorConfirmacionDeOrigenDebeNotificarAOrigenYDestino() {
     SolicitudTransferencia solicitud = solicitudPendienteCompleta();
@@ -268,7 +268,7 @@ public class ServicioTransferenciaMascotaImplTest {
         org.mockito.ArgumentMatchers.anyString()
       );
   }
-  
+
   @Test
   public void alCancelarUnaTransferenciaDebeNotificarAOrigenYDestino() {
     SolicitudTransferencia solicitud = solicitudPendienteCompleta();

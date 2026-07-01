@@ -50,7 +50,27 @@ public class SolicitudTransferenciaDaoImpl implements SolicitudTransferenciaDao 
     sessionFactory
       .getCurrentSession()
       .createQuery(
-        "DELETE FROM SolicitudTransferencia s WHERE s.usuarioOrigen.id = :id OR s.usuarioDestino.id = :id"
+        "DELETE FROM SolicitudTransferencia s WHERE " +
+        "(s.usuarioOrigen.id = :id OR s.usuarioDestino.id = :id) " +
+        "AND s.estado = 'PENDIENTE'"
+      )
+      .setParameter("id", idUsuario)
+      .executeUpdate();
+
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "UPDATE SolicitudTransferencia s SET s.usuarioOrigen = null " +
+        "WHERE s.usuarioOrigen.id = :id AND s.estado != 'PENDIENTE'"
+      )
+      .setParameter("id", idUsuario)
+      .executeUpdate();
+
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "UPDATE SolicitudTransferencia s SET s.usuarioDestino = null " +
+        "WHERE s.usuarioDestino.id = :id AND s.estado != 'PENDIENTE'"
       )
       .setParameter("id", idUsuario)
       .executeUpdate();
