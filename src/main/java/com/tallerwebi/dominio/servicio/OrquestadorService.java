@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.dto.ImpactoDatosDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import java.util.Map;
@@ -23,4 +24,6 @@ public interface OrquestadorService {
   RangosVitalesDto obtenerRangosVitales(Long idMascota);
 
   Map<String, Object> obtenerVallado(Long idMascota);
+
+  ImpactoDatosDto obtenerImpactoDatos(Long idMascota);
 }

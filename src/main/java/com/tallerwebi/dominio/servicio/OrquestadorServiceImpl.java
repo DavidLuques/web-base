@@ -6,9 +6,11 @@ import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dao.ValladoDao;
+import com.tallerwebi.dominio.dto.ImpactoDatosDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
+import com.tallerwebi.dominio.estado.ComportamientoEstado;
 import com.tallerwebi.dominio.modelo.Actividad;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
@@ -17,6 +19,7 @@ import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import com.tallerwebi.dominio.modelo.RegistroSueno;
 import com.tallerwebi.dominio.modelo.Vallado;
+import com.tallerwebi.dominio.tamano.ComportamientoTamano;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -324,5 +327,32 @@ public class OrquestadorServiceImpl implements OrquestadorService {
       calorias,
       minutosDormidos
     );
+  }
+
+  @Override
+  public ImpactoDatosDto obtenerImpactoDatos(Long idMascota) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    if (mascota == null) {
+      return null;
+    }
+
+    ComportamientoTamano comportamientoTamano = mascota.getTamano().getComportamiento();
+    EstadoMascota estadoActual = mascota.getEstadoActual();
+    ComportamientoEstado comportamientoEstado = estadoActual != null
+      ? estadoActual.getComportamiento()
+      : null;
+
+    ImpactoDatosDto dto = new ImpactoDatosDto();
+    dto.setPeso(mascota.getPeso());
+    dto.setTamano(mascota.getTamano().name());
+    dto.setPasosPorKm(comportamientoTamano.getPasosPorKm());
+    dto.setPesoMinimoTamano(comportamientoTamano.getPesoMinimo());
+    dto.setPesoMaximoTamano(comportamientoTamano.getPesoMaximo());
+    dto.setEstadoActual(estadoActual != null ? estadoActual.name() : null);
+    dto.setMetActual(comportamientoEstado != null ? comportamientoEstado.getMET() : null);
+    dto.setVelocidadActualKmH(
+      comportamientoEstado != null ? comportamientoEstado.getVelocidadKmH() : null
+    );
+    return dto;
   }
 }

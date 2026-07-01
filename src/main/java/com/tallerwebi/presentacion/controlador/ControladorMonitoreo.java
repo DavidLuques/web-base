@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion.controlador;
 
+import com.tallerwebi.dominio.dto.ImpactoDatosDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.servicio.OrquestadorService;
@@ -74,5 +75,11 @@ public class ControladorMonitoreo {
     ResultadoSimulacionDto estado = orquestadorService.obtenerUltimoEstado(idMascota);
     model.addAttribute("mascotaNombre", estado != null ? estado.getNombreMascota() : "Mascota");
     return "dashboard";
+  }
+
+  @GetMapping(value = "/impacto/{idMascota}", produces = "application/json;charset=UTF-8")
+  @ResponseBody
+  public ImpactoDatosDto obtenerImpactoDatos(@PathVariable Long idMascota) {
+    return orquestadorService.obtenerImpactoDatos(idMascota);
   }
 }

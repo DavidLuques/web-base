@@ -76,6 +76,94 @@
   </div>
 </div>
 
+    <!-- IMPACTO DE LOS DATOS CARGADOS -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6" id="panel-impacto">
+      <div class="mb-6">
+        <h3 class="text-slate-800 font-bold text-lg">Así usamos los datos que cargaste de tu mascota</h3>
+        <p class="text-sm text-slate-400 mt-1">
+          El peso y el tamaño que ingresaste al registrar a tu mascota no son solo datos de perfil:
+          alimentan directamente los cálculos que ves en esta pantalla.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- PESO -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3 bg-slate-100 border border-slate-200 rounded-xl px-4 py-3">
+            <div class="bg-indigo-600 text-white rounded-lg p-2 shrink-0">
+              <i data-lucide="weight" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium">Peso cargado</p>
+              <p id="impacto-peso-valor" class="text-slate-800 font-bold text-lg">—</p>
+              <p id="impacto-peso-badge" class="text-xs font-medium mt-1 text-slate-400"></p>
+            </div>
+          </div>
+
+          <div class="flex justify-center">
+            <i data-lucide="arrow-down" class="w-4 h-4 text-slate-300"></i>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl px-4 py-3">
+            <p class="text-xs text-slate-400 font-medium mb-1">Cómo lo usamos</p>
+            <p id="impacto-peso-formula" class="text-sm text-slate-600 leading-relaxed">Cargando...</p>
+          </div>
+
+          <div class="flex justify-center">
+            <i data-lucide="arrow-down" class="w-4 h-4 text-slate-300"></i>
+          </div>
+
+          <div class="bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-3">
+            <div class="bg-emerald-500 text-white rounded-lg p-2 shrink-0">
+              <i data-lucide="flame" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 font-medium">Resultado en pantalla</p>
+              <p id="impacto-peso-resultado" class="text-slate-800 font-bold text-sm">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAMAÑO -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3 bg-slate-100 border border-slate-200 rounded-xl px-4 py-3">
+            <div class="bg-amber-500 text-white rounded-lg p-2 shrink-0">
+              <i data-lucide="ruler" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 font-medium">Tamaño cargado</p>
+              <p id="impacto-tamano-valor" class="text-slate-800 font-bold text-lg">—</p>
+            </div>
+          </div>
+
+          <div class="flex justify-center">
+            <i data-lucide="arrow-down" class="w-4 h-4 text-slate-300"></i>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl px-4 py-3">
+            <p class="text-xs text-slate-400 font-medium mb-1">Cómo lo usamos</p>
+            <p id="impacto-tamano-formula" class="text-sm text-slate-600 leading-relaxed">Cargando...</p>
+          </div>
+
+          <div class="flex justify-center">
+            <i data-lucide="arrow-down" class="w-4 h-4 text-slate-300"></i>
+          </div>
+
+          <div class="bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-3">
+            <div class="bg-rose-500 text-white rounded-lg p-2 shrink-0">
+              <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 font-medium">Resultado en pantalla</p>
+              <p id="impacto-tamano-resultado" class="text-slate-800 font-bold text-sm">—</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- HISTORIAL DISTANCIA -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
       <h3 class="text-lg font-bold mb-4 text-slate-800">Distancia Recorrida - Hoy</h3>
@@ -125,6 +213,8 @@
   </script>
 
   <script th:src="@{/js/simulacion.js}"></script>
+
+  <script th:src="@{/js/impacto.js}"></script>
 
 </body>
 </html>
