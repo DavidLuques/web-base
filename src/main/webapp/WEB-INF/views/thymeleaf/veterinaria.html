@@ -21,15 +21,15 @@
   <main class="flex-1 flex flex-col h-full overflow-y-auto">
 
     <div th:replace="fragmentos/header :: header(
-	    ${mascotaNombre},
-	    ${idMascota},
-	    'veterinaria',
-	    'Veterinaria'
-	  )"></div>
+      ${mascotaNombre},
+      ${idMascota},
+      'veterinaria',
+      'Veterinaria'
+    )"></div>
 
     <div th:if="${param.exito}"
-      class="bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 p-4 mx-6 mt-6 rounded-r-lg shadow-sm flex items-center">
-      <i data-lucide="check-circle" class="w-5 h-5 mr-3"></i>
+      class="bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 p-4 mx-4 lg:mx-6 mt-4 lg:mt-6 rounded-r-lg shadow-sm flex items-center">
+      <i data-lucide="check-circle" class="w-5 h-5 mr-3 shrink-0"></i>
       <div>
         <p class="font-bold" th:if="${param.exito[0] == 'turno_guardado'}">¡Turno agendado con éxito!</p>
         <p class="font-bold" th:if="${param.exito[0] == 'turno_cancelado'}">El turno fue cancelado correctamente.</p>
@@ -37,28 +37,29 @@
     </div>
 
     <div th:if="${param.error}"
-      class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 mx-6 mt-6 rounded-r-lg shadow-sm flex items-center">
-      <i data-lucide="alert-circle" class="w-5 h-5 mr-3"></i>
+      class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 mx-4 lg:mx-6 mt-4 lg:mt-6 rounded-r-lg shadow-sm flex items-center">
+      <i data-lucide="alert-circle" class="w-5 h-5 mr-3 shrink-0"></i>
       <p class="font-bold">Ocurrió un error al procesar la solicitud. Por favor, intenta nuevamente.</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
 
-      <div class="col-span-1 flex flex-col gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 p-4 lg:p-6">
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200">
+      <div class="col-span-1 flex flex-col gap-4 lg:gap-6">
+
+        <div class="bg-white p-4 lg:p-5 rounded-2xl border border-slate-200">
           <h3 class="font-bold text-slate-800 mb-3">Buscar Veterinarias</h3>
           <input type="text" id="input-direccion-origen" placeholder="Tu dirección. Ej: Av. Corrientes 1200"
-            class="w-full border rounded-lg px-3 py-2 mb-2" />
+            class="w-full border rounded-lg px-3 py-2 mb-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
           <button id="btn-buscar-origen"
-            class="w-full bg-slate-800 text-white rounded-lg py-2 font-semibold">Buscar</button>
+            class="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-lg py-2 font-semibold transition-colors">Buscar</button>
         </div>
 
-        <div id="lista-veterinarias" class="bg-white rounded-2xl border border-slate-200 h-[300px] overflow-y-auto">
+        <div id="lista-veterinarias" class="bg-white rounded-2xl border border-slate-200 h-[250px] lg:h-[300px] overflow-y-auto">
           <p class="text-slate-400 text-sm p-4 text-center">Ingresá tu dirección para ver opciones cercanas.</p>
         </div>
 
         <form th:action="@{/analisis/veterinaria/agendar}" method="POST"
-          class="bg-blue-50 p-5 rounded-2xl border border-blue-100 mt-auto">
+          class="bg-blue-50 p-4 lg:p-5 rounded-2xl border border-blue-100 mt-auto">
           <h3 class="font-bold text-blue-900 mb-3">Agendar Turno</h3>
 
           <label class="text-sm font-semibold text-blue-800">Veterinaria Seleccionada:</label>
@@ -69,48 +70,51 @@
 
           <label class="text-sm font-semibold text-blue-800">Fecha y Hora:</label>
           <input type="datetime-local" name="fechaYHora"
-            class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm mb-2" required />
+            class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm mb-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
 
           <label class="text-sm font-semibold text-blue-800">Motivo de la consulta:</label>
           <textarea name="motivo" rows="2"
-            class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm mb-4"></textarea>
+            class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm mb-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
 
           <input type="hidden" name="idMascota" th:value="${idMascota}" />
 
           <button type="submit"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2">Confirmar
-            Reserva</button>
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition-colors">Confirmar Reserva</button>
         </form>
       </div>
 
-      <div class="col-span-2 bg-white rounded-2xl border border-slate-200 p-2">
-        <div id="mapa-veterinarias" class="w-full h-full min-h-[600px] rounded-xl z-10"></div>
+      <div class="col-span-1 lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-2 h-full">
+        <div id="mapa-veterinarias" class="w-full h-full min-h-[350px] lg:min-h-[600px] rounded-xl z-10"></div>
       </div>
 
     </div>
-    <div class="p-6">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+
+    <div class="p-4 lg:p-6 pt-0">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 lg:p-6 overflow-hidden">
         <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
           <i data-lucide="calendar" class="w-6 h-6 text-indigo-500"></i>
           Cronograma de Turnos
         </h3>
-        <div id="calendario-turnos" class="min-h-[500px]"></div>
+        <div class="w-full overflow-x-auto">
+          <div id="calendario-turnos" class="min-w-[500px] min-h-[500px]"></div>
+        </div>
       </div>
     </div>
+    
     <div id="modal-turno"
-      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center transition-opacity">
-      <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl relative border border-slate-200">
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center transition-opacity p-4">
+      <div class="bg-white rounded-2xl p-5 lg:p-6 w-full max-w-sm shadow-xl relative border border-slate-200">
 
         <button id="btn-cerrar-modal" onclick="cerrarModalTurno()"
           class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
 
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+        <div class="flex items-center gap-3 mb-4 pr-6">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
             <i data-lucide="calendar-clock" class="w-5 h-5"></i>
           </div>
-          <h3 class="font-bold text-lg text-slate-800" id="modal-vet-nombre">Nombre Veterinaria</h3>
+          <h3 class="font-bold text-lg text-slate-800 leading-tight" id="modal-vet-nombre">Nombre Veterinaria</h3>
         </div>
 
         <div class="space-y-3 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -135,6 +139,7 @@
       </div>
     </div>
   </main>
+  
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
 
@@ -153,7 +158,6 @@
       inicializarCalendarioTurnos();
     });
   </script>
-</body>
 </body>
 
 </html>
