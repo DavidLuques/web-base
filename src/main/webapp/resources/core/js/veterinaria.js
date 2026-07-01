@@ -228,3 +228,7 @@ function inicializarCalendarioTurnos() {
     calendar.render();
   }
 }
+function cerrarModalTurno() {
+  const modalVisible = document.getElementById("modal-turno");
+  modalVisible.classList.add("hidden");
+}
