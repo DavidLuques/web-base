@@ -26,4 +26,8 @@ public interface ServicioAlerta {
   List<Map<String, Object>> obtenerEmergenciasActivasPorUsuario(Long idUsuario);
 
   void marcarTodasComoLeidas(Long idMascota);
+
+  void eliminarAlertas(List<Long> ids);
+
+  void marcarTodasComoLeidasUsuario(Long idUsuario);
 }

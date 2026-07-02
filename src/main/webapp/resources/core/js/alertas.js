@@ -2,6 +2,7 @@
 /* eslint-disable-next-line no-unused-vars */
 function inicializarAlertas(idMascota) {
   lucide.createIcons();
+  let todasLasAlertasMascota = [];
 
   function formatearFecha(fechaStr) {
     const fecha = new Date(fechaStr);
@@ -53,11 +54,12 @@ function inicializarAlertas(idMascota) {
     const fechaFormato = formatearFecha(alerta.fechaYHora);
 
     return (
-      "<div class=\"bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4 cursor-pointer " + opacidad + "\" onclick=\"marcarAlertaComoLeida(" + alerta.id + ")\">" +
+      "<div class=\"bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4 " + opacidad + "\" data-id=\"" + alerta.id + "\">" +
+      "<input type=\"checkbox\" class=\"checkbox-alerta mt-1 w-4 h-4 accent-rose-500 shrink-0 cursor-pointer\" onclick=\"event.stopPropagation()\">" +
       "<div class=\"p-3 rounded-xl " + bgClass + " " + iconColor + " shrink-0\">" +
       "<i data-lucide=\"" + iconName + "\" class=\"w-6 h-6\"></i>" +
       "</div>" +
-      "<div class=\"flex-1 min-w-0\">" +
+      "<div class=\"flex-1 min-w-0 cursor-pointer\" onclick=\"marcarAlertaComoLeida(" + alerta.id + ")\">" +
       "<div class=\"flex items-center justify-between gap-2 mb-2\">" +
       "<span class=\"text-xs font-bold uppercase tracking-wider " + textClass + " " + bgClass + " px-2 py-0.5 rounded-md\">" + alerta.tipoFormato + "</span>" +
       badge +
@@ -69,6 +71,46 @@ function inicializarAlertas(idMascota) {
     );
   }
 
+  function renderizarAlertasMascota() {
+    const contenedor = document.getElementById("lista-alertas-exclusiva");
+    const contador = document.getElementById("contador-alertas");
+    const filtro = document.getElementById("filtro-alertas-mascota");
+    const valorFiltro = filtro ? filtro.value : "TODAS";
+
+    const seleccionados = new Set(
+      Array.from(document.querySelectorAll("#lista-alertas-exclusiva .checkbox-alerta:checked"))
+        .map(function (cb) { return cb.closest("[data-id]").getAttribute("data-id"); })
+    );
+
+    const listaFiltrada = valorFiltro === "TODAS"
+      ? todasLasAlertasMascota
+      : todasLasAlertasMascota.filter(function (a) { return a.tipo === valorFiltro; });
+
+    if (listaFiltrada.length === 0) {
+      contador.textContent = "0 Alertas";
+      contenedor.innerHTML =
+        "<div class=\"bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm\">" +
+        "<i data-lucide=\"check-circle-2\" class=\"w-12 h-12 text-emerald-500 mx-auto mb-3\"></i>" +
+        "<h3 class=\"text-lg font-bold text-slate-800 mb-1\">Todo controlado</h3>" +
+        "<p class=\"text-sm text-slate-500\">No se registran anomal\u00edas ni alertas para esta mascota en este momento.</p>" +
+        "</div>";
+      lucide.createIcons();
+      return;
+    }
+
+    contador.textContent = listaFiltrada.length + " Alertas";
+    contenedor.innerHTML = [...listaFiltrada].reverse()
+      .map(function (alerta) { return construirHtmlAlerta(alerta); })
+      .join("");
+
+    seleccionados.forEach(function (id) {
+      const cb = contenedor.querySelector("[data-id=\"" + id + "\"] .checkbox-alerta");
+      if (cb) cb.checked = true;
+    });
+
+    lucide.createIcons();
+  }
+
   function cargarAlertasMascota() {
     fetch("/spring/analisis/alertas/datos/" + idMascota)
       .then(function (response) {
@@ -78,28 +120,8 @@ function inicializarAlertas(idMascota) {
         return response.json();
       })
       .then(function (listaDeAlertas) {
-        const contenedor = document.getElementById("lista-alertas-exclusiva");
-        const contador = document.getElementById("contador-alertas");
-
-        if (!listaDeAlertas || !Array.isArray(listaDeAlertas) || listaDeAlertas.length === 0) {
-          contador.textContent = "0 Alertas";
-          contenedor.innerHTML =
-            "<div class=\"bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm\">" +
-            "<i data-lucide=\"check-circle-2\" class=\"w-12 h-12 text-emerald-500 mx-auto mb-3\"></i>" +
-            "<h3 class=\"text-lg font-bold text-slate-800 mb-1\">Todo controlado</h3>" +
-            "<p class=\"text-sm text-slate-500\">No se registran anomal\u00edas ni alertas para esta mascota en este momento.</p>" +
-            "</div>";
-          lucide.createIcons();
-          return;
-        }
-
-        contador.textContent = listaDeAlertas.length + " Alertas";
-        contenedor.innerHTML = [...listaDeAlertas].reverse()
-          .map(function (alerta) {
-            return construirHtmlAlerta(alerta);
-          })
-          .join("");
-        lucide.createIcons();
+        todasLasAlertasMascota = listaDeAlertas || [];
+        renderizarAlertasMascota();
       })
       .catch(function (error) {
         console.error("Detalle del error:", error);
@@ -121,6 +143,11 @@ function inicializarAlertas(idMascota) {
       .then(function (listaDeAlertas) {
         const contenedor = document.getElementById("lista-alertas-usuario");
 
+        const seleccionados = new Set(
+          Array.from(document.querySelectorAll("#lista-alertas-usuario .checkbox-alerta:checked"))
+            .map(function (cb) { return cb.closest("[data-id]").getAttribute("data-id"); })
+        );
+
         if (!listaDeAlertas || !Array.isArray(listaDeAlertas) || listaDeAlertas.length === 0) {
           contenedor.innerHTML =
             "<div class=\"bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm\">" +
@@ -134,6 +161,12 @@ function inicializarAlertas(idMascota) {
         contenedor.innerHTML = listaDeAlertas
           .map(function (a) { return construirHtmlAlerta(a); })
           .join("");
+
+        seleccionados.forEach(function (id) {
+          const div = contenedor.querySelector("[data-id=\"" + id + "\"] .checkbox-alerta");
+          if (div) div.checked = true;
+        });
+
         lucide.createIcons();
       })
       .catch(function (error) {
@@ -242,16 +275,30 @@ function inicializarAlertas(idMascota) {
   };
 
   window.marcarTodasComoLeidas = function () {
-    fetch("/spring/analisis/alertas/todas-leidas/" + idMascota, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" }
-    }).then(function (res) {
-      if (res.ok) {
-        cargarAlertasMascota();
-        cargarAlertasUsuario();
-        actualizarBadgeInmediato(0);
-      }
+    Promise.all([
+      fetch("/spring/analisis/alertas/todas-leidas/" + idMascota, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" }
+      }),
+      fetch("/spring/analisis/alertas/todas-leidas/usuario", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" }
+      })
+    ]).then(function () {
+      cargarAlertasMascota();
+      cargarAlertasUsuario();
+      actualizarBadgeInmediato(0);
     });
+  };
+
+  window.filtrarAlertasMascota = function () {
+    renderizarAlertasMascota();
+  };
+
+  window._alertas = {
+    cargarMascota: cargarAlertasMascota,
+    cargarUsuario: cargarAlertasUsuario,
+    badge: actualizarBadgeInmediato
   };
 
   if (idMascota !== null && idMascota !== undefined) {
@@ -264,3 +311,24 @@ function inicializarAlertas(idMascota) {
   inicializarBotonMail();
   setInterval(cargarAlertasUsuario, 5000);
 }
+
+window.eliminarSeleccionadas = function () {
+  const checkboxes = document.querySelectorAll(".checkbox-alerta:checked");
+  const ids = Array.from(checkboxes).map(function (cb) {
+    return parseInt(cb.closest("[data-id]").getAttribute("data-id"));
+  });
+
+  if (ids.length === 0) return;
+
+  fetch("/spring/analisis/alertas/eliminar", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(ids)
+  }).then(function (res) {
+    if (res.ok) {
+      window._alertas.cargarMascota();
+      window._alertas.cargarUsuario();
+      window._alertas.badge(-ids.length);
+    }
+  });
+};

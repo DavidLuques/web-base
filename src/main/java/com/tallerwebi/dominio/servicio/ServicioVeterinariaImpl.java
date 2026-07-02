@@ -64,7 +64,7 @@ public class ServicioVeterinariaImpl implements ServicioVeterinaria {
       "Turno reservado con éxito en " + nombre + " para el " + fecha.toString();
     TipoAlerta tipoAlerta = TipoAlerta.INFO;
 
-    servicioAlerta.crearAlerta(mascota, tipoAlerta, mensajeAlerta);
+    servicioAlerta.crearAlertaUsuario(mascota.getUsuario(), tipoAlerta, mensajeAlerta);
   }
 
   @Override
@@ -88,7 +88,7 @@ public class ServicioVeterinariaImpl implements ServicioVeterinaria {
       String mensajeAlerta = "El turno en " + turno.getNombreVeterinaria() + " ha sido cancelado.";
       TipoAlerta tipoAlerta = TipoAlerta.INFO;
       Mascota mascota = turno.getMascota();
-      servicioAlerta.crearAlerta(mascota, tipoAlerta, mensajeAlerta);
+      servicioAlerta.crearAlertaUsuario(mascota.getUsuario(), tipoAlerta, mensajeAlerta);
     }
   }
 

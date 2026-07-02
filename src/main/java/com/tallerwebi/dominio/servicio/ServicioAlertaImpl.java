@@ -132,4 +132,16 @@ public class ServicioAlertaImpl implements ServicioAlerta {
   public void marcarTodasComoLeidas(Long idMascota) {
     repositorioAlerta.marcarTodasComoLeidasPorMascota(idMascota);
   }
+
+  @Override
+  @Transactional
+  public void marcarTodasComoLeidasUsuario(Long idUsuario) {
+    repositorioAlerta.marcarTodasComoLeidasPorUsuario(idUsuario);
+  }
+
+  @Override
+  @Transactional
+  public void eliminarAlertas(List<Long> ids) {
+    repositorioAlerta.eliminarPorIds(ids);
+  }
 }

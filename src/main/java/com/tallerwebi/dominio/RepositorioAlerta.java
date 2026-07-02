@@ -25,4 +25,8 @@ public interface RepositorioAlerta {
   void eliminarPorMascota(Long id);
 
   void marcarTodasComoLeidasPorMascota(Long idMascota);
+
+  void eliminarPorIds(List<Long> ids);
+
+  void marcarTodasComoLeidasPorUsuario(Long idUsuario);
 }
