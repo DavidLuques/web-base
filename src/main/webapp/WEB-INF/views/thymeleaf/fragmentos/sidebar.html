@@ -14,14 +14,14 @@
   </div>
 
   <aside id="sidebar-menu" 
-         class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out w-20 bg-[#2d3748] flex flex-col items-center py-6 border-r border-slate-700 shadow-xl z-[1050]">
+         class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out w-20 h-full bg-[#2d3748] flex flex-col items-center justify-between py-2 border-r border-slate-700 shadow-xl z-[1050]">
     
     <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-8">
       <i data-lucide="paw-print" class="w-6 h-6 text-white"></i>
     </div>
     
     <nav class="flex flex-col gap-2 w-full">
-
+      <!-- CON MASCOTA -->
       <th:block th:if="${idMascota != null}">
         <a th:href="@{/analisis/dashboard/{id}(id=${idMascota})}"
            th:class="${paginaActiva == 'dashboard'} ? 'w-full flex justify-center py-3 bg-white/10 border-l-4 border-indigo-400' : 'w-full flex justify-center py-3 text-slate-400 hover:text-white transition-colors'">
@@ -57,7 +57,7 @@
           <i th:class="${paginaActiva == 'transferencias'} ? 'w-6 h-6 text-white' : 'w-6 h-6'" data-lucide="repeat"></i>
         </a>
       </th:block>
-
+      <!-- SIN MASCOTA -->
       <th:block th:if="${idMascota == null}">
         <span class="w-full flex justify-center py-3 text-slate-600 cursor-not-allowed opacity-40">
           <i data-lucide="home" class="w-6 h-6"></i>
