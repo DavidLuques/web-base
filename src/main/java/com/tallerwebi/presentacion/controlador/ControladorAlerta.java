@@ -10,11 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/analisis/alertas")
@@ -98,6 +94,27 @@ public class ControladorAlerta {
   @ResponseBody
   public ResponseEntity<Void> marcarTodasComoLeidas(@PathVariable Long idMascota) {
     servicioAlerta.marcarTodasComoLeidas(idMascota);
+    return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/todas-leidas/usuario")
+  @ResponseBody
+  public ResponseEntity<Void> marcarTodasComoLeidasUsuario(HttpServletRequest request) {
+    Long idUsuario = (Long) request.getSession().getAttribute(ATRIBUTO_ID_USUARIO);
+    if (idUsuario == null) {
+      return ResponseEntity.status(401).build();
+    }
+    servicioAlerta.marcarTodasComoLeidasUsuario(idUsuario);
+    return ResponseEntity.ok().build();
+  }
+
+  @DeleteMapping("/eliminar")
+  @ResponseBody
+  public ResponseEntity<Void> eliminarAlertas(@RequestBody List<Long> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
+    servicioAlerta.eliminarAlertas(ids);
     return ResponseEntity.ok().build();
   }
 }

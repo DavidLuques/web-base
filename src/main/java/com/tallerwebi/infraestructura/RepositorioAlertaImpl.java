@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 public class RepositorioAlertaImpl implements RepositorioAlerta {
 
   private static final String PARAM_ID_MASCOTA = "idMascota";
+  private static final String PARAM_ID_USUARIO = "idUsuario";
 
   private final SessionFactory sessionFactory;
 
@@ -45,7 +46,7 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
         "SELECT a FROM Alerta a WHERE a.usuario.id = :idUsuario ORDER BY a.fechaYHora DESC",
         Alerta.class
       )
-      .setParameter("idUsuario", idUsuario)
+      .setParameter(PARAM_ID_USUARIO, idUsuario)
       .getResultList();
   }
 
@@ -105,7 +106,7 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
         "AND a.tipo = :tipo AND a.leido = false",
         Alerta.class
       )
-      .setParameter("idUsuario", idUsuario)
+      .setParameter(PARAM_ID_USUARIO, idUsuario)
       .setParameter("tipo", TipoAlerta.EMERGENCIA)
       .getResultList();
   }
@@ -115,7 +116,7 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
     sessionFactory
       .getCurrentSession()
       .createQuery("DELETE FROM Alerta a WHERE a.usuario.id = :idUsuario")
-      .setParameter("idUsuario", idUsuario)
+      .setParameter(PARAM_ID_USUARIO, idUsuario)
       .executeUpdate();
   }
 
@@ -136,6 +137,27 @@ public class RepositorioAlertaImpl implements RepositorioAlerta {
         "UPDATE Alerta a SET a.leido = true WHERE a.mascota.id = :idMascota AND a.leido = false"
       )
       .setParameter(PARAM_ID_MASCOTA, idMascota)
+      .executeUpdate();
+  }
+
+  @Override
+  public void eliminarPorIds(List<Long> ids) {
+    if (ids == null || ids.isEmpty()) return;
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("DELETE FROM Alerta a WHERE a.id IN :ids")
+      .setParameter("ids", ids)
+      .executeUpdate();
+  }
+
+  @Override
+  public void marcarTodasComoLeidasPorUsuario(Long idUsuario) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "UPDATE Alerta a SET a.leido = true WHERE a.usuario.id = :idUsuario AND a.leido = false"
+      )
+      .setParameter(PARAM_ID_USUARIO, idUsuario)
       .executeUpdate();
   }
 }

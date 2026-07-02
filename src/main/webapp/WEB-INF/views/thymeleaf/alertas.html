@@ -44,10 +44,13 @@
                             class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm px-4 py-2 rounded-xl font-medium transition">
                         Desactivar notificaciones por mail
                     </button>
-                    <button onclick="marcarTodasComoLeidas()"
-                            class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm px-4 py-2 rounded-xl font-medium transition">
-                        Marcar todas como leídas
-                    </button>
+                    <select id="filtro-alertas-mascota" onchange="filtrarAlertasMascota()"
+                            class="bg-white border border-slate-200 text-slate-700 text-sm px-3 py-1.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <option value="TODAS">Todas</option>
+                        <option value="INFO">Info</option>
+                        <option value="ALERTA">Alerta</option>
+                        <option value="EMERGENCIA">Emergencia</option>
+                    </select>
                 </div>
 
                 <!-- Sin mascota registrada -->
@@ -71,7 +74,17 @@
             <section class="flex flex-col gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-slate-800">Notificaciones</h2>
-                    <p class="text-sm text-slate-500">Solicitudes de amistad, transferencias y actividad social.</p>
+                    <p class="text-sm text-slate-500">Solicitudes de amistad, transferencias y turnos veterinarios.</p>
+                </div>
+                <div class="flex justify-end gap-3 mt-4">
+                    <button onclick="marcarTodasComoLeidas()"
+                            class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm px-4 py-2 rounded-xl font-medium transition">
+                        Marcar todas como leídas
+                    </button>
+                    <button onclick="eliminarSeleccionadas()"
+                            class="bg-rose-100 hover:bg-rose-200 text-rose-700 text-sm px-4 py-2 rounded-xl font-medium transition">
+                        Eliminar seleccionadas
+                    </button>
                 </div>
                 <div id="lista-alertas-usuario" class="flex flex-col gap-4">
                     <div class="text-center py-12 text-slate-400">
