@@ -380,33 +380,19 @@ function conectarYActualizar() {
     .catch(function(error) { console.error("Error al conectar con el backend:", error); });
 }
 
-function cargarAlertasRecientes() {
-  fetch("/spring/analisis/alertas/datos/" + idMascota)
-    .then(function(response) { return response.json(); })
-    .then(function(alertas) {
-      var contenedor = document.getElementById("contenedor-alertas");
-      if (!alertas || alertas.length === 0) {
-        contenedor.innerHTML = "<div class=\"bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center\"><p class=\"text-xs text-emerald-600 font-medium\">Sin alertas recientes</p></div>";
-        return;
-      }
-      var ultimas = alertas.slice(-3).reverse();
-      contenedor.innerHTML = ultimas.map(function(alerta) {
-        var esEmergencia = alerta.tipo === "EMERGENCIA";
-        var bgClass  = esEmergencia ? "bg-rose-50 border-rose-200" : "bg-amber-50 border-amber-200";
-        var dotColor = esEmergencia ? "bg-rose-500" : "bg-amber-500";
-        return "<div class=\"" + bgClass + " border rounded-xl p-4 flex flex-col gap-1\">" +
-                 "<div class=\"flex items-center gap-2\">" +
-                   "<div class=\"w-2 h-2 rounded-full " + dotColor + " shrink-0\"></div>" +
-                   "<span class=\"font-bold text-slate-800 text-sm\">" + alerta.tipo + "</span>" +
-                 "</div>" +
-                 "<p class=\"text-xs text-slate-600 ml-4 leading-relaxed\">" + alerta.mensaje + "</p>" +
-               "</div>";
-      }).join("");
-    })
-    .catch(function(err) { console.error("Error al cargar alertas en dashboard:", err); });
+function abrirModalImpacto() {
+  document.getElementById("modal-impacto").classList.remove("hidden");
+  lucide.createIcons();
 }
+
+function cerrarModalImpacto() {
+  document.getElementById("modal-impacto").classList.add("hidden");
+}
+
+document.getElementById("modal-impacto").addEventListener("click", function(e) {
+  if (e.target === this) { cerrarModalImpacto(); }
+});
 
 lucide.createIcons();
 conectarYActualizar();
-cargarAlertasRecientes();
 setInterval(conectarYActualizar, 5000);

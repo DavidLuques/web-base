@@ -246,10 +246,10 @@ public class ServicioAlertaImplTest {
     emergencia.setFechaYHora(LocalDateTime.now());
 
     when(repositorioAlertaMock.buscarEmergenciasActivasPorUsuario(1L))
-            .thenReturn(Arrays.asList(emergencia));
+      .thenReturn(Arrays.asList(emergencia));
 
     List<java.util.Map<String, Object>> resultado =
-            servicioAlerta.obtenerEmergenciasActivasPorUsuario(1L);
+      servicioAlerta.obtenerEmergenciasActivasPorUsuario(1L);
 
     assertEquals(1, resultado.size());
     assertEquals(1L, resultado.get(0).get("id"));
@@ -260,10 +260,10 @@ public class ServicioAlertaImplTest {
   @Test
   void debeRetornarListaVaciaSiNoHayEmergenciasActivas() {
     when(repositorioAlertaMock.buscarEmergenciasActivasPorUsuario(1L))
-            .thenReturn(java.util.Collections.emptyList());
+      .thenReturn(java.util.Collections.emptyList());
 
     List<java.util.Map<String, Object>> resultado =
-            servicioAlerta.obtenerEmergenciasActivasPorUsuario(1L);
+      servicioAlerta.obtenerEmergenciasActivasPorUsuario(1L);
 
     assertTrue(resultado.isEmpty());
   }
