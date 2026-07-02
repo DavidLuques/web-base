@@ -195,4 +195,76 @@ public class ServicioAlertaImplTest {
 
     assertNull(resultado);
   }
+
+  @Test
+  void debeMarcarTodasLasAlertasDeUnaMascotaComoLeidas() {
+    Long idMascota = 1L;
+
+    servicioAlerta.marcarTodasComoLeidas(idMascota);
+
+    verify(repositorioAlertaMock, times(1)).marcarTodasComoLeidasPorMascota(idMascota);
+  }
+
+  @Test
+  void debeMarcarTodasLasAlertasDeUnUsuarioComoLeidas() {
+    Long idUsuario = 2L;
+
+    servicioAlerta.marcarTodasComoLeidasUsuario(idUsuario);
+
+    verify(repositorioAlertaMock, times(1)).marcarTodasComoLeidasPorUsuario(idUsuario);
+  }
+
+  @Test
+  void debeEliminarAlertasPorIds() {
+    List<Long> ids = Arrays.asList(1L, 2L, 3L);
+
+    servicioAlerta.eliminarAlertas(ids);
+
+    verify(repositorioAlertaMock, times(1)).eliminarPorIds(ids);
+  }
+
+  @Test
+  void debeEliminarAlertasConListaVacia() {
+    List<Long> ids = java.util.Collections.emptyList();
+
+    servicioAlerta.eliminarAlertas(ids);
+
+    verify(repositorioAlertaMock, times(1)).eliminarPorIds(ids);
+  }
+
+  @Test
+  void debeObtenerEmergenciasActivasPorUsuario() {
+    Mascota mascota = new Mascota();
+    mascota.setNombre("Firulais");
+
+    Alerta emergencia = new Alerta();
+    emergencia.setId(1L);
+    emergencia.setTipo(TipoAlerta.EMERGENCIA);
+    emergencia.setMensaje("Emergencia activa");
+    emergencia.setMascota(mascota);
+    emergencia.setLeido(false);
+    emergencia.setFechaYHora(LocalDateTime.now());
+
+    when(repositorioAlertaMock.buscarEmergenciasActivasPorUsuario(1L))
+            .thenReturn(Arrays.asList(emergencia));
+
+    List<java.util.Map<String, Object>> resultado =
+            servicioAlerta.obtenerEmergenciasActivasPorUsuario(1L);
+
+    assertEquals(1, resultado.size());
+    assertEquals(1L, resultado.get(0).get("id"));
+    assertEquals("Emergencia activa", resultado.get(0).get("mensaje"));
+    assertEquals("Firulais", resultado.get(0).get("nombreMascota"));
+  }
+
+  @Test
+  void debeRetornarListaVaciaSiNoHayEmergenciasActivas() {
+    when(repositorioAlertaMock.buscarEmergenciasActivasPorUsuario(1L))
+            .thenReturn(java.util.Collections.emptyList());
+
+    List<java.util.Map<String, Object>> resultado =
+            servicioAlerta.obtenerEmergenciasActivasPorUsuario(1L);
+
+    assertTrue(resultado.isEmpty());
+  }
 }
