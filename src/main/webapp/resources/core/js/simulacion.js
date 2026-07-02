@@ -436,6 +436,19 @@ function simDesc(texto) {
   return "<p class=\"text-slate-400 text-xs leading-relaxed px-1\">" + texto + "</p>";
 }
 
+function abrirModalImpactoSim() {
+  document.getElementById("modal-impacto-sim").classList.remove("hidden");
+  lucide.createIcons();
+}
+
+function cerrarModalImpactoSim() {
+  document.getElementById("modal-impacto-sim").classList.add("hidden");
+}
+
+document.getElementById("modal-impacto-sim").addEventListener("click", function(e) {
+  if (e.target === this) { cerrarModalImpactoSim(); }
+});
+
 lucide.createIcons();
 actualizarEstado();
 setInterval(actualizarEstado, 30000);
