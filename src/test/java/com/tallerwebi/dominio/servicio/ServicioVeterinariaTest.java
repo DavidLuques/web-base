@@ -50,17 +50,11 @@ public class ServicioVeterinariaTest {
 
     LocalDateTime fecha = LocalDateTime.now().plusDays(2);
 
-    servicioVeterinaria.agendarTurno(
-      idMascota,
-      "Vet Centro",
-      "Av. San Martin 123",
-      fecha,
-      "Control"
-    );
+    servicioVeterinaria.agendarTurno(idMascota, "Vet Centro", "Av. San Martin 123", fecha, "Control");
 
     verify(turnoDaoMock, times(1)).guardar(any(TurnoVeterinaria.class));
     verify(servicioAlertaMock, times(1))
-      .crearAlerta(eq(mascotaMock), eq(TipoAlerta.INFO), anyString());
+            .crearAlertaUsuario(any(), eq(TipoAlerta.INFO), anyString());
   }
 
   @Test
@@ -102,6 +96,7 @@ public class ServicioVeterinariaTest {
 
     assertEquals(EstadoTurno.CANCELADO, turnoMock.getEstado());
     verify(turnoDaoMock, times(1)).modificar(turnoMock);
-    verify(servicioAlertaMock, times(1)).crearAlerta(eq(mascota), eq(TipoAlerta.INFO), anyString());
+    verify(servicioAlertaMock, times(1))
+            .crearAlertaUsuario(any(), eq(TipoAlerta.INFO), anyString());
   }
 }
