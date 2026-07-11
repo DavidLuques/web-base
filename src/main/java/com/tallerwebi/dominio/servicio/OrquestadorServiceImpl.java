@@ -108,7 +108,10 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   @Override
   public ResultadoSimulacionDto refrescarLectura(Long idMascota) {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
-    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTipoYTamano(
+      mascota.getTipo(),
+      mascota.getTamano()
+    );
     LecturaSensor lectura = lectorCollarService.obtenerLectura(idMascota);
 
     servicioEvaluadorAlerta.evaluarLectura(mascota, lectura, rango);
@@ -121,7 +124,10 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   @Override
   public RangosVitalesDto obtenerRangosVitales(Long idMascota) {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
-    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTipoYTamano(
+      mascota.getTipo(),
+      mascota.getTamano()
+    );
     return new RangosVitalesDto(rango);
   }
 

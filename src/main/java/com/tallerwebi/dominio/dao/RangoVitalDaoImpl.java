@@ -1,14 +1,13 @@
 package com.tallerwebi.dominio.dao;
 
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repositorio de acceso a datos.
- */
 @Repository
 public class RangoVitalDaoImpl implements RangoVitalDao {
 
@@ -20,13 +19,15 @@ public class RangoVitalDaoImpl implements RangoVitalDao {
   }
 
   @Override
-  public RangoVitalPorTamano buscarPorTamano(TamanoMascota tamano) {
-    String hql = "FROM RangoVitalPorTamano WHERE tamano = :tamano";
+  public RangoVitalPorTamano buscarPorTipoYTamano(TipoMascota tipo, TamanoMascota tamano) {
+    String hql = "FROM RangoVitalPorTamano WHERE tipoMascota = :tipo AND tamano = :tamano";
 
-    return (RangoVitalPorTamano) sessionFactory
+    Query<RangoVitalPorTamano> query = sessionFactory
       .getCurrentSession()
-      .createQuery(hql)
-      .setParameter("tamano", tamano)
-      .uniqueResult();
+      .createQuery(hql, RangoVitalPorTamano.class)
+      .setParameter("tipo", tipo)
+      .setParameter("tamano", tamano);
+
+    return query.uniqueResult();
   }
 }

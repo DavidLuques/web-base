@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 
 /**
  * as
@@ -8,7 +9,7 @@ import com.tallerwebi.dominio.enums.TamanoMascota;
 public class DatosAltaMascota {
 
   private String nombre;
-  private String tipo;
+  private TipoMascota tipo;
   private String raza;
   private String genero;
   private Double peso;
@@ -24,11 +25,11 @@ public class DatosAltaMascota {
     this.nombre = nombre;
   }
 
-  public String getTipo() {
+  public TipoMascota getTipo() {
     return tipo;
   }
 
-  public void setTipo(String tipo) {
+  public void setTipo(TipoMascota tipo) {
     this.tipo = tipo;
   }
 

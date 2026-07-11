@@ -49,7 +49,10 @@ public class LectorCollarServiceImpl implements LectorCollarService {
   @Override
   public LecturaSensor obtenerLectura(Long idMascota) {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
-    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTipoYTamano(
+      mascota.getTipo(),
+      mascota.getTamano()
+    );
 
     inicializarPresionSiEsNecesario(rango);
 

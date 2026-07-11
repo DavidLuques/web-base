@@ -16,6 +16,7 @@ import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
@@ -73,6 +74,7 @@ public class OrquestadorServiceImplTest {
     mascota = new Mascota();
     mascota.setId(1L);
     mascota.setNombre("Firulais");
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
     mascota.setPeso(10.5);
     mascota.setEstadoActual(EstadoMascota.CAMINANDO);
@@ -102,7 +104,8 @@ public class OrquestadorServiceImplTest {
     when(analizadorDeDatosService.calcularCalorias(1.5, EstadoMascota.CAMINANDO, 10.5))
       .thenReturn(50.0);
     when(repositorioSueno.obtenerTotalMinutosDormidosPorMascota(1L)).thenReturn(30);
-    when(rangoVitalDao.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDao.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
   }
 
   // ── procesarMascota ─────────────────────────────────────────────
@@ -169,6 +172,7 @@ public class OrquestadorServiceImplTest {
     Mascota otraMascota = new Mascota();
     otraMascota.setId(2L);
     otraMascota.setNombre("Rex");
+    otraMascota.setTipo(TipoMascota.PERRO);
     otraMascota.setPeso(25.0);
     otraMascota.setEstadoActual(EstadoMascota.REPOSO);
 
@@ -272,13 +276,14 @@ public class OrquestadorServiceImplTest {
     assertThat(resultado, notNullValue());
 
     verify(mascotaDao).buscarPorId(1L);
-    verify(rangoVitalDao).buscarPorTamano(TamanoMascota.MEDIANO);
+    verify(rangoVitalDao).buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO);
   }
 
   @Test
   void refrescarTodasLasLecturasDeberiaProcesarCadaMascota() {
     Mascota mascota2 = new Mascota();
     mascota2.setId(2L);
+    mascota2.setTipo(TipoMascota.PERRO);
 
     when(mascotaDao.buscarTodas()).thenReturn(List.of(mascota, mascota2));
 

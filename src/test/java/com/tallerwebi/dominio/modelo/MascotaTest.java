@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.modelo;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.tallerwebi.dominio.enums.TipoMascota;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,7 @@ public class MascotaTest {
     mascota.setPeso(10.5);
     mascota.setRaza("Labrador");
     mascota.setGenero("Macho");
-    mascota.setTipo("Perro");
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setImagenMascota("url_imagen.jpg");
 
     assertNotNull(mascota, "La instancia de mascota no debe ser nula");
@@ -30,7 +31,7 @@ public class MascotaTest {
     assertEquals(10.5, mascota.getPeso());
     assertEquals("Labrador", mascota.getRaza());
     assertEquals("Macho", mascota.getGenero());
-    assertEquals("Perro", mascota.getTipo());
+    assertEquals(TipoMascota.PERRO, mascota.getTipo());
     assertEquals("url_imagen.jpg", mascota.getImagenMascota());
   }
 }

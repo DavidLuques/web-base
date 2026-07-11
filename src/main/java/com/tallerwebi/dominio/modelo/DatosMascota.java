@@ -1,18 +1,21 @@
 package com.tallerwebi.dominio.modelo;
 
+import com.tallerwebi.dominio.enums.TipoMascota;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
-/**
- * Entidad del sistema
- */
 @Embeddable
 public class DatosMascota {
 
   private String raza;
   private String genero;
-  private String tipo;
+
+  @Enumerated(EnumType.STRING)
+  private TipoMascota tipo;
+
   private Double peso;
   private Boolean esteril;
 
@@ -40,11 +43,11 @@ public class DatosMascota {
     this.genero = genero;
   }
 
-  public String getTipo() {
+  public TipoMascota getTipo() {
     return tipo;
   }
 
-  public void setTipo(String tipo) {
+  public void setTipo(TipoMascota tipo) {
     this.tipo = tipo;
   }
 
