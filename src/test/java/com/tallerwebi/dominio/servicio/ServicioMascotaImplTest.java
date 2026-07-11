@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.Usuario;
 import com.tallerwebi.presentacion.DatosAltaMascota;
@@ -37,7 +38,7 @@ public class ServicioMascotaImplTest {
     DatosAltaMascota datos = new DatosAltaMascota();
     datos.setNombre("Firulais");
     datos.setTamano(TamanoMascota.MEDIANO);
-    datos.setTipo("Perro");
+    datos.setTipo(TipoMascota.PERRO);
     datos.setPeso(10.5);
     datos.setFechaNacimiento("2020-01-01");
     Long idUsuario = 1L;
@@ -71,7 +72,7 @@ public class ServicioMascotaImplTest {
     assertEquals(EstadoMascota.CORRIENDO, mascotaGuardada.getEstadoActual());
     assertEquals(usuarioMock, mascotaGuardada.getUsuario());
     assertNotNull(mascotaGuardada.getDatos());
-    assertEquals("Perro", mascotaGuardada.getDatos().getTipo());
+    assertEquals(TipoMascota.PERRO, mascotaGuardada.getDatos().getTipo());
     assertEquals(10.5, mascotaGuardada.getPeso());
     assertNotNull(mascotaGuardada.getFechaNacimiento());
   }
@@ -193,7 +194,7 @@ public class ServicioMascotaImplTest {
     mascota.setTamano(TamanoMascota.PEQUENO);
     com.tallerwebi.dominio.modelo.DatosMascota datosMascota =
       new com.tallerwebi.dominio.modelo.DatosMascota();
-    datosMascota.setTipo("Perro");
+    datosMascota.setTipo(TipoMascota.PERRO);
     datosMascota.setPeso(5.0);
     mascota.setDatos(datosMascota);
 
@@ -204,7 +205,7 @@ public class ServicioMascotaImplTest {
     assertNotNull(resultado);
     assertEquals("Boby", resultado.getNombre());
     assertEquals(TamanoMascota.PEQUENO, resultado.getTamano());
-    assertEquals("Perro", resultado.getTipo());
+    assertEquals(TipoMascota.PERRO, resultado.getTipo());
     assertEquals(5.0, resultado.getPeso());
   }
 

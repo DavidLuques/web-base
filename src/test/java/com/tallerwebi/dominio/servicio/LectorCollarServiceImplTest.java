@@ -9,6 +9,7 @@ import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -42,10 +43,12 @@ public class LectorCollarServiceImplTest {
     rango.setDiastolicaMaxima(100);
 
     Mascota mascota = new Mascota();
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     when(mascotaDao.buscarPorId(1L)).thenReturn(mascota);
-    when(rangoVitalDao.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDao.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
     when(repositorioAnalisis.obtenerUltimoAnalisis(anyLong())).thenReturn(null);
   }
 
@@ -134,7 +137,7 @@ public class LectorCollarServiceImplTest {
     servicio.obtenerLectura(1L);
 
     verify(mascotaDao, times(1)).buscarPorId(1L);
-    verify(rangoVitalDao, times(1)).buscarPorTamano(TamanoMascota.MEDIANO);
+    verify(rangoVitalDao, times(1)).buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO);
   }
 
   // ── estado incremental ──────────────────────────────────────────
@@ -152,6 +155,7 @@ public class LectorCollarServiceImplTest {
   @Test
   void deberiaMantenerseLaFrecuenciaIndependientePorCadaMascota() {
     Mascota otraMascota = new Mascota();
+    otraMascota.setTipo(TipoMascota.PERRO);
     otraMascota.setTamano(TamanoMascota.MEDIANO);
     when(mascotaDao.buscarPorId(2L)).thenReturn(otraMascota);
 

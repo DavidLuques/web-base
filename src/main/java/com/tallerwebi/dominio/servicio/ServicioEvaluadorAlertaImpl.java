@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.TipoAlerta;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
@@ -30,6 +31,8 @@ public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
   private static final String INFIJO_LA_PRESION = ". La presion ";
   private static final int RADIO_TIERRA = 6371000;
   private static final long INTERVALO_ALERTA_VALLADO_SEGUNDOS = 30;
+  private static final double PESO_MINIMO_GATO = 3.0;
+  private static final double PESO_MAXIMO_GATO = 7.0;
 
   private final ServicioAlerta servicioAlerta;
   private final ValladoDao valladoDao;
@@ -336,6 +339,8 @@ public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
   }
 
   private Double obtenerPesoMinimo(Mascota mascota) {
+    if (mascota.getTipo() == TipoMascota.GATO) return PESO_MINIMO_GATO;
+    if (mascota.getTamano() == null) return null;
     switch (mascota.getTamano()) {
       case PEQUENO:
         return 2.0;
@@ -349,6 +354,8 @@ public class ServicioEvaluadorAlertaImpl implements ServicioEvaluadorAlerta {
   }
 
   private Double obtenerPesoMaximo(Mascota mascota) {
+    if (mascota.getTipo() == TipoMascota.GATO) return PESO_MAXIMO_GATO;
+    if (mascota.getTamano() == null) return null;
     switch (mascota.getTamano()) {
       case PEQUENO:
         return 10.0;

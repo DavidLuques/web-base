@@ -3,6 +3,8 @@ package com.tallerwebi.dominio.servicio;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.ValladoDao;
 import com.tallerwebi.dominio.enums.EstadoMascota;
+import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.DatosMascota;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.Usuario;
@@ -15,9 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Servicio de lógica de negocio.
- */
 @Service
 @Transactional
 public class ServicioMascotaImpl implements ServicioMascota {
@@ -46,12 +45,12 @@ public class ServicioMascotaImpl implements ServicioMascota {
 
     Mascota mascota = new Mascota();
     mascota.setNombre(datos.getNombre());
-    mascota.setTamano(datos.getTamano());
-    mascota.setEstadoActual(EstadoMascota.CORRIENDO); // Estado por defecto
+    mascota.setTamano(resolverTamano(datos.getTipo(), datos.getTamano()));
+    mascota.setEstadoActual(EstadoMascota.CORRIENDO);
     mascota.setUsuario(usuario);
 
     DatosMascota datosMascota = new DatosMascota();
-    datosMascota.setTipo("Perro");
+    datosMascota.setTipo(datos.getTipo());
     datosMascota.setRaza(datos.getRaza());
     datosMascota.setGenero(datos.getGenero());
     datosMascota.setPeso(datos.getPeso());
@@ -108,7 +107,7 @@ public class ServicioMascotaImpl implements ServicioMascota {
     Mascota mascota = mascotaDao.buscarPorId(idMascota);
     if (mascota != null) {
       mascota.setNombre(datos.getNombre());
-      mascota.setTamano(datos.getTamano());
+      mascota.setTamano(resolverTamano(datos.getTipo(), datos.getTamano()));
       if (mascota.getDatos() == null) {
         mascota.setDatos(new DatosMascota());
       }
@@ -138,5 +137,12 @@ public class ServicioMascotaImpl implements ServicioMascota {
       mascota.setActivo(false);
       mascotaDao.modificar(mascota);
     }
+  }
+
+  private TamanoMascota resolverTamano(TipoMascota tipo, TamanoMascota tamanoIngresado) {
+    if (tipo == TipoMascota.GATO) {
+      return TamanoMascota.PEQUENO;
+    }
+    return tamanoIngresado;
   }
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
@@ -73,13 +74,15 @@ public class AnalizadorDeDatosServiceImplTest {
   public void dadaUnaMascotaSinEstadoPrevioCuandoSeDeterminaEstadoDebeRetornarElEstadoDeducido() {
     Mascota mascota = new Mascota();
     mascota.setId(1L);
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     RangoVitalPorTamano rango = new RangoVitalPorTamano();
     rango.setFrecuenciaMinima(60);
     rango.setFrecuenciaMaxima(140);
 
-    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDaoMock.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
 
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(65);
@@ -206,13 +209,15 @@ public class AnalizadorDeDatosServiceImplTest {
   public void dadaUnaMascotaConEstadoPrevioDistintoDebeAvanzarUnPasoHaciaElNuevoEstado() {
     Mascota mascota = new Mascota();
     mascota.setId(2L);
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     RangoVitalPorTamano rango = new RangoVitalPorTamano();
     rango.setFrecuenciaMinima(60);
     rango.setFrecuenciaMaxima(140);
 
-    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDaoMock.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
 
     LecturaSensor lectura1 = new LecturaSensor();
     lectura1.setFrecuenciaCardiaca(65);
@@ -244,13 +249,15 @@ public class AnalizadorDeDatosServiceImplTest {
   public void cuandoSeLimpiaLaMemoriaLaSiguienteDeterminacionEsComoSinEstadoPrevio() {
     Mascota mascota = new Mascota();
     mascota.setId(3L);
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     RangoVitalPorTamano rango = new RangoVitalPorTamano();
     rango.setFrecuenciaMinima(60);
     rango.setFrecuenciaMaxima(140);
 
-    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDaoMock.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
 
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(65);
@@ -273,13 +280,15 @@ public class AnalizadorDeDatosServiceImplTest {
   public void dadaUnaLecturaDeCorridaDebeDeducirEstadoCorriendo() {
     Mascota mascota = new Mascota();
     mascota.setId(4L);
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     RangoVitalPorTamano rango = new RangoVitalPorTamano();
     rango.setFrecuenciaMinima(60);
     rango.setFrecuenciaMaxima(140);
 
-    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDaoMock.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
 
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(138);
@@ -299,13 +308,15 @@ public class AnalizadorDeDatosServiceImplTest {
   public void cuandoPermaneceDormidoAvanzaAReposo() {
     Mascota mascota = new Mascota();
     mascota.setId(100L);
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     RangoVitalPorTamano rango = new RangoVitalPorTamano();
     rango.setFrecuenciaMinima(60);
     rango.setFrecuenciaMaxima(140);
 
-    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDaoMock.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
 
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(65);
@@ -327,13 +338,15 @@ public class AnalizadorDeDatosServiceImplTest {
   public void cuandoPermaneceCorriendoRetrocedeACaminando() {
     Mascota mascota = new Mascota();
     mascota.setId(101L);
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setTamano(TamanoMascota.MEDIANO);
 
     RangoVitalPorTamano rango = new RangoVitalPorTamano();
     rango.setFrecuenciaMinima(60);
     rango.setFrecuenciaMaxima(140);
 
-    when(rangoVitalDaoMock.buscarPorTamano(TamanoMascota.MEDIANO)).thenReturn(rango);
+    when(rangoVitalDaoMock.buscarPorTipoYTamano(TipoMascota.PERRO, TamanoMascota.MEDIANO))
+      .thenReturn(rango);
 
     LecturaSensor lectura = new LecturaSensor();
     lectura.setFrecuenciaCardiaca(138);

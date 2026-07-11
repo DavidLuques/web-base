@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.modelo;
 
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -14,9 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-/**
- * Entidad del sistema
- */
 @Entity
 @Table(name = "mascota")
 public class Mascota {
@@ -140,11 +138,11 @@ public class Mascota {
     datos.setGenero(genero);
   }
 
-  public String getTipo() {
+  public TipoMascota getTipo() {
     return datos.getTipo();
   }
 
-  public void setTipo(String tipo) {
+  public void setTipo(TipoMascota tipo) {
     datos.setTipo(tipo);
   }
 

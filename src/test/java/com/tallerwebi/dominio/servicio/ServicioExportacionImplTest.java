@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.RepositorioAlerta;
 import com.tallerwebi.dominio.RepositorioAnalisis;
 import com.tallerwebi.dominio.enums.TipoAlerta;
+import com.tallerwebi.dominio.enums.TipoMascota;
 import com.tallerwebi.dominio.modelo.Alerta;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
@@ -47,7 +48,7 @@ public class ServicioExportacionImplTest {
     Mascota mascota = new Mascota();
     mascota.setId(idMascota);
     mascota.setNombre("Firulais");
-    mascota.setTipo("Perro");
+    mascota.setTipo(TipoMascota.PERRO);
     mascota.setRaza("Golden");
     mascota.setPeso(20.5);
 

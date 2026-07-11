@@ -1,6 +1,9 @@
 package com.tallerwebi.dominio.modelo;
 
 import com.tallerwebi.dominio.enums.TamanoMascota;
+import com.tallerwebi.dominio.enums.TipoMascota;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -9,9 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * Entidad del sistema
- */
 @Entity
 @Table(name = "rango_vital_por_tamano")
 public class RangoVitalPorTamano {
@@ -21,24 +21,33 @@ public class RangoVitalPorTamano {
   private Long id;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "tipo_mascota", nullable = false)
+  private TipoMascota tipoMascota;
+
+  @Enumerated(EnumType.STRING)
   private TamanoMascota tamano;
 
-  private Integer frecuenciaMinima;
-  private Integer frecuenciaMaxima;
+  @Embedded
+  private final RangoFrecuenciaCardiaca frecuenciaCardiaca = new RangoFrecuenciaCardiaca();
 
-  private Integer sistolicaMinima;
-  private Integer sistolicaMaxima;
+  @Embedded
+  private final RangoPresionArterial presionArterial = new RangoPresionArterial();
 
-  private Integer diastolicaMinima;
-  private Integer diastolicaMaxima;
-
-  private Double temperaturaMinima;
-  private Double temperaturaMaxima;
+  @Embedded
+  private final RangoTemperatura temperatura = new RangoTemperatura();
 
   public RangoVitalPorTamano() {}
 
   public Long getId() {
     return id;
+  }
+
+  public TipoMascota getTipoMascota() {
+    return tipoMascota;
+  }
+
+  public void setTipoMascota(TipoMascota tipoMascota) {
+    this.tipoMascota = tipoMascota;
   }
 
   public TamanoMascota getTamano() {
@@ -50,66 +59,66 @@ public class RangoVitalPorTamano {
   }
 
   public Integer getFrecuenciaMinima() {
-    return frecuenciaMinima;
+    return frecuenciaCardiaca.getMinima();
   }
 
   public void setFrecuenciaMinima(Integer frecuenciaMinima) {
-    this.frecuenciaMinima = frecuenciaMinima;
+    frecuenciaCardiaca.setMinima(frecuenciaMinima);
   }
 
   public Integer getFrecuenciaMaxima() {
-    return frecuenciaMaxima;
+    return frecuenciaCardiaca.getMaxima();
   }
 
   public void setFrecuenciaMaxima(Integer frecuenciaMaxima) {
-    this.frecuenciaMaxima = frecuenciaMaxima;
+    frecuenciaCardiaca.setMaxima(frecuenciaMaxima);
   }
 
   public Integer getSistolicaMinima() {
-    return sistolicaMinima;
+    return presionArterial.getSistolicaMinima();
   }
 
   public void setSistolicaMinima(Integer sistolicaMinima) {
-    this.sistolicaMinima = sistolicaMinima;
+    presionArterial.setSistolicaMinima(sistolicaMinima);
   }
 
   public Integer getSistolicaMaxima() {
-    return sistolicaMaxima;
+    return presionArterial.getSistolicaMaxima();
   }
 
   public void setSistolicaMaxima(Integer sistolicaMaxima) {
-    this.sistolicaMaxima = sistolicaMaxima;
+    presionArterial.setSistolicaMaxima(sistolicaMaxima);
   }
 
   public Integer getDiastolicaMinima() {
-    return diastolicaMinima;
+    return presionArterial.getDiastolicaMinima();
   }
 
   public void setDiastolicaMinima(Integer diastolicaMinima) {
-    this.diastolicaMinima = diastolicaMinima;
+    presionArterial.setDiastolicaMinima(diastolicaMinima);
   }
 
   public Integer getDiastolicaMaxima() {
-    return diastolicaMaxima;
+    return presionArterial.getDiastolicaMaxima();
   }
 
   public void setDiastolicaMaxima(Integer diastolicaMaxima) {
-    this.diastolicaMaxima = diastolicaMaxima;
+    presionArterial.setDiastolicaMaxima(diastolicaMaxima);
   }
 
   public Double getTemperaturaMinima() {
-    return temperaturaMinima;
+    return temperatura.getMinima();
   }
 
   public void setTemperaturaMinima(Double temperaturaMinima) {
-    this.temperaturaMinima = temperaturaMinima;
+    temperatura.setMinima(temperaturaMinima);
   }
 
   public Double getTemperaturaMaxima() {
-    return temperaturaMaxima;
+    return temperatura.getMaxima();
   }
 
   public void setTemperaturaMaxima(Double temperaturaMaxima) {
-    this.temperaturaMaxima = temperaturaMaxima;
+    temperatura.setMaxima(temperaturaMaxima);
   }
 }

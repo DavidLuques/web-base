@@ -34,7 +34,10 @@ public class AnalizadorDeDatosServiceImpl implements AnalizadorDeDatosService {
 
   @Override
   public EstadoMascota determinarEstado(Mascota mascota, LecturaSensor lectura) {
-    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTamano(mascota.getTamano());
+    RangoVitalPorTamano rango = rangoVitalDao.buscarPorTipoYTamano(
+      mascota.getTipo(),
+      mascota.getTamano()
+    );
 
     int frecuencia = lectura.getFrecuenciaCardiaca();
     double movimiento = magnitudVector(
