@@ -55,7 +55,6 @@
                             <select th:field="*{tipo}" id="select-tipo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all">
                                 <option value="PERRO">Perro</option>
                                 <option value="GATO">Gato</option>
-                                <option value="OTRO">Otro</option>
                             </select>
                         </div>
 
@@ -88,12 +87,11 @@
                             <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
                                 <i data-lucide="maximize" class="w-4 h-4 text-slate-400"></i> Tamaño
                             </label>
-                            <select th:field="*{tamano}" id="select-tamano" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                            <select th:field="*{tamano}" id="select-tamano" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all">
                                 <option value="PEQUENO">Pequeño</option>
                                 <option value="MEDIANO">Mediano</option>
                                 <option value="GRANDE">Grande</option>
                             </select>
-                            <p id="hint-tamano-gato" class="text-xs text-slate-400 hidden">Los gatos se categorizan siempre como tamaño Pequeño.</p>
                         </div>
 
                         <div class="space-y-2">
@@ -122,16 +120,13 @@
   lucide.createIcons();
 
   const selectTipo = document.getElementById('select-tipo');
+  const grupoTamano = document.getElementById('grupo-tamano');
   const selectTamano = document.getElementById('select-tamano');
-  const hintTamanoGato = document.getElementById('hint-tamano-gato');
 
   function toggleTamano() {
     const esGato = selectTipo.value === 'GATO';
+    grupoTamano.classList.toggle('hidden', esGato);
     selectTamano.disabled = esGato;
-    hintTamanoGato.classList.toggle('hidden', !esGato);
-    if (esGato) {
-      selectTamano.value = 'PEQUENO';
-    }
   }
 
   selectTipo.addEventListener('change', toggleTamano);
