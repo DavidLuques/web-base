@@ -30,8 +30,8 @@ public class Vallado {
   @Column(name = "radio_metros", nullable = false)
   private Integer radioMetros;
 
-  @Column(name = "activo", columnDefinition = "boolean default true")
-  private Boolean activo = true;
+  @Column(name = "activo", columnDefinition = "boolean default false")
+  private Boolean activo = false;
 
   public Vallado() {}
 

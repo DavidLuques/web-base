@@ -68,4 +68,9 @@ public class ValladoTest {
     assertNull(valladoVacio.getId());
     assertNull(valladoVacio.getMascota());
   }
+
+  @Test
+  void debeEstarDesactivadoPorDefecto() {
+    assertFalse(vallado.getActivo());
+  }
 }
