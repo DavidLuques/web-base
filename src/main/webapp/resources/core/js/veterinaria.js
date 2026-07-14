@@ -4,12 +4,12 @@
 /* eslint-disable no-unused-vars */
 
 const preciosPorTipo = {
-    "Consulta General": 15000,
-    "Estudios": 25000,
-    "Vacunación": 12000,
-    "Cirugía": 80000,
-    "Urgencia": 30000
-  };
+  "Consulta General": 15000,
+  "Estudios": 25000,
+  "Vacunación": 12000,
+  "Cirugía": 80000,
+  "Urgencia": 30000
+};
 
 
 function inicializarMapaVeterinarias() {
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       selectHora.disabled = false;
-      selectHora.innerHTML = '<option value="">Cargando horarios...</option>';
+      selectHora.innerHTML = "<option value=\"\">Cargando horarios...</option>";
 
       try {
         const response = await fetch(`/spring/analisis/veterinaria/turnos-ocupados?veterinaria=${encodeURIComponent(vetSeleccionada)}&fecha=${fechaSeleccionada}`);
@@ -282,13 +282,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
       } catch (error) {
         console.error("Error al obtener horarios", error);
-        selectHora.innerHTML = '<option value="">Error al cargar horarios</option>';
+        selectHora.innerHTML = "<option value=\"\">Error al cargar horarios</option>";
       }
     });
   }
 
   function generarOpcionesDeHorario(ocupados) {
-    selectHora.innerHTML = '<option value="">Elegí un horario</option>';
+    selectHora.innerHTML = "<option value=\"\">Elegí un horario</option>";
 
     const horaInicio = 9;
     const horaFin = 18;
@@ -323,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const tipo = this.value;
       const precio = preciosPorTipo[tipo] || 15000;
       // Formatear el precio con separadores de miles
-      textoPrecio.textContent = `Valor de la consulta: $${precio.toLocaleString('es-AR')}`;
+      textoPrecio.textContent = `Valor de la consulta: $${precio.toLocaleString("es-AR")}`;
     });
 
     // Ejecutar una vez al cargar para establecer el precio inicial
