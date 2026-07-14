@@ -11,6 +11,7 @@ import com.tallerwebi.dominio.dao.RegistroHistorialDao;
 import com.tallerwebi.dominio.dao.TurnoVeterinariaDao;
 import com.tallerwebi.dominio.enums.EstadoTurno;
 import com.tallerwebi.dominio.enums.TipoAlerta;
+import com.tallerwebi.dominio.excepcion.ExcepcionTurnoInvalido;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.TurnoVeterinaria;
 import java.time.LocalDateTime;
@@ -48,7 +49,7 @@ public class ServicioVeterinariaTest {
     mascotaMock.setId(idMascota);
     when(mascotaDaoMock.buscarPorId(idMascota)).thenReturn(mascotaMock);
 
-    LocalDateTime fecha = LocalDateTime.now().plusDays(2);
+    LocalDateTime fecha = LocalDateTime.of(2026, 12, 15, 10, 30);
 
     servicioVeterinaria.agendarTurno(
       idMascota,
@@ -62,6 +63,34 @@ public class ServicioVeterinariaTest {
     verify(turnoDaoMock, times(1)).guardar(any(TurnoVeterinaria.class));
     verify(servicioAlertaMock, times(1))
       .crearAlertaUsuario(any(), eq(TipoAlerta.INFO), anyString());
+  }
+
+  @Test
+  public void queNoSePuedaAgendarTurnoSiLosMinutosNoSonExactos() {
+    Long idMascota = 1L;
+    Mascota mascotaMock = new Mascota();
+    mascotaMock.setId(idMascota);
+    when(mascotaDaoMock.buscarPorId(idMascota)).thenReturn(mascotaMock);
+
+    LocalDateTime fechaInvalida = LocalDateTime.of(2026, 12, 15, 10, 15);
+
+    // Se verifica que al intentar agendar, se lance la excepción esperada
+    org.junit.jupiter.api.Assertions.assertThrows(
+      ExcepcionTurnoInvalido.class,
+      () -> {
+        servicioVeterinaria.agendarTurno(
+          idMascota,
+          "Vet Centro",
+          "Av. San Martin 123",
+          fechaInvalida,
+          "Consulta General",
+          "Control"
+        );
+      }
+    );
+
+    // Se verifica que el turno nunca llegó a guardarse
+    verify(turnoDaoMock, never()).guardar(any(TurnoVeterinaria.class));
   }
 
   @Test
