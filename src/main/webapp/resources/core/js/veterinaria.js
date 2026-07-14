@@ -3,6 +3,15 @@
 /* global FullCalendar, lucide */
 /* eslint-disable no-unused-vars */
 
+const preciosPorTipo = {
+    "Consulta General": 15000,
+    "Estudios": 25000,
+    "Vacunación": 12000,
+    "Cirugía": 80000,
+    "Urgencia": 30000
+  };
+
+
 function inicializarMapaVeterinarias() {
   let map = null;
   let marcadorOrigen = null;
@@ -174,6 +183,8 @@ function inicializarCalendarioTurnos() {
       start: turno.fechaYHora,
       color: "#3b82f6",
       description: turno.motivo,
+      tipoTurno: turno.tipoTurno,
+      direccion: turno.direccion,
       esPasado: false
     });
   });
@@ -183,6 +194,8 @@ function inicializarCalendarioTurnos() {
       title: turno.nombreVeterinaria + " (Completado)",
       start: turno.fechaYHora,
       color: "#94a3b8",
+      tipoTurno: turno.tipoTurno,
+      direccion: turno.direccion,
       esPasado: true
     });
   });
@@ -211,6 +224,10 @@ function inicializarCalendarioTurnos() {
         const opcionesFecha = { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" };
         document.getElementById("modal-vet-fecha").innerText = info.event.start.toLocaleDateString("es-AR", opcionesFecha);
         document.getElementById("modal-vet-motivo").innerText = props.description || "Sin especificar";
+        document.getElementById("modal-vet-tipo").textContent = props.tipoTurno;
+        const precio = preciosPorTipo[props.tipoTurno] || 15000;
+        document.getElementById("modal-vet-precio").textContent = `$${precio.toLocaleString('es-AR')}`;
+        document.getElementById("modal-vet-direccion").textContent = props.direccion || "Dirección no registrada";
 
         if (!props.esPasado && info.event.id) {
           formParaCancelar.action = urlBase + info.event.id + "/cancelar";
@@ -232,3 +249,84 @@ function cerrarModalTurno() {
   const modalVisible = document.getElementById("modal-turno");
   modalVisible.classList.add("hidden");
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const inputFecha = document.getElementById("input-fecha-turno");
+  const selectHora = document.getElementById("select-hora-turno");
+  const inputVetNombre = document.getElementById("form-vet-nombre");
+
+  const hoy = new Date().toISOString().split("T")[0];
+  if (inputFecha) {
+    inputFecha.setAttribute("min", hoy);
+  }
+
+  if (inputFecha) {
+    inputFecha.addEventListener("change", async function () {
+      const fechaSeleccionada = this.value;
+      const vetSeleccionada = inputVetNombre.value;
+
+      if (!vetSeleccionada) {
+        alert("Por favor, primero seleccioná una veterinaria en el mapa.");
+        this.value = "";
+        return;
+      }
+
+      selectHora.disabled = false;
+      selectHora.innerHTML = '<option value="">Cargando horarios...</option>';
+
+      try {
+        const response = await fetch(`/spring/analisis/veterinaria/turnos-ocupados?veterinaria=${encodeURIComponent(vetSeleccionada)}&fecha=${fechaSeleccionada}`);
+        const ocupados = await response.json(); // Ej: ["10:00", "15:30"]
+
+        generarOpcionesDeHorario(ocupados);
+
+      } catch (error) {
+        console.error("Error al obtener horarios", error);
+        selectHora.innerHTML = '<option value="">Error al cargar horarios</option>';
+      }
+    });
+  }
+
+  function generarOpcionesDeHorario(ocupados) {
+    selectHora.innerHTML = '<option value="">Elegí un horario</option>';
+
+    const horaInicio = 9;
+    const horaFin = 18;
+
+    for (let h = horaInicio; h < horaFin; h++) {
+      const fracciones = ["00", "30"];
+
+      fracciones.forEach(min => {
+        const horaString = `${h.toString().padStart(2, '0')}:${min}`;
+
+        const option = document.createElement("option");
+        option.value = horaString;
+
+        if (ocupados.includes(horaString)) {
+          option.textContent = `${horaString} - (Ocupado)`;
+          option.disabled = true;
+          option.style.color = "#94a3b8";
+        } else {
+          option.textContent = horaString;
+        }
+
+        selectHora.appendChild(option);
+      });
+    }
+  }
+
+  const selectTipoTurno = document.getElementById("select-tipo-turno");
+  const textoPrecio = document.getElementById("texto-precio-informativo");
+
+  if (selectTipoTurno && textoPrecio) {
+    selectTipoTurno.addEventListener("change", function () {
+      const tipo = this.value;
+      const precio = preciosPorTipo[tipo] || 15000;
+      // Formatear el precio con separadores de miles
+      textoPrecio.textContent = `Valor de la consulta: $${precio.toLocaleString('es-AR')}`;
+    });
+
+    // Ejecutar una vez al cargar para establecer el precio inicial
+    selectTipoTurno.dispatchEvent(new Event("change"));
+  }
+});

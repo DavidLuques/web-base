@@ -5,11 +5,11 @@ import com.tallerwebi.dominio.modelo.RegistroHistorial;
 import com.tallerwebi.dominio.modelo.TurnoVeterinaria;
 import com.tallerwebi.dominio.servicio.ServicioMascota;
 import com.tallerwebi.dominio.servicio.ServicioVeterinaria;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +57,9 @@ public class ControladorVeterinaria {
       mapa.put("id", t.getId().toString());
       mapa.put("nombreVeterinaria", t.getNombreVeterinaria());
       mapa.put("fechaYHora", t.getFechaYHora().toString());
+      mapa.put("direccion", t.getDireccionVeterinaria());
       mapa.put("motivo", t.getMotivo());
+      mapa.put("tipoTurno", t.getTipoTurno() != null ? t.getTipoTurno() : "Consulta General");
       proximosParaJS.add(mapa);
     }
 
@@ -87,13 +89,22 @@ public class ControladorVeterinaria {
     @RequestParam("idMascota") Long idMascota,
     @RequestParam("nombreVeterinaria") String nombre,
     @RequestParam("direccionVeterinaria") String direccion,
-    @RequestParam("fechaYHora") @DateTimeFormat(
-      iso = DateTimeFormat.ISO.DATE_TIME
-    ) LocalDateTime fecha,
+    @RequestParam("fechaForm") String fecha,
+    @RequestParam("horaForm") String hora,
+    @RequestParam("tipoTurno") String tipoTurno,
     @RequestParam(value = "motivo", required = false) String motivo
   ) {
     try {
-      servicioVeterinaria.agendarTurno(idMascota, nombre, direccion, fecha, motivo);
+      LocalDateTime fechaYHoraUnida = LocalDateTime.parse(fecha + "T" + hora);
+
+      servicioVeterinaria.agendarTurno(
+        idMascota,
+        nombre,
+        direccion,
+        fechaYHoraUnida,
+        tipoTurno,
+        motivo
+      );
       return new ModelAndView(
         "redirect:/analisis/veterinaria/mascota/" + idMascota + "?exito=turno_guardado"
       );
@@ -117,5 +128,17 @@ public class ControladorVeterinaria {
     return new ModelAndView(
       "redirect:/analisis/veterinaria/mascota/" + idMascota + "?exito=turno_cancelado"
     );
+  }
+
+  @GetMapping("/turnos-ocupados")
+  @ResponseBody
+  public List<String> obtenerHorariosOcupados(
+    @RequestParam("veterinaria") String veterinaria,
+    @RequestParam("fecha") String fechaStr
+  ) {
+    // Transformamos el string "2026-12-12" a un objeto LocalDate
+    LocalDate fecha = LocalDate.parse(fechaStr);
+
+    return servicioVeterinaria.obtenerHorariosOcupados(veterinaria, fecha);
   }
 }

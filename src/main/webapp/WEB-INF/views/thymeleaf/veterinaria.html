@@ -54,7 +54,8 @@
             class="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-lg py-2 font-semibold transition-colors">Buscar</button>
         </div>
 
-        <div id="lista-veterinarias" class="bg-white rounded-2xl border border-slate-200 h-[250px] lg:h-[300px] overflow-y-auto">
+        <div id="lista-veterinarias"
+          class="bg-white rounded-2xl border border-slate-200 h-[250px] lg:h-[300px] overflow-y-auto">
           <p class="text-slate-400 text-sm p-4 text-center">Ingresá tu dirección para ver opciones cercanas.</p>
         </div>
 
@@ -68,9 +69,33 @@
             placeholder="Seleccioná una del mapa" required />
           <input type="hidden" id="form-vet-direccion" name="direccionVeterinaria" />
 
-          <label class="text-sm font-semibold text-blue-800">Fecha y Hora:</label>
-          <input type="datetime-local" name="fechaYHora"
-            class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm mb-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+          <label class="text-sm font-semibold text-blue-800 mt-2">Tipo de consulta:</label>
+          <select id="select-tipo-turno" name="tipoTurno"
+            class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm mb-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            required>
+            <option value="Consulta General">Consulta General</option>
+            <option value="Estudios">Estudios / Análisis</option>
+            <option value="Vacunación">Vacunación</option>
+            <option value="Cirugía">Cirugía</option>
+            <option value="Urgencia">Urgencia</option>
+          </select>
+
+          <div class="grid grid-cols-2 gap-3 mb-2">
+            <div>
+              <label class="text-sm font-semibold text-blue-800">Fecha:</label>
+              <input type="date" id="input-fecha-turno" name="fechaForm"
+                class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                required />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-blue-800">Hora:</label>
+              <select id="select-hora-turno" name="horaForm" disabled
+                class="w-full bg-white border border-blue-200 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400"
+                required>
+                <option value="">Elegí la fecha primero...</option>
+              </select>
+            </div>
+          </div>
 
           <label class="text-sm font-semibold text-blue-800">Motivo de la consulta:</label>
           <textarea name="motivo" rows="2"
@@ -78,8 +103,19 @@
 
           <input type="hidden" name="idMascota" th:value="${idMascota}" />
 
+          <div class="mb-4 bg-indigo-50 border border-indigo-100 p-3 rounded-lg flex gap-3 items-start">
+            <i data-lucide="info" class="w-5 h-5 text-indigo-500 shrink-0 mt-0.5"></i>
+            <div>
+              <p id="texto-precio-informativo" class="text-sm font-semibold text-indigo-900">Valor de la consulta:
+                $15.000</p>
+              <p class="text-xs text-indigo-700 mt-1">El pago se realiza presencialmente en la veterinaria el día del
+                turno.</p>
+            </div>
+          </div>
+
           <button type="submit"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition-colors">Confirmar Reserva</button>
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition-colors">Confirmar
+            Reserva</button>
         </form>
       </div>
 
@@ -100,7 +136,7 @@
         </div>
       </div>
     </div>
-    
+
     <div id="modal-turno"
       class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center transition-opacity p-4">
       <div class="bg-white rounded-2xl p-5 lg:p-6 w-full max-w-sm shadow-xl relative border border-slate-200">
@@ -118,13 +154,25 @@
         </div>
 
         <div class="space-y-3 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <div class="flex items-center gap-1.5 mt-2 text-slate-500">
+            <i data-lucide="map-pin" class="w-4 h-4"></i>
+            <span id="modal-vet-direccion" class="text-sm font-medium">Dirección de la veterinaria</span>
+          </div>
           <div>
             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Fecha y Hora</p>
             <p class="text-sm font-medium text-slate-800" id="modal-vet-fecha">12/12/2026 15:30</p>
           </div>
           <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tipo de Turno</p>
+            <p class="text-sm font-medium text-slate-800" id="modal-vet-tipo">Consulta General</p>
+          </div>
+          <div>
             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Motivo</p>
             <p class="text-sm font-medium text-slate-800" id="modal-vet-motivo">Revisión general</p>
+          </div>
+          <div class="pt-2 border-t border-slate-200">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">A abonar en sucursal</p>
+            <p class="text-lg font-bold text-emerald-600" id="modal-vet-precio">$15.000</p>
           </div>
         </div>
 
@@ -139,14 +187,14 @@
       </div>
     </div>
   </main>
-  
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
 
   <script th:inline="javascript">
-      window.turnosProximosData = /*[[${proximosJS}]]*/ [];
-      window.turnosPasadosData = /*[[${pasadosJS}]]*/ [];
-      window.urlBaseTurnos = /*[[@{/analisis/veterinaria/turno/}]]*/ '/analisis/veterinaria/turno/';
+    window.turnosProximosData = /*[[${proximosJS}]]*/[];
+    window.turnosPasadosData = /*[[${pasadosJS}]]*/[];
+    window.urlBaseTurnos = /*[[@{/analisis/veterinaria/turno/}]]*/ '/analisis/veterinaria/turno/';
   </script>
 
   <script th:src="@{/js/veterinaria.js}"></script>

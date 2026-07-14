@@ -53,7 +53,10 @@ public class ControladorVeterinariaTest {
     Long idMascota = 1L;
     String nombreVet = "Centro Veterinario";
     String direccion = "Calle Falsa 123";
-    LocalDateTime fecha = LocalDateTime.now();
+
+    String fecha = "2026-12-12";
+    String hora = "15:30";
+    String tipoTurno = "Consulta General";
     String motivo = "Consulta";
 
     ModelAndView mav = controladorVeterinaria.agendarTurno(
@@ -61,6 +64,8 @@ public class ControladorVeterinariaTest {
       nombreVet,
       direccion,
       fecha,
+      hora,
+      tipoTurno,
       motivo
     );
 
@@ -68,8 +73,11 @@ public class ControladorVeterinariaTest {
       "redirect:/analisis/veterinaria/mascota/1?exito=turno_guardado",
       mav.getViewName()
     );
+
+    LocalDateTime fechaYHoraEsperada = LocalDateTime.parse(fecha + "T" + hora);
+
     verify(servicioVeterinariaMock, times(1))
-      .agendarTurno(idMascota, nombreVet, direccion, fecha, motivo);
+      .agendarTurno(idMascota, nombreVet, direccion, fechaYHoraEsperada, tipoTurno, motivo);
   }
 
   @Test
@@ -89,24 +97,22 @@ public class ControladorVeterinariaTest {
   @Test
   public void queSiOcurreUnErrorAlAgendarRedirijaConParametroDeError() {
     Long idMascota = 1L;
+
     doThrow(new RuntimeException("Fallo en la base de datos"))
       .when(servicioVeterinariaMock)
-      .agendarTurno(anyLong(), anyString(), anyString(), any(), anyString());
+      .agendarTurno(anyLong(), anyString(), anyString(), any(), anyString(), anyString());
 
     ModelAndView mav = controladorVeterinaria.agendarTurno(
       idMascota,
       "Vet",
       "Dir",
-      LocalDateTime.now(),
+      "2026-12-12",
+      "15:30",
+      "Consulta General",
       "Motivo"
     );
 
-    // Debe ir por el 'catch' y devolver la URL con el error
-    assertTrue(mav.getViewName().contains("error=fallo_reserva"));
-    assertEquals(
-      "No se pudo agendar el turno: Fallo en la base de datos",
-      mav.getModel().get("error")
-    );
+    assertEquals("redirect:/analisis/veterinaria/mascota/1?error=fallo_reserva", mav.getViewName());
   }
 
   @Test

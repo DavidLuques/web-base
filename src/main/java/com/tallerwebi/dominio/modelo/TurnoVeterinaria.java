@@ -32,6 +32,8 @@ public class TurnoVeterinaria {
   @Column(nullable = false)
   private EstadoTurno estado = EstadoTurno.PENDIENTE;
 
+  private String tipoTurno;
+
   public Long getId() {
     return id;
   }
@@ -86,5 +88,13 @@ public class TurnoVeterinaria {
 
   public void setEstado(EstadoTurno estado) {
     this.estado = estado;
+  }
+
+  public String getTipoTurno() {
+    return tipoTurno;
+  }
+
+  public void setTipoTurno(String tipoTurno) {
+    this.tipoTurno = tipoTurno;
   }
 }

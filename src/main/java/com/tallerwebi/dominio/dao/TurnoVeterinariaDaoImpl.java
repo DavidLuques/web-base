@@ -2,6 +2,7 @@ package com.tallerwebi.dominio.dao;
 
 import com.tallerwebi.dominio.enums.EstadoTurno;
 import com.tallerwebi.dominio.modelo.TurnoVeterinaria;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.hibernate.SessionFactory;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository("turnoVeterinariaDao")
 public class TurnoVeterinariaDaoImpl implements TurnoVeterinariaDao {
 
+  private static final String PARAM_ESTADO_CANCELADO = "estadoCancelado";
   private final SessionFactory sessionFactory;
 
   @Autowired
@@ -48,8 +50,7 @@ public class TurnoVeterinariaDaoImpl implements TurnoVeterinariaDao {
     query.setParameter("idMascota", idMascota);
     query.setParameter("fechaActual", fechaActual);
 
-    // Acá usamos directamente el Enum gracias al import
-    query.setParameter("estadoCancelado", EstadoTurno.CANCELADO);
+    query.setParameter(PARAM_ESTADO_CANCELADO, EstadoTurno.CANCELADO);
     return query.getResultList();
   }
 
@@ -64,7 +65,61 @@ public class TurnoVeterinariaDaoImpl implements TurnoVeterinariaDao {
     query.setParameter("idMascota", idMascota);
     query.setParameter("fechaActual", fechaActual);
 
-    query.setParameter("estadoCancelado", EstadoTurno.CANCELADO);
+    query.setParameter(PARAM_ESTADO_CANCELADO, EstadoTurno.CANCELADO);
     return query.getResultList();
+  }
+
+  @Override
+  public boolean existeTurnoParaMascotaEnFecha(Long idMascota, LocalDateTime fecha) {
+    String hql =
+      "SELECT count(t) FROM TurnoVeterinaria t WHERE t.mascota.id = :idMascota AND t.fechaYHora = :fecha AND t.estado != :estadoCancelado";
+    Long count = (Long) sessionFactory
+      .getCurrentSession()
+      .createQuery(hql)
+      .setParameter("idMascota", idMascota)
+      .setParameter("fecha", fecha)
+      .setParameter(PARAM_ESTADO_CANCELADO, EstadoTurno.CANCELADO)
+      .uniqueResult();
+    return count > 0;
+  }
+
+  @Override
+  public boolean existeTurnoEnVeterinariaEnFecha(String nombreVeterinaria, LocalDateTime fecha) {
+    String hql =
+      "SELECT count(t) FROM TurnoVeterinaria t WHERE t.nombreVeterinaria = :nombreVeterinaria AND t.fechaYHora = :fecha AND t.estado != :estadoCancelado";
+    Long count = (Long) sessionFactory
+      .getCurrentSession()
+      .createQuery(hql)
+      .setParameter("nombreVeterinaria", nombreVeterinaria)
+      .setParameter("fecha", fecha)
+      .setParameter(PARAM_ESTADO_CANCELADO, EstadoTurno.CANCELADO)
+      .uniqueResult();
+    return count > 0;
+  }
+
+  @Override
+  public List<LocalDateTime> obtenerFechasOcupadasEnVeterinaria(
+    String nombreVeterinaria,
+    LocalDate fecha
+  ) {
+    // Establecemos el rango del día completo
+    LocalDateTime inicioDia = fecha.atStartOfDay();
+    LocalDateTime finDia = fecha.plusDays(1).atStartOfDay();
+
+    String hql =
+      "SELECT t.fechaYHora FROM TurnoVeterinaria t " +
+      "WHERE t.nombreVeterinaria = :nombreVeterinaria " +
+      "AND t.fechaYHora >= :inicioDia " +
+      "AND t.fechaYHora < :finDia " +
+      "AND t.estado != :estadoCancelado";
+
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(hql, LocalDateTime.class)
+      .setParameter("nombreVeterinaria", nombreVeterinaria)
+      .setParameter("inicioDia", inicioDia)
+      .setParameter("finDia", finDia)
+      .setParameter(PARAM_ESTADO_CANCELADO, EstadoTurno.CANCELADO)
+      .getResultList();
   }
 }

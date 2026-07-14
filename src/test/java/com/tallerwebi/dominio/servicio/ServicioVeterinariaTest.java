@@ -55,6 +55,7 @@ public class ServicioVeterinariaTest {
       "Vet Centro",
       "Av. San Martin 123",
       fecha,
+      "Consulta General",
       "Control"
     );
 
@@ -76,6 +77,7 @@ public class ServicioVeterinariaTest {
           "Vet Centro",
           "Direccion",
           LocalDateTime.now(),
+          "Consulta General",
           "Motivo"
         );
       }
