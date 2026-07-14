@@ -111,7 +111,7 @@ function inicializarMapaVeterinarias() {
 
     } catch (error) {
       console.error("Error buscando veterinarias con Overpass:", error);
-      listaSugerencias.innerHTML = "<p class='text-red-500 text-sm p-4'>Error de conexión al buscar veterinarias.</p>";
+      listaSugerencias.innerHTML = "<p class='text-red-500 text-sm p-4'>El servicio de mapas está temporalmente saturado. Por favor, vuelve a buscar en unos segundos.</p>";
     }
   }
 
