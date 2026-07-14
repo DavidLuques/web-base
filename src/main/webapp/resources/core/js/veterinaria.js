@@ -226,7 +226,7 @@ function inicializarCalendarioTurnos() {
         document.getElementById("modal-vet-motivo").innerText = props.description || "Sin especificar";
         document.getElementById("modal-vet-tipo").textContent = props.tipoTurno;
         const precio = preciosPorTipo[props.tipoTurno] || 15000;
-        document.getElementById("modal-vet-precio").textContent = `$${precio.toLocaleString('es-AR')}`;
+        document.getElementById("modal-vet-precio").textContent = `$${precio.toLocaleString("es-AR")}`;
         document.getElementById("modal-vet-direccion").textContent = props.direccion || "Dirección no registrada";
 
         if (!props.esPasado && info.event.id) {
@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const fracciones = ["00", "30"];
 
       fracciones.forEach(min => {
-        const horaString = `${h.toString().padStart(2, '0')}:${min}`;
+        const horaString = `${h.toString().padStart(2, "0")}:${min}`;
 
         const option = document.createElement("option");
         option.value = horaString;
