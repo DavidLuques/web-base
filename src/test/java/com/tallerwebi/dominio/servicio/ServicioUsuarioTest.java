@@ -186,9 +186,11 @@ public class ServicioUsuarioTest {
   public void queAlActualizarPerfilConPasswordSeLaHashea() {
     Long id = 1L;
     Usuario usuario = new Usuario();
+    usuario.setPassword(BCrypt.hashpw("passwordVieja", BCrypt.gensalt()));
     when(repositorioMock.buscarPorId(id)).thenReturn(usuario);
 
     DatosPerfil datos = new DatosPerfil();
+    datos.setPasswordAnterior("passwordVieja");
     datos.setPassword("miPassword123");
 
     servicio.actualizarPerfil(id, datos);
@@ -196,6 +198,20 @@ public class ServicioUsuarioTest {
     assertNotNull(usuario.getPassword());
     assertNotEquals("miPassword123", usuario.getPassword());
     assertTrue(BCrypt.checkpw("miPassword123", usuario.getPassword()));
+  }
+
+  @Test
+  public void queAlActualizarPerfilConPasswordAnteriorIncorrectaLanzaExcepcion() {
+    Long id = 1L;
+    Usuario usuario = new Usuario();
+    usuario.setPassword(BCrypt.hashpw("passwordVieja", BCrypt.gensalt()));
+    when(repositorioMock.buscarPorId(id)).thenReturn(usuario);
+
+    DatosPerfil datos = new DatosPerfil();
+    datos.setPasswordAnterior("passwordIncorrecta");
+    datos.setPassword("miPassword123");
+
+    assertThrows(IllegalArgumentException.class, () -> servicio.actualizarPerfil(id, datos));
   }
 
   @Test

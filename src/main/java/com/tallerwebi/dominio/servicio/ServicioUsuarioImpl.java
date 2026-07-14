@@ -87,7 +87,10 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
     usuario.setTelefono(datosPerfil.getTelefono());
 
     if (datosPerfil.getPassword() != null && !datosPerfil.getPassword().isEmpty()) {
-      if (datosPerfil.getPasswordAnterior() == null || !BCrypt.checkpw(datosPerfil.getPasswordAnterior(), usuario.getPassword())) {
+      if (
+        datosPerfil.getPasswordAnterior() == null ||
+        !BCrypt.checkpw(datosPerfil.getPasswordAnterior(), usuario.getPassword())
+      ) {
         throw new IllegalArgumentException("La contraseña anterior es incorrecta.");
       }
       usuario.setPassword(BCrypt.hashpw(datosPerfil.getPassword(), BCrypt.gensalt()));
