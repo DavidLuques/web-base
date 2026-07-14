@@ -80,7 +80,7 @@ public class ControladorPerfil {
         ? "redirect:/perfil?exito=true&idMascota=" + idMascota
         : "redirect:/perfil?exito=true";
       return new ModelAndView(redirectUrl);
-    } catch (UsuarioNoEncontrado e) {
+    } catch (UsuarioNoEncontrado | IllegalArgumentException e) {
       ModelMap modelo = servicioPerfil.prepararModeloErrorActualizar(
         idUsuario,
         datosPerfil,

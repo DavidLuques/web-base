@@ -8,6 +8,7 @@ public class DatosPerfil {
   private String nombre;
   private String email;
   private String password;
+  private String passwordAnterior;
   private Long telefono;
   private String calle;
   private String ciudad;
@@ -39,6 +40,14 @@ public class DatosPerfil {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public String getPasswordAnterior() {
+    return passwordAnterior;
+  }
+
+  public void setPasswordAnterior(String passwordAnterior) {
+    this.passwordAnterior = passwordAnterior;
   }
 
   public Long getTelefono() {
