@@ -1,5 +1,5 @@
 /* global ApexCharts, idMascota, lucide */
-/* exported abrirModal, cerrarModal */
+/* exported abrirModal, cerrarModal, abrirModalImpacto */
 
 var ultimosDatos  = {};
 var rangosVitales = {};

@@ -1,5 +1,5 @@
 /* global ApexCharts, idMascota, lucide */
-/* exported abrirModalSim, cerrarModalSim */
+/* exported conectarYActualizar, abrirModalSim, cerrarModalSim, abrirModalImpactoSim */
 
 var ultimosDatosSimulacion = {};
 
@@ -318,7 +318,7 @@ function actualizarBadge(estado) {
 // =========================
 function conectarYActualizar() {
   fetch("/spring/analisis/estado/" + idMascota, { cache: "no-store" })
-	.then(function(response) { return response.json(); })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
       ultimosDatosSimulacion = data;
 
@@ -450,5 +450,5 @@ document.getElementById("modal-impacto-sim").addEventListener("click", function(
 });
 
 lucide.createIcons();
-actualizarEstado();
-setInterval(actualizarEstado, 30000);
+conectarYActualizar();
+setInterval(conectarYActualizar, 30000);
