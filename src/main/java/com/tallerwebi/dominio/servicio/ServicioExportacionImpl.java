@@ -67,7 +67,9 @@ public class ServicioExportacionImpl implements ServicioExportacion {
     List<Alerta> alertasUltimos30Dias = alertas
       .stream()
       .filter(a ->
-        a.getFechaYHora() != null && a.getFechaYHora().isAfter(LocalDateTime.now().minusDays(30))
+        a.getFechaYHora() != null &&
+        a.getFechaYHora().isAfter(LocalDateTime.now().minusDays(30)) &&
+        (a.getMensaje() == null || !a.getMensaje().contains("area permitida"))
       )
       .collect(Collectors.toList());
 
