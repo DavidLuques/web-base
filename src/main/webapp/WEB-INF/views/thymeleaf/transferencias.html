@@ -197,35 +197,6 @@
     </div>
   </main>
 
-  <script>
-    (function () {
-      let hashInicial = null;
-      async function obtenerHash() {
-        try {
-          const res = await fetch('/spring/transferencias/estado');
-          if (!res.ok) return null;
-          const data = await res.json();
-          if (data.error) return null;
-          return data.hash;
-        } catch (_) {
-          return null;
-        }
-      }
-      async function iniciarPolling() {
-        hashInicial = await obtenerHash();
-        if (hashInicial === null) return;
-        setInterval(async () => {
-          const hashActual = await obtenerHash();
-          if (hashActual !== null && hashActual !== hashInicial) {
-        	  const params = new URLSearchParams(window.location.search);
-        	  const idMascota = params.get('idMascota');
-        	  window.location.href = '/spring/transferencias' + (idMascota ? '?idMascota=' + idMascota : '');
-          }
-        }, 3000);
-      }
-      iniciarPolling();
-    })();
-  </script>
   <script>lucide.createIcons();</script>
 </body>
 </html>

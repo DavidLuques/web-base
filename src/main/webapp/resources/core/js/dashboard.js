@@ -12,7 +12,7 @@ fetch("/spring/analisis/rangos/" + idMascota)
 // =========================
 // RANGO DE TIEMPO
 // =========================
-var rangoMinutos = 3;
+var rangoMinutos = 0;
 
 var selectorRango = document.getElementById("selector-rango");
 if (selectorRango) {
@@ -66,7 +66,7 @@ function aplicarFiltroRango() {
   var temperaturaFiltrada = indices.map(function(i) { return historialTemperatura[i]; });
   var sistolicaFiltrada   = indices.map(function(i) { return historialSistolica[i]; });
   var diastolicaFiltrada  = indices.map(function(i) { return historialDiastolica[i]; });
-  var pasosFiltrados      = indices.map(function(i) { return historialPasos[i] != null ? (historialPasos[i] - basePasos) : null; });
+  var pasosFiltrados = indices.map(function(i) { return historialPasos[i] != null ? Math.max(0, historialPasos[i] - basePasos) : null; });
 
   // Actualizar líneas
   chartLineaFrecuencia.updateOptions({  series: [{ data: frecuenciaFiltrada }],  xaxis: { categories: horasFiltradas } });
@@ -356,7 +356,7 @@ chartLineaPasos.render();
 // CONEXIÓN Y ACTUALIZACIÓN
 // =========================
 function conectarYActualizar() {
-  fetch("/spring/analisis/estado/" + idMascota)
+	fetch("/spring/analisis/estado/" + idMascota, { cache: 'no-store' })
     .then(function(response) { return response.json(); })
     .then(function(data) {
       ultimosDatos = data;

@@ -119,6 +119,34 @@
       }
     });
   </script>
+  
+  <script>
+  (function () {
+    let hashInicial = null;
+    async function obtenerHash() {
+      try {
+        const res = await fetch('/spring/transferencias/estado', { cache: 'no-store' });
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (data.error) return null;
+        return data.hash;
+      } catch (_) {
+        return null;
+      }
+    }
+    async function iniciarPollingGlobal() {
+      hashInicial = await obtenerHash();
+      if (hashInicial === null) return;
+      setInterval(async () => {
+        const hashActual = await obtenerHash();
+        if (hashActual !== null && hashActual !== hashInicial) {
+          window.location.href = '/spring/transferencias';
+        }
+      }, 3000);
+    }
+    iniciarPollingGlobal();
+  })();
+</script>
 
 </div>
 

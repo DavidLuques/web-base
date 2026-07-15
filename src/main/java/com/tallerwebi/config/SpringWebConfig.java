@@ -60,6 +60,10 @@ public class SpringWebConfig implements WebMvcConfigurer {
         "/webjars/**",
         "/img/**"
       );
+
+    registry
+      .addInterceptor(new com.tallerwebi.presentacion.interceptor.NoCacheInterceptor())
+      .addPathPatterns("/analisis/estado/**", "/transferencias/estado");
   }
 
   // https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html

@@ -12,7 +12,7 @@ var historialHoras      = [];
 var nivelesHoras        = {};
 
 var STORAGE_KEY  = "analisis_" + idMascota;
-var rangoMinutos = 3;
+var rangoMinutos = 0;
 
 // =========================
 // RANGO DE TIEMPO
@@ -68,10 +68,10 @@ function aplicarFiltroRango() {
   var basePasos     = limite !== null ? valorAcumuladoEnLimite(historialPasos, limite)      : 0;
 
   var horasFiltradas      = indices.map(function(i) { return historialHoras[i]; });
-  var distanciasFiltradas = indices.map(function(i) { return historialDistancias[i] != null ? Number((historialDistancias[i] - baseDistancia).toFixed(2)) : null; });
-  var caloriasFiltradas   = indices.map(function(i) { return historialCalorias[i]   != null ? Number((historialCalorias[i]   - baseCalorias).toFixed(1))  : null; });
-  var suenoFiltrado       = indices.map(function(i) { return historialSueno[i]      != null ? (historialSueno[i]      - baseSueno)                        : null; });
-  var pasosFiltrados      = indices.map(function(i) { return historialPasos[i]      != null ? (historialPasos[i]      - basePasos)                        : null; });
+  var distanciasFiltradas = indices.map(function(i) { return historialDistancias[i] != null ? Math.max(0, Number((historialDistancias[i] - baseDistancia).toFixed(2))) : null; });
+  var caloriasFiltradas   = indices.map(function(i) { return historialCalorias[i]   != null ? Math.max(0, Number((historialCalorias[i]   - baseCalorias).toFixed(1)))  : null; });
+  var suenoFiltrado       = indices.map(function(i) { return historialSueno[i]      != null ? Math.max(0, historialSueno[i]      - baseSueno)                          : null; });
+  var pasosFiltrados      = indices.map(function(i) { return historialPasos[i]      != null ? Math.max(0, historialPasos[i]      - basePasos)                          : null; });
 
   // Actualizar líneas (ahora muestran lo acumulado DENTRO de la ventana elegida, arrancando en 0)
   chartHistorialDistancia.updateOptions({ series: [{ data: distanciasFiltradas }], xaxis: { categories: horasFiltradas } });
@@ -317,7 +317,7 @@ function actualizarBadge(estado) {
 // POLLING
 // =========================
 function actualizarEstado() {
-  fetch("/spring/analisis/estado/" + idMascota)
+	fetch("/spring/analisis/estado/" + idMascota, { cache: 'no-store' })
     .then(function(response) { return response.json(); })
     .then(function(data) {
       ultimosDatosSimulacion = data;
