@@ -25,3 +25,9 @@ VALUES ('Firulais', 'CAMINANDO', 'MEDIANO', 'Labrador', 'Macho', 'PERRO', 10.5, 
 
 INSERT INTO vallado (id_mascota, latitud_centro, longitud_centro, radio_metros)
 VALUES (1, -34.7222, -58.5250, 150.0);
+
+INSERT INTO Usuario(id, email, password, rol, activo, nombre, telefono, calle, ciudad, pais, codigoPostal, provincia, notificaciones_mail_activas)
+VALUES(null, 'luques.cc@gmail.com', '$2a$10$BrBw0uvjc9DLu7vl0J.8POSMmw/UJJyF6J.KKxX/2V/LBRe.ySQcG', 'USER', true, 'David luques', '1123906876', 'av siempre viva 111', 'Saltavilla', 'Argentina', '1842', 'Buenos Aires', false);
+
+INSERT INTO Usuario(id, email, password, rol, activo, nombre, telefono, calle, ciudad, pais, codigoPostal, provincia, notificaciones_mail_activas)
+VALUES(null, 'marcheschi97@hotmail.com', '$2a$10$1UK5Mno2SyZKsXbHdlGgoO8ii7CPaBNK90As2IYg3xiXX0QStS4Fu', 'USER', true, 'Sebastian Marcheschi', '1122334455', 'av siempre viva 111', 'saltavilla', 'Uruguay', '1842', 'Montevideo', false);
