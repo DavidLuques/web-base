@@ -317,8 +317,8 @@ function actualizarBadge(estado) {
 // POLLING
 // =========================
 function actualizarEstado() {
-	fetch("/spring/analisis/estado/" + idMascota, { cache: 'no-store' })
-    .then(function(response) { return response.json(); })
+  	fetch("/spring/analisis/estado/" + idMascota, { cache: "no-store" })    
+	.then(function(response) { return response.json(); })
     .then(function(data) {
       ultimosDatosSimulacion = data;
 
