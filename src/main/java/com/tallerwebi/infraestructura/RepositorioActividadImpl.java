@@ -2,6 +2,7 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.modelo.Actividad;
+import java.util.List;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,5 +35,17 @@ public class RepositorioActividadImpl implements RepositorioActividad {
       .setParameter("mascotaId", mascotaId)
       .uniqueResult();
     return (resultado != null) ? resultado : 0.0;
+  }
+
+  @Override
+  public List<Actividad> buscarPorMascota(Long idMascota) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "FROM Actividad a WHERE a.mascota.id = :idMascota ORDER BY a.fechaYHora ASC",
+        Actividad.class
+      )
+      .setParameter("idMascota", idMascota)
+      .getResultList();
   }
 }

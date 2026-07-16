@@ -44,4 +44,16 @@ public class RepositorioAnalisisImpl implements RepositorioAnalisis {
       .setParameter("idMascota", idMascota)
       .getResultList();
   }
+
+  @Override
+  public List<Analisis> buscarPorMascotaAsc(Long idMascota) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "FROM Analisis a WHERE a.mascota.id = :idMascota ORDER BY a.fechaYHora ASC",
+        Analisis.class
+      )
+      .setParameter("idMascota", idMascota)
+      .getResultList();
+  }
 }

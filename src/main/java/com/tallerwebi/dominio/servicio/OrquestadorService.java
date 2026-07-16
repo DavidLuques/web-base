@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio.servicio;
 
+import com.tallerwebi.dominio.dto.HistorialDto;
 import com.tallerwebi.dominio.dto.ImpactoDatosDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
@@ -26,4 +27,6 @@ public interface OrquestadorService {
   Map<String, Object> obtenerVallado(Long idMascota);
 
   ImpactoDatosDto obtenerImpactoDatos(Long idMascota);
+
+  HistorialDto obtenerHistorial(Long idMascota);
 }

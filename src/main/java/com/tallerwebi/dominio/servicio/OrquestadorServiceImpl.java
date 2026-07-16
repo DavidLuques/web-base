@@ -2,11 +2,15 @@ package com.tallerwebi.dominio.servicio;
 
 import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
+import com.tallerwebi.dominio.RepositorioRegistroEstado;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dao.ValladoDao;
+import com.tallerwebi.dominio.dto.HistorialDto;
 import com.tallerwebi.dominio.dto.ImpactoDatosDto;
+import com.tallerwebi.dominio.dto.NivelHoraDto;
+import com.tallerwebi.dominio.dto.PuntoHistorialDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
@@ -17,11 +21,15 @@ import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
+import com.tallerwebi.dominio.modelo.RegistroEstado;
 import com.tallerwebi.dominio.modelo.RegistroSueno;
 import com.tallerwebi.dominio.modelo.Vallado;
 import com.tallerwebi.dominio.tamano.ComportamientoTamano;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +47,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private static final String CLAVE_LATITUD = "latitud";
   private static final String CLAVE_LONGITUD = "longitud";
   private static final String CLAVE_RADIO = "radio";
+  private static final DateTimeFormatter FORMATTER_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
   private final MascotaDao mascotaDao;
   private final ValladoDao valladoDao;
@@ -49,6 +58,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
   private final RepositorioSueno repositorioSueno;
   private final RepositorioAnalisis repositorioAnalisis;
   private final RangoVitalDao rangoVitalDao;
+  private final RepositorioRegistroEstado repositorioRegistroEstado;
 
   @Autowired
   public OrquestadorServiceImpl(
@@ -59,6 +69,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     RepositorioActividad repositorioActividad,
     RepositorioSueno repositorioSueno,
     RepositorioAnalisis repositorioAnalisis,
+    RepositorioRegistroEstado repositorioRegistroEstado,
     RangoVitalDao rangoVitalDao,
     ValladoDao valladoDao
   ) {
@@ -69,6 +80,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     this.repositorioActividad = repositorioActividad;
     this.repositorioSueno = repositorioSueno;
     this.repositorioAnalisis = repositorioAnalisis;
+    this.repositorioRegistroEstado = repositorioRegistroEstado;
     this.rangoVitalDao = rangoVitalDao;
     this.valladoDao = valladoDao;
   }
@@ -90,6 +102,7 @@ public class OrquestadorServiceImpl implements OrquestadorService {
     mascota.setEstadoActual(estado);
     mascotaDao.modificar(mascota);
 
+    persistirEstado(mascota, estado);
     persistirSuenoSiCorresponde(mascota, estado);
     persistirActividadSiCorresponde(mascota, estado, lectura);
     persistirLectura(mascota, lectura);
@@ -360,5 +373,171 @@ public class OrquestadorServiceImpl implements OrquestadorService {
       comportamientoEstado != null ? comportamientoEstado.getVelocidadKmH() : null
     );
     return dto;
+  }
+
+  private void persistirEstado(Mascota mascota, EstadoMascota estado) {
+    RegistroEstado registro = new RegistroEstado();
+    registro.setEstado(estado);
+    registro.setFechaYHora(LocalDateTime.now());
+    registro.setMascota(mascota);
+    repositorioRegistroEstado.guardar(registro);
+  }
+
+  /**
+   * Se suprime DataflowAnomalyAnalysis: PMD reporta falsos positivos sobre
+   * variables definidas antes de un for-each (actividadList, suenoList,
+   * acumulador) y usadas en cada vuelta del loop. Es un patrón acumulador
+   * estándar; no hay una anomalía real de dataflow.
+   */
+  @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+  @Override
+  public HistorialDto obtenerHistorial(Long idMascota) {
+    Mascota mascota = mascotaDao.buscarPorId(idMascota);
+    if (mascota == null) {
+      return new HistorialDto();
+    }
+
+    List<Analisis> analisisList = repositorioAnalisis.buscarPorMascotaAsc(idMascota);
+    List<Actividad> actividadList = repositorioActividad.buscarPorMascota(idMascota);
+    List<RegistroSueno> suenoList = repositorioSueno.buscarPorMascota(idMascota);
+    List<RegistroEstado> estadoList = repositorioRegistroEstado.buscarPorMascota(idMascota);
+
+    AcumuladorHistorial acumulador = new AcumuladorHistorial(mascota.getEstadoActual());
+    List<PuntoHistorialDto> puntos = new ArrayList<>();
+
+    for (Analisis analisis : analisisList) {
+      acumulador.avanzarHasta(analisis.getFechaYHora(), actividadList, suenoList, estadoList);
+      puntos.add(construirPunto(analisis, acumulador, mascota));
+    }
+
+    HistorialDto dto = new HistorialDto();
+    dto.setPuntos(puntos);
+    dto.setNivelesActividad(construirNivelesActividad(estadoList));
+    return dto;
+  }
+
+  private PuntoHistorialDto construirPunto(
+    Analisis analisis,
+    AcumuladorHistorial acumulador,
+    Mascota mascota
+  ) {
+    Integer pasos = analizadorDeDatosService.calcularPasos(
+      acumulador.distanciaAcumulada,
+      mascota.getTamano()
+    );
+    Double calorias = analizadorDeDatosService.calcularCalorias(
+      acumulador.distanciaAcumulada,
+      acumulador.estadoVigente,
+      mascota.getPeso()
+    );
+
+    PuntoHistorialDto punto = new PuntoHistorialDto();
+    punto.setFechaYHora(
+      analisis.getFechaYHora().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    );
+    punto.setFrecuenciaCardiaca(analisis.getDatos().getFrecuenciaCardiaca());
+    punto.setPresionSistolica(analisis.getDatos().getPresionSistolica());
+    punto.setPresionDiastolica(analisis.getDatos().getPresionDiastolica());
+    punto.setTemperatura(analisis.getDatos().getTemperatura());
+    punto.setDistanciaAcumulada(Math.round(acumulador.distanciaAcumulada * 100.0) / 100.0);
+    punto.setCaloriasAcumuladas(calorias != null ? Math.round(calorias * 10.0) / 10.0 : null);
+    punto.setMinutosDormidosAcumulados(acumulador.minutosAcumulados);
+    punto.setPasosAcumulados(pasos);
+    return punto;
+  }
+
+  /**
+   * Encapsula el estado que se va acumulando a medida que se recorren
+   * cronológicamente los análisis, para no tener variables primitivas
+   * sueltas viviendo a lo largo de todo el método (evita anomalías de
+   * dataflow y baja la complejidad ciclomática de obtenerHistorial).
+   */
+  private static final class AcumuladorHistorial {
+
+    private double distanciaAcumulada = 0.0;
+    private int minutosAcumulados = 0;
+    private int idxActividad = 0;
+    private int idxSueno = 0;
+    private int idxEstado = 0;
+    private EstadoMascota estadoVigente;
+
+    private AcumuladorHistorial(EstadoMascota estadoInicial) {
+      this.estadoVigente = estadoInicial;
+    }
+
+    private void avanzarHasta(
+      LocalDateTime ts,
+      List<Actividad> actividadList,
+      List<RegistroSueno> suenoList,
+      List<RegistroEstado> estadoList
+    ) {
+      while (
+        idxActividad < actividadList.size() &&
+        !actividadList.get(idxActividad).getFechaYHora().isAfter(ts)
+      ) {
+        distanciaAcumulada += actividadList.get(idxActividad).getDistanciaRecorrida();
+        idxActividad++;
+      }
+      while (idxSueno < suenoList.size() && !suenoList.get(idxSueno).getFechaYHora().isAfter(ts)) {
+        minutosAcumulados += suenoList.get(idxSueno).getMinutosDormido();
+        idxSueno++;
+      }
+      while (
+        idxEstado < estadoList.size() && !estadoList.get(idxEstado).getFechaYHora().isAfter(ts)
+      ) {
+        estadoVigente = estadoList.get(idxEstado).getEstado();
+        idxEstado++;
+      }
+    }
+  }
+
+  private List<NivelHoraDto> construirNivelesActividad(List<RegistroEstado> estadoList) {
+    LinkedHashMap<String, ContadorNivel> mapa = new LinkedHashMap<>();
+
+    for (RegistroEstado registro : estadoList) {
+      String hora = redondearHora(registro.getFechaYHora());
+      ContadorNivel contador = mapa.computeIfAbsent(hora, k -> new ContadorNivel());
+      contador.incrementar(registro.getEstado());
+    }
+
+    List<NivelHoraDto> resultado = new ArrayList<>();
+    for (Map.Entry<String, ContadorNivel> entry : mapa.entrySet()) {
+      ContadorNivel contador = entry.getValue();
+      NivelHoraDto nivel = new NivelHoraDto();
+      nivel.setHora(entry.getKey());
+      nivel.setIntenso(contador.intenso);
+      nivel.setModerado(contador.moderado);
+      nivel.setLiviano(contador.liviano);
+      resultado.add(nivel);
+    }
+    return resultado;
+  }
+
+  private String redondearHora(LocalDateTime ts) {
+    int minutoRedondeado = (ts.getMinute() / 5) * 5;
+    LocalDateTime tsRedondeado = ts.withMinute(minutoRedondeado).withSecond(0).withNano(0);
+    return tsRedondeado.format(FORMATTER_HORA);
+  }
+
+  /**
+   * Reemplaza el int[3] original: cada entrada del mapa de niveles de
+   * actividad tiene su propio contador, en vez de reusar un mismo array
+   * a lo largo de todas las iteraciones del loop.
+   */
+  private static final class ContadorNivel {
+
+    private int intenso = 0;
+    private int moderado = 0;
+    private int liviano = 0;
+
+    private void incrementar(EstadoMascota estado) {
+      if (estado == EstadoMascota.CORRIENDO) {
+        intenso++;
+      } else if (estado == EstadoMascota.CAMINANDO) {
+        moderado++;
+      } else {
+        liviano++;
+      }
+    }
   }
 }

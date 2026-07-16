@@ -9,19 +9,25 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.RepositorioActividad;
 import com.tallerwebi.dominio.RepositorioAnalisis;
+import com.tallerwebi.dominio.RepositorioRegistroEstado;
 import com.tallerwebi.dominio.RepositorioSueno;
 import com.tallerwebi.dominio.dao.MascotaDao;
 import com.tallerwebi.dominio.dao.RangoVitalDao;
 import com.tallerwebi.dominio.dao.ValladoDao;
+import com.tallerwebi.dominio.dto.HistorialDto;
+import com.tallerwebi.dominio.dto.ImpactoDatosDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
 import com.tallerwebi.dominio.enums.TamanoMascota;
 import com.tallerwebi.dominio.enums.TipoMascota;
+import com.tallerwebi.dominio.modelo.Actividad;
 import com.tallerwebi.dominio.modelo.Analisis;
 import com.tallerwebi.dominio.modelo.DatosAnalisis;
 import com.tallerwebi.dominio.modelo.LecturaSensor;
 import com.tallerwebi.dominio.modelo.Mascota;
 import com.tallerwebi.dominio.modelo.RangoVitalPorTamano;
+import com.tallerwebi.dominio.modelo.RegistroEstado;
+import com.tallerwebi.dominio.modelo.RegistroSueno;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +46,7 @@ public class OrquestadorServiceImplTest {
   private RepositorioActividad repositorioActividad;
   private RepositorioSueno repositorioSueno;
   private RepositorioAnalisis repositorioAnalisis;
+  private RepositorioRegistroEstado repositorioRegistroEstado;
   private RangoVitalDao rangoVitalDao;
   private RangoVitalPorTamano rango;
 
@@ -55,6 +62,7 @@ public class OrquestadorServiceImplTest {
     repositorioActividad = mock(RepositorioActividad.class);
     repositorioSueno = mock(RepositorioSueno.class);
     repositorioAnalisis = mock(RepositorioAnalisis.class);
+    repositorioRegistroEstado = mock(RepositorioRegistroEstado.class);
     rangoVitalDao = mock(RangoVitalDao.class);
     valladoDao = mock(ValladoDao.class);
 
@@ -67,6 +75,7 @@ public class OrquestadorServiceImplTest {
         repositorioActividad,
         repositorioSueno,
         repositorioAnalisis,
+        repositorioRegistroEstado,
         rangoVitalDao,
         valladoDao
       );
@@ -360,5 +369,178 @@ public class OrquestadorServiceImplTest {
     servicio.procesarMascota(1L);
 
     verify(repositorioActividad, never()).guardar(any());
+  }
+
+  // ── obtenerImpactoDatos ─────────────────────────────────────────
+
+  @Test
+  void obtenerImpactoDatosDeberiaRetornarNullSiLaMascotaNoExiste() {
+    when(mascotaDao.buscarPorId(99L)).thenReturn(null);
+
+    ImpactoDatosDto resultado = servicio.obtenerImpactoDatos(99L);
+
+    assertThat(resultado, nullValue());
+  }
+
+  @Test
+  void obtenerImpactoDatosDeberiaRetornarPesoYTamanoDeLaMascota() {
+    ImpactoDatosDto resultado = servicio.obtenerImpactoDatos(1L);
+
+    assertThat(resultado.getPeso(), equalTo(10.5));
+    assertThat(resultado.getTamano(), equalTo(TamanoMascota.MEDIANO.name()));
+  }
+
+  @Test
+  void obtenerImpactoDatosDeberiaRetornarElEstadoActualDeLaMascota() {
+    ImpactoDatosDto resultado = servicio.obtenerImpactoDatos(1L);
+
+    assertThat(resultado.getEstadoActual(), equalTo(EstadoMascota.CAMINANDO.name()));
+    assertThat(resultado.getMetActual(), notNullValue());
+    assertThat(resultado.getVelocidadActualKmH(), notNullValue());
+  }
+
+  @Test
+  void obtenerImpactoDatosDeberiaRetornarMetYVelocidadNulosSiNoHayEstado() {
+    mascota.setEstadoActual(null);
+
+    ImpactoDatosDto resultado = servicio.obtenerImpactoDatos(1L);
+
+    assertThat(resultado.getEstadoActual(), nullValue());
+    assertThat(resultado.getMetActual(), nullValue());
+    assertThat(resultado.getVelocidadActualKmH(), nullValue());
+  }
+
+  // ── obtenerHistorial ────────────────────────────────────────────
+
+  @Test
+  void obtenerHistorialDeberiaRetornarDtoVacioSiLaMascotaNoExiste() {
+    when(mascotaDao.buscarPorId(99L)).thenReturn(null);
+
+    HistorialDto resultado = servicio.obtenerHistorial(99L);
+
+    assertThat(resultado, notNullValue());
+    verify(repositorioAnalisis, never()).buscarPorMascotaAsc(any());
+  }
+
+  @Test
+  void obtenerHistorialDeberiaAcumularDistanciaYMinutosEnOrdenCronologico() {
+    LocalDateTime tPrevia = LocalDateTime.of(2026, 7, 1, 10, 0);
+    LocalDateTime t1 = LocalDateTime.of(2026, 7, 1, 10, 10);
+    LocalDateTime tEntreT1yT2 = LocalDateTime.of(2026, 7, 1, 10, 15);
+    LocalDateTime t2 = LocalDateTime.of(2026, 7, 1, 10, 20);
+
+    DatosAnalisis datos = new DatosAnalisis();
+    datos.setFrecuenciaCardiaca(90);
+    datos.setPresionSistolica(120);
+    datos.setPresionDiastolica(80);
+    datos.setTemperatura(38.0);
+
+    Analisis analisis1 = new Analisis();
+    analisis1.setFechaYHora(t1);
+    analisis1.setDatos(datos);
+
+    Analisis analisis2 = new Analisis();
+    analisis2.setFechaYHora(t2);
+    analisis2.setDatos(datos);
+
+    Actividad actividadPrevia = new Actividad();
+    actividadPrevia.setFechaYHora(tPrevia);
+    actividadPrevia.setDistanciaRecorrida(0.5);
+
+    Actividad actividadEntreT1yT2 = new Actividad();
+    actividadEntreT1yT2.setFechaYHora(tEntreT1yT2);
+    actividadEntreT1yT2.setDistanciaRecorrida(0.3);
+
+    RegistroSueno sueno = new RegistroSueno();
+    sueno.setFechaYHora(tPrevia);
+    sueno.setMinutosDormido(10);
+
+    RegistroEstado estadoCorriendo = new RegistroEstado();
+    estadoCorriendo.setFechaYHora(tPrevia);
+    estadoCorriendo.setEstado(EstadoMascota.CORRIENDO);
+
+    when(repositorioAnalisis.buscarPorMascotaAsc(1L)).thenReturn(List.of(analisis1, analisis2));
+    when(repositorioActividad.buscarPorMascota(1L))
+      .thenReturn(List.of(actividadPrevia, actividadEntreT1yT2));
+    when(repositorioSueno.buscarPorMascota(1L)).thenReturn(List.of(sueno));
+    when(repositorioRegistroEstado.buscarPorMascota(1L)).thenReturn(List.of(estadoCorriendo));
+
+    when(analizadorDeDatosService.calcularPasos(anyDouble(), any())).thenReturn(500);
+    when(analizadorDeDatosService.calcularCalorias(anyDouble(), any(), anyDouble()))
+      .thenReturn(20.0);
+
+    HistorialDto resultado = servicio.obtenerHistorial(1L);
+
+    assertThat(resultado.getPuntos(), hasSize(2));
+    assertThat(resultado.getPuntos().get(0).getDistanciaAcumulada(), equalTo(0.5));
+    assertThat(resultado.getPuntos().get(0).getMinutosDormidosAcumulados(), equalTo(10));
+    assertThat(resultado.getPuntos().get(1).getDistanciaAcumulada(), equalTo(0.8));
+    assertThat(resultado.getPuntos().get(1).getMinutosDormidosAcumulados(), equalTo(10));
+
+    // el registro de estado CORRIENDO es previo a ambos análisis, así que
+    // el estado vigente usado para calcular calorías debe ser CORRIENDO
+    // y no el estado actual de la mascota (CAMINANDO).
+    verify(analizadorDeDatosService, times(2))
+      .calcularCalorias(anyDouble(), eq(EstadoMascota.CORRIENDO), anyDouble());
+  }
+
+  @Test
+  void obtenerHistorialDeberiaUsarElEstadoActualDeLaMascotaSiNoHayRegistrosDeEstadoPrevios() {
+    LocalDateTime t1 = LocalDateTime.of(2026, 7, 1, 10, 10);
+
+    DatosAnalisis datos = new DatosAnalisis();
+    datos.setFrecuenciaCardiaca(90);
+
+    Analisis analisis1 = new Analisis();
+    analisis1.setFechaYHora(t1);
+    analisis1.setDatos(datos);
+
+    when(repositorioAnalisis.buscarPorMascotaAsc(1L)).thenReturn(List.of(analisis1));
+    when(repositorioActividad.buscarPorMascota(1L)).thenReturn(List.of());
+    when(repositorioSueno.buscarPorMascota(1L)).thenReturn(List.of());
+    when(repositorioRegistroEstado.buscarPorMascota(1L)).thenReturn(List.of());
+
+    when(analizadorDeDatosService.calcularPasos(anyDouble(), any())).thenReturn(0);
+    when(analizadorDeDatosService.calcularCalorias(anyDouble(), any(), anyDouble()))
+      .thenReturn(0.0);
+
+    servicio.obtenerHistorial(1L);
+
+    verify(analizadorDeDatosService)
+      .calcularCalorias(anyDouble(), eq(EstadoMascota.CAMINANDO), anyDouble());
+  }
+
+  @Test
+  void obtenerHistorialDeberiaAgruparNivelesDeActividadPorFranjaDeCincoMinutos() {
+    LocalDateTime t1 = LocalDateTime.of(2026, 7, 1, 10, 10);
+    LocalDateTime t1MismaFranja = LocalDateTime.of(2026, 7, 1, 10, 12);
+    LocalDateTime t2 = LocalDateTime.of(2026, 7, 1, 10, 20);
+
+    RegistroEstado corriendo1 = new RegistroEstado();
+    corriendo1.setFechaYHora(t1);
+    corriendo1.setEstado(EstadoMascota.CORRIENDO);
+
+    RegistroEstado corriendo2 = new RegistroEstado();
+    corriendo2.setFechaYHora(t1MismaFranja);
+    corriendo2.setEstado(EstadoMascota.CORRIENDO);
+
+    RegistroEstado caminando = new RegistroEstado();
+    caminando.setFechaYHora(t2);
+    caminando.setEstado(EstadoMascota.CAMINANDO);
+
+    when(repositorioAnalisis.buscarPorMascotaAsc(1L)).thenReturn(List.of());
+    when(repositorioActividad.buscarPorMascota(1L)).thenReturn(List.of());
+    when(repositorioSueno.buscarPorMascota(1L)).thenReturn(List.of());
+    when(repositorioRegistroEstado.buscarPorMascota(1L))
+      .thenReturn(List.of(corriendo1, corriendo2, caminando));
+
+    HistorialDto resultado = servicio.obtenerHistorial(1L);
+
+    assertThat(resultado.getNivelesActividad(), hasSize(2));
+    assertThat(resultado.getNivelesActividad().get(0).getHora(), equalTo("10:10"));
+    assertThat(resultado.getNivelesActividad().get(0).getIntenso(), equalTo(2));
+    assertThat(resultado.getNivelesActividad().get(0).getModerado(), equalTo(0));
+    assertThat(resultado.getNivelesActividad().get(1).getHora(), equalTo("10:20"));
+    assertThat(resultado.getNivelesActividad().get(1).getModerado(), equalTo(1));
   }
 }

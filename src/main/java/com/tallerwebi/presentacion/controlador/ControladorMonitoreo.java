@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion.controlador;
 
+import com.tallerwebi.dominio.dto.HistorialDto;
 import com.tallerwebi.dominio.dto.ImpactoDatosDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/analisis")
 public class ControladorMonitoreo {
+
+  private static final String JSON_UTF8 = "application/json;charset=UTF-8";
 
   private final OrquestadorService orquestadorService;
   private final ServicioMascota servicioMascota;
@@ -49,13 +52,13 @@ public class ControladorMonitoreo {
     return "simulacion";
   }
 
-  @GetMapping(value = "/estado/{idMascota}", produces = "application/json;charset=UTF-8")
+  @GetMapping(value = "/estado/{idMascota}", produces = JSON_UTF8)
   @ResponseBody
   public ResultadoSimulacionDto obtenerEstado(@PathVariable Long idMascota) {
     return orquestadorService.refrescarLectura(idMascota);
   }
 
-  @GetMapping(value = "/rangos/{idMascota}", produces = "application/json;charset=UTF-8")
+  @GetMapping(value = "/rangos/{idMascota}", produces = JSON_UTF8)
   @ResponseBody
   public RangosVitalesDto obtenerRangosVitales(@PathVariable Long idMascota) {
     return orquestadorService.obtenerRangosVitales(idMascota);
@@ -72,14 +75,21 @@ public class ControladorMonitoreo {
     if (idUsuario != null) {
       model.addAttribute("misMascotas", servicioMascota.obtenerMascotasPorUsuario(idUsuario));
     }
+
     ResultadoSimulacionDto estado = orquestadorService.obtenerUltimoEstado(idMascota);
     model.addAttribute("mascotaNombre", estado != null ? estado.getNombreMascota() : "Mascota");
     return "dashboard";
   }
 
-  @GetMapping(value = "/impacto/{idMascota}", produces = "application/json;charset=UTF-8")
+  @GetMapping(value = "/impacto/{idMascota}", produces = JSON_UTF8)
   @ResponseBody
   public ImpactoDatosDto obtenerImpactoDatos(@PathVariable Long idMascota) {
     return orquestadorService.obtenerImpactoDatos(idMascota);
+  }
+
+  @GetMapping(value = "/historial/{idMascota}", produces = JSON_UTF8)
+  @ResponseBody
+  public HistorialDto obtenerHistorial(@PathVariable Long idMascota) {
+    return orquestadorService.obtenerHistorial(idMascota);
   }
 }

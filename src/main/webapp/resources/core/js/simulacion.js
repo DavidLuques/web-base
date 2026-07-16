@@ -11,7 +11,6 @@ var historialPasos      = [];
 var historialHoras      = [];
 var nivelesHoras        = {};
 
-var STORAGE_KEY  = "analisis_" + idMascota;
 var rangoMinutos = 0;
 
 // =========================
@@ -106,53 +105,6 @@ function aplicarFiltroRango() {
     chartPasos.updateOptions({ series: [Math.min((pa / 10000) * 100, 100)], plotOptions: { radialBar: { dataLabels: { value: { formatter: function() { return pa.toLocaleString("es-AR"); } } } } } });
   }
 }
-
-// =========================
-// PERSISTENCIA
-// =========================
-function cargarEstado() {
-  try {
-    var guardado = sessionStorage.getItem(STORAGE_KEY);
-    if (!guardado) { return; }
-    var s = JSON.parse(guardado);
-    historialTimestamps = (s.historialTimestamps || []).map(function(t) { return new Date(t); });
-    historialDistancias = s.historialDistancias || [];
-    historialCalorias   = s.historialCalorias   || [];
-    historialSueno      = s.historialSueno      || [];
-    historialPasos      = s.historialPasos      || [];
-    historialHoras      = s.historialHoras      || [];
-    nivelesHoras        = s.nivelesHoras        || {};
-  } catch (e) { console.warn("No se pudo cargar el estado guardado:", e); }
-}
-
-function guardarEstado() {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-      historialTimestamps: historialTimestamps.map(function(t) { return t.toISOString(); }),
-      historialDistancias: historialDistancias,
-      historialCalorias:   historialCalorias,
-      historialSueno:      historialSueno,
-      historialPasos:      historialPasos,
-      historialHoras:      historialHoras,
-      nivelesHoras:        nivelesHoras
-    }));
-  } catch (e) { console.warn("No se pudo guardar el estado:", e); }
-}
-
-function limpiarViejos() {
-  if (rangoMinutos === 0) { return; }
-  var limite = new Date(ahora().getTime() - 60 * 60 * 1000);
-  while (historialTimestamps.length > 0 && historialTimestamps[0] < limite) {
-    historialTimestamps.shift();
-    historialHoras.shift();
-    historialDistancias.shift();
-    historialCalorias.shift();
-    historialSueno.shift();
-    historialPasos.shift();
-  }
-}
-
-cargarEstado();
 
 // =========================
 // NIVELES DE ACTIVIDAD
@@ -346,9 +298,7 @@ function conectarYActualizar() {
         xaxis: { categories: niveles.categorias }
       });
 
-      limpiarViejos();
       aplicarFiltroRango();
-      guardarEstado();
     })
     .catch(function(error) { console.error("Error al actualizar estado:", error); });
 }
@@ -445,10 +395,42 @@ function cerrarModalImpactoSim() {
   document.getElementById("modal-impacto-sim").classList.add("hidden");
 }
 
+function cargarHistorialDesdeBackend() {
+  return fetch("/spring/analisis/historial/" + idMascota, { cache: "no-store" })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      (data.puntos || []).forEach(function(p) {
+        var ts = new Date(p.fechaYHora);
+        historialTimestamps.push(ts);
+        historialHoras.push(ts.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+        historialDistancias.push(p.distanciaAcumulada != null ? p.distanciaAcumulada : null);
+        historialCalorias.push(p.caloriasAcumuladas != null ? p.caloriasAcumuladas : null);
+        historialSueno.push(p.minutosDormidosAcumulados != null ? p.minutosDormidosAcumulados : null);
+        historialPasos.push(p.pasosAcumulados != null ? p.pasosAcumulados : null);
+      });
+      (data.nivelesActividad || []).forEach(function(n) {
+        nivelesHoras[n.hora] = { intenso: n.intenso, moderado: n.moderado, liviano: n.liviano };
+      });
+    })
+    .catch(function(error) { console.warn("No se pudo cargar el historial:", error); });
+}
+
 document.getElementById("modal-impacto-sim").addEventListener("click", function(e) {
   if (e.target === this) { cerrarModalImpactoSim(); }
 });
 
 lucide.createIcons();
-conectarYActualizar();
-setInterval(conectarYActualizar, 30000);
+cargarHistorialDesdeBackend().then(function() {
+  var niveles = getNivelesSeriesYCategorias();
+  chartNiveles.updateOptions({
+    series: [
+      { name: "Intenso",  data: niveles.intenso  },
+      { name: "Moderado", data: niveles.moderado },
+      { name: "Liviano",  data: niveles.liviano  }
+    ],
+    xaxis: { categories: niveles.categorias }
+  });
+  aplicarFiltroRango();
+  conectarYActualizar();
+  setInterval(conectarYActualizar, 30000);
+});

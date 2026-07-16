@@ -215,36 +215,6 @@ var historialTemperatura = [];
 var historialSistolica   = [];
 var historialDiastolica  = [];
 var historialPasos       = [];
-var STORAGE_KEY          = "dashboard_" + idMascota;
-
-function cargarEstado() {
-  try {
-    var guardado = sessionStorage.getItem(STORAGE_KEY);
-    if (!guardado) { return; }
-    var s = JSON.parse(guardado);
-    historialTimestamps  = (s.historialTimestamps  || []).map(function(t) { return new Date(t); });
-    historialHoras       = s.historialHoras       || [];
-    historialFrecuencia  = s.historialFrecuencia  || [];
-    historialTemperatura = s.historialTemperatura || [];
-    historialSistolica   = s.historialSistolica   || [];
-    historialDiastolica  = s.historialDiastolica  || [];
-    historialPasos       = s.historialPasos       || [];
-  } catch (e) { console.warn("No se pudo cargar el estado:", e); }
-}
-
-function guardarEstado() {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-      historialTimestamps:  historialTimestamps.map(function(t) { return t.toISOString(); }),
-      historialHoras:       historialHoras,
-      historialFrecuencia:  historialFrecuencia,
-      historialTemperatura: historialTemperatura,
-      historialSistolica:   historialSistolica,
-      historialDiastolica:  historialDiastolica,
-      historialPasos:       historialPasos
-    }));
-  } catch (e) { console.warn("No se pudo guardar el estado:", e); }
-}
 
 function limpiarViejos() {
   // Solo limpia si NO estamos en modo "todo el historial"
@@ -260,8 +230,6 @@ function limpiarViejos() {
     historialPasos.shift();
   }
 }
-
-cargarEstado();
 
 // =========================
 // GRÁFICOS RADIALES
@@ -375,7 +343,6 @@ function conectarYActualizar() {
 
       limpiarViejos();
       aplicarFiltroRango();
-      guardarEstado();
     })
     .catch(function(error) { console.error("Error al conectar con el backend:", error); });
 }
@@ -389,10 +356,31 @@ function cerrarModalImpacto() {
   document.getElementById("modal-impacto").classList.add("hidden");
 }
 
+function cargarHistorialDesdeBackend() {
+  return fetch("/spring/analisis/historial/" + idMascota, { cache: "no-store" })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      (data.puntos || []).forEach(function(p) {
+        var ts = new Date(p.fechaYHora);
+        historialTimestamps.push(ts);
+        historialHoras.push(ts.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+        historialFrecuencia.push(p.frecuenciaCardiaca != null ? p.frecuenciaCardiaca : null);
+        historialTemperatura.push(p.temperatura != null ? p.temperatura : null);
+        historialSistolica.push(p.presionSistolica != null ? p.presionSistolica : null);
+        historialDiastolica.push(p.presionDiastolica != null ? p.presionDiastolica : null);
+        historialPasos.push(p.pasosAcumulados != null ? p.pasosAcumulados : null);
+      });
+    })
+    .catch(function(error) { console.warn("No se pudo cargar el historial:", error); });
+}
+
 document.getElementById("modal-impacto").addEventListener("click", function(e) {
   if (e.target === this) { cerrarModalImpacto(); }
 });
 
 lucide.createIcons();
-conectarYActualizar();
-setInterval(conectarYActualizar, 5000);
+cargarHistorialDesdeBackend().then(function() {
+  aplicarFiltroRango();
+  conectarYActualizar();
+  setInterval(conectarYActualizar, 5000);
+});

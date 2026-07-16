@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.dto.HistorialDto;
+import com.tallerwebi.dominio.dto.ImpactoDatosDto;
 import com.tallerwebi.dominio.dto.RangosVitalesDto;
 import com.tallerwebi.dominio.dto.ResultadoSimulacionDto;
 import com.tallerwebi.dominio.enums.EstadoMascota;
@@ -256,5 +258,86 @@ public class ControladorMonitoreoTest {
     controlador.procesarMascota(mascotaId);
 
     verify(orquestadorServiceMock, times(1)).procesarMascota(mascotaId);
+  }
+
+  // ── obtenerImpactoDatos ─────────────────────────────────────────
+
+  @Test
+  public void cuandoSolicitoImpactoDatosDevuelveElDtoCorrecto() {
+    Long mascotaId = 1L;
+
+    ImpactoDatosDto impactoMock = mock(ImpactoDatosDto.class);
+
+    when(orquestadorServiceMock.obtenerImpactoDatos(mascotaId)).thenReturn(impactoMock);
+
+    ImpactoDatosDto resultado = controlador.obtenerImpactoDatos(mascotaId);
+
+    assertThat(resultado, equalTo(impactoMock));
+    verify(orquestadorServiceMock).obtenerImpactoDatos(mascotaId);
+  }
+
+  @Test
+  public void cuandoSolicitoImpactoDatosDeMascotaInexistenteDevuelveNull() {
+    Long mascotaId = 99L;
+
+    when(orquestadorServiceMock.obtenerImpactoDatos(mascotaId)).thenReturn(null);
+
+    ImpactoDatosDto resultado = controlador.obtenerImpactoDatos(mascotaId);
+
+    assertThat(resultado, equalTo(null));
+    verify(orquestadorServiceMock).obtenerImpactoDatos(mascotaId);
+  }
+
+  @Test
+  public void cuandoSolicitoImpactoDatosSeLlamaAlServicioUnaVez() {
+    Long mascotaId = 1L;
+
+    when(orquestadorServiceMock.obtenerImpactoDatos(mascotaId)).thenReturn(
+      mock(ImpactoDatosDto.class)
+    );
+
+    controlador.obtenerImpactoDatos(mascotaId);
+
+    verify(orquestadorServiceMock, times(1)).obtenerImpactoDatos(mascotaId);
+  }
+
+  // ── obtenerHistorial ────────────────────────────────────────────
+
+  @Test
+  public void cuandoSolicitoHistorialDevuelveElDtoCorrecto() {
+    Long mascotaId = 1L;
+
+    HistorialDto historialMock = mock(HistorialDto.class);
+
+    when(orquestadorServiceMock.obtenerHistorial(mascotaId)).thenReturn(historialMock);
+
+    HistorialDto resultado = controlador.obtenerHistorial(mascotaId);
+
+    assertThat(resultado, equalTo(historialMock));
+    verify(orquestadorServiceMock).obtenerHistorial(mascotaId);
+  }
+
+  @Test
+  public void cuandoSolicitoHistorialDeMascotaInexistenteDevuelveDtoVacio() {
+    Long mascotaId = 99L;
+
+    HistorialDto historialVacio = new HistorialDto();
+
+    when(orquestadorServiceMock.obtenerHistorial(mascotaId)).thenReturn(historialVacio);
+
+    HistorialDto resultado = controlador.obtenerHistorial(mascotaId);
+
+    assertThat(resultado, equalTo(historialVacio));
+  }
+
+  @Test
+  public void cuandoSolicitoHistorialSeLlamaAlServicioUnaVez() {
+    Long mascotaId = 1L;
+
+    when(orquestadorServiceMock.obtenerHistorial(mascotaId)).thenReturn(mock(HistorialDto.class));
+
+    controlador.obtenerHistorial(mascotaId);
+
+    verify(orquestadorServiceMock, times(1)).obtenerHistorial(mascotaId);
   }
 }

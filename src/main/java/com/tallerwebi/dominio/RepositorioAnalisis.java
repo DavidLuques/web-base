@@ -11,4 +11,5 @@ public interface RepositorioAnalisis {
   Analisis obtenerUltimoAnalisis(Long id);
 
   List<Analisis> buscarPorMascota(Long idMascota);
+  List<Analisis> buscarPorMascotaAsc(Long idMascota);
 }
