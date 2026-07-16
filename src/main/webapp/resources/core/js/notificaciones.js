@@ -26,58 +26,65 @@
       if (Notification.permission !== "granted") return;
       if (!idMascota) return;
 
+      actualizarBadge(); // badge ahora es independiente
+
       const activasAhora = notificacionesWindowsActivas();
       const recienActivadas = estabanDesactivadas && activasAhora;
       estabanDesactivadas = !activasAhora;
 
+      if (!activasAhora) return;
+
       fetch("/spring/analisis/alertas/datos/" + idMascota)
-        .then(function (res) {
-          if (!res.ok) return null;
-          return res.json();
-        })
-        .then(function (alertas) {
-          if (!alertas || !Array.isArray(alertas)) return;
+          .then(function(res) { return res.ok ? res.json() : null; })
+          .then(function(alertas) {
+            if (!alertas || !Array.isArray(alertas)) return;
 
-          actualizarBadge(alertas);
-
-          if (!activasAhora) return;
-
-          alertas.forEach(function (alerta) {
-            if (alerta.tipo === "EMERGENCIA" && !alerta.leido) {
-              if (recienActivadas) {
-                notificadas.add(alerta.id);
-              } else if (!notificadas.has(alerta.id)) {
-                const notif = new Notification("⚠️ EMERGENCIA - PetTracker", {
-                  body: alerta.mensaje,
-                  tag: "emergencia-" + alerta.id,
-                  requireInteraction: false,
-                });
-                setTimeout(function () {
-                  notif.close();
-                }, 5000);
-                notificadas.add(alerta.id);
+            alertas.forEach(function(alerta) {
+              if (alerta.tipo === "EMERGENCIA" && !alerta.leido) {
+                if (recienActivadas) {
+                  notificadas.add(alerta.id);
+                } else if (!notificadas.has(alerta.id)) {
+                  const notif = new Notification("⚠️ EMERGENCIA - PetTracker", {
+                    body: alerta.mensaje,
+                    tag: "emergencia-" + alerta.id,
+                    requireInteraction: false,
+                  });
+                  setTimeout(function() { notif.close(); }, 5000);
+                  notificadas.add(alerta.id);
+                }
               }
-            }
-          });
-          guardarNotificadas();
-        })
-        .catch(function () {});
+            });
+            guardarNotificadas();
+          })
+          .catch(function() {});
     }
 
-    function actualizarBadge(alertas) {
+    function actualizarBadge() {
       const badge = document.getElementById("badge-alertas-sin-leer");
       if (!badge) return;
 
-      const sinLeer = alertas.filter(function (a) {
-        return !a.leido;
-      }).length;
+      const fetchMascota = idMascota
+          ? fetch("/spring/analisis/alertas/datos/" + idMascota).then(function(r) { return r.ok ? r.json() : []; })
+          : Promise.resolve([]);
 
-      if (sinLeer > 0) {
-        badge.textContent = sinLeer > 99 ? "99+" : sinLeer;
-        badge.classList.remove("hidden");
-      } else {
-        badge.classList.add("hidden");
-      }
+      const fetchUsuario = fetch("/spring/analisis/alertas/usuario").then(function(r) { return r.ok ? r.json() : []; });
+
+      Promise.all([fetchMascota, fetchUsuario])
+          .then(function(resultados) {
+            const alertasMascota = resultados[0] || [];
+            const alertasUsuario = resultados[1] || [];
+            const todas = alertasMascota.concat(alertasUsuario);
+
+            const sinLeer = todas.filter(function(a) { return !a.leido; }).length;
+
+            if (sinLeer > 0) {
+              badge.textContent = sinLeer > 99 ? "99+" : sinLeer;
+              badge.classList.remove("hidden");
+            } else {
+              badge.classList.add("hidden");
+            }
+          })
+          .catch(function() {});
     }
 
     chequearEmergencias();
