@@ -122,13 +122,6 @@ public class ServicioExportacionImpl implements ServicioExportacion {
         fontText
       )
     );
-    document.add(
-      new Paragraph(
-        "Estado actual: " +
-        (mascota.getEstadoActual() != null ? mascota.getEstadoActual().toString() : "-"),
-        fontText
-      )
-    );
 
     document.add(new Paragraph(" "));
   }
