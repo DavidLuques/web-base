@@ -1,4 +1,4 @@
-/* global L, lucide */
+ /* global L, lucide */
 
 // eslint-disable-next-line max-lines-per-function
 function inicializarValla(idMascota) {
@@ -299,6 +299,6 @@ function inicializarValla(idMascota) {
 
   cargarVallado().then(() => {
     actualizarPosicion();
-    setInterval(actualizarPosicion, 60000);
+    setInterval(actualizarPosicion, 10000);
   });
 }
