@@ -52,7 +52,6 @@
                   tag: "emergencia-" + alerta.id,
                   requireInteraction: false
                 });
-                setTimeout(function () { notif.close(); }, 5000);
                 notificadas.add(alerta.id);
               }
             }
