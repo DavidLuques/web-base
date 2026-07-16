@@ -1,14 +1,14 @@
 (function () {
   function inicializarNotificacionesBg(idMascota) {
-    const soporteNotification = "Notification" in window;
+    if (!("Notification" in window)) return;
 
-    if (soporteNotification && Notification.permission === "default") {
+    if (Notification.permission === "default") {
       Notification.requestPermission();
     }
 
-    const sessionKey = "alertas-notificadas-sesion-" + (idMascota || "global");
+    const sessionKey = "alertas-notificadas-sesion-" + idMascota;
     const notificadas = new Set(
-        JSON.parse(sessionStorage.getItem(sessionKey) || "[]")
+      JSON.parse(sessionStorage.getItem(sessionKey) || "[]")
     );
 
     function guardarNotificadas() {
@@ -16,15 +16,17 @@
     }
 
     function notificacionesWindowsActivas() {
-      const notifWindowsKey = "notificaciones-windows-activas-" + (idMascota || "global");
+      const notifWindowsKey = "notificaciones-windows-activas-" + idMascota;
       return localStorage.getItem(notifWindowsKey) === "true";
     }
 
     let estabanDesactivadas = !notificacionesWindowsActivas();
 
     function chequearEmergencias() {
-      if (!soporteNotification || Notification.permission !== "granted") return;
+      if (Notification.permission !== "granted") return;
       if (!idMascota) return;
+
+      actualizarBadge(); // badge ahora es independiente
 
       const activasAhora = notificacionesWindowsActivas();
       const recienActivadas = estabanDesactivadas && activasAhora;
@@ -85,13 +87,8 @@
           .catch(function() {});
     }
 
-    actualizarBadge();
-    setInterval(actualizarBadge, 10000);
-
-    if (idMascota && soporteNotification) {
-      chequearEmergencias();
-      setInterval(chequearEmergencias, 10000);
-    }
+    chequearEmergencias();
+    setInterval(chequearEmergencias, 10000);
   }
 
   window.inicializarNotificacionesBg = inicializarNotificacionesBg;
