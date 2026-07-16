@@ -292,9 +292,8 @@ public class ControladorMonitoreoTest {
   public void cuandoSolicitoImpactoDatosSeLlamaAlServicioUnaVez() {
     Long mascotaId = 1L;
 
-    when(orquestadorServiceMock.obtenerImpactoDatos(mascotaId)).thenReturn(
-      mock(ImpactoDatosDto.class)
-    );
+    when(orquestadorServiceMock.obtenerImpactoDatos(mascotaId))
+      .thenReturn(mock(ImpactoDatosDto.class));
 
     controlador.obtenerImpactoDatos(mascotaId);
 
