@@ -35,7 +35,10 @@
       if (!activasAhora) return;
 
       fetch("/spring/analisis/alertas/datos/" + idMascota)
-          .then(function (res) { return res.ok ? res.json() : null; })
+          .then(function (res) {
+            if (!res.ok) return null;
+            return res.json();
+          })
           .then(function (alertas) {
             if (!alertas || !Array.isArray(alertas)) return;
 
@@ -44,10 +47,10 @@
                 if (recienActivadas) {
                   notificadas.add(alerta.id);
                 } else if (!notificadas.has(alerta.id)) {
-                  const notif = new Notification("⚠️ EMERGENCIA - PetTracker", {
+                  const notif = new Notification("\u26a0\ufe0f EMERGENCIA - PetTracker", {
                     body: alerta.mensaje,
                     tag: "emergencia-" + alerta.id,
-                    requireInteraction: false,
+                    requireInteraction: false
                   });
                   setTimeout(function () { notif.close(); }, 5000);
                   notificadas.add(alerta.id);
@@ -67,7 +70,8 @@
           ? fetch("/spring/analisis/alertas/datos/" + idMascota).then(function (r) { return r.ok ? r.json() : []; })
           : Promise.resolve([]);
 
-      const fetchUsuario = fetch("/spring/analisis/alertas/usuario").then(function (r) { return r.ok ? r.json() : []; });
+      const fetchUsuario = fetch("/spring/analisis/alertas/usuario")
+          .then(function (r) { return r.ok ? r.json() : []; });
 
       Promise.all([fetchMascota, fetchUsuario])
           .then(function (resultados) {
