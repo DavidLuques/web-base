@@ -1,4 +1,4 @@
- /* global L, lucide */
+/* global L, lucide */
 
 // eslint-disable-next-line max-lines-per-function
 function inicializarValla(idMascota) {
